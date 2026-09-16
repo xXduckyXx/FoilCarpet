@@ -126,8 +126,7 @@ public class SystemInfo
         put("server_dev_environment", c -> BooleanValue.of(Vanilla.isDevelopmentEnvironment()));
         put("server_mods", c -> Vanilla.getServerMods(c.server()));
         put("server_last_tick_times", c -> {
-            //assuming we are in the tick world section
-            // might be off one tick when run in the off tasks or asynchronously.
+
             int currentReportedTick = carpet.folia.MixinCompat.server_getTickCount(c.server()) - 1;
             List<Value> ticks = new ArrayList<>(100);
             long[] tickArray = c.server().getTickTimesNanos();

@@ -18,5 +18,4 @@ public class Minecraft_tickMixin
         }
     }
 
-
 }

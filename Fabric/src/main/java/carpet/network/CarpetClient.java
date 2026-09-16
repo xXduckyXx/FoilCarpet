@@ -54,14 +54,14 @@ public class CarpetClient
 
     public static void disconnect()
     {
-        if (isServerCarpet) // multiplayer connection
+        if (isServerCarpet)
         {
             isServerCarpet = false;
             clientPlayer = null;
             CarpetServer.onServerClosed(null);
             CarpetServer.onServerDoneClosing(null);
         }
-        else // singleplayer disconnect
+        else
         {
             CarpetServer.clientPreClosing();
         }

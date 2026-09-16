@@ -1,6 +1,5 @@
 package carpet.mixins;
 
-
 import carpet.CarpetSettings;
 import net.minecraft.util.RandomSource;
 import org.spongepowered.asm.mixin.Mixin;

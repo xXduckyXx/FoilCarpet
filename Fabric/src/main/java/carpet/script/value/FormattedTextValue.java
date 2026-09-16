@@ -101,7 +101,7 @@ public class FormattedTextValue extends StringValue
 
     public Tag serialize(RegistryAccess regs)
     {
-        return ComponentSerialization.CODEC.encodeStart(regs.createSerializationContext(NbtOps.INSTANCE), text).getOrThrow(InternalExpressionException::new);// text.getContents() Component.Serializer.toJson(text, regs);
+        return ComponentSerialization.CODEC.encodeStart(regs.createSerializationContext(NbtOps.INSTANCE), text).getOrThrow(InternalExpressionException::new);
     }
 
     public static FormattedTextValue deserialize(Tag tag, RegistryAccess regs)

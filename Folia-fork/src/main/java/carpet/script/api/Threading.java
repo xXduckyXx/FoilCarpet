@@ -14,7 +14,7 @@ public class Threading
 {
     public static void apply(Expression expression)
     {
-        //"overridden" native call to cancel if on main thread
+
         expression.addContextFunction("task_join", 1, (c, t, lv) -> {
             if (((CarpetContext) c).server().isSameThread())
             {
@@ -28,13 +28,12 @@ public class Threading
             return tv.join();
         });
 
-        // has to be lazy due to deferred execution of the expression
         expression.addLazyFunctionWithDelegation("task_dock", 1, false, true, (c, t, expr, tok, lv) -> {
             CarpetContext cc = (CarpetContext) c;
             MinecraftServer server = cc.server();
             if (server.isSameThread())
             {
-                return lv.get(0); // pass through for on thread tasks
+                return lv.get(0);
             }
             Value[] result = new Value[]{Value.NULL};
             RuntimeException[] internal = new RuntimeException[]{null};
@@ -69,10 +68,9 @@ public class Threading
             {
                 throw internal[0];
             }
-            Value ret = result[0]; // preventing from lazy evaluating of the result in case a future completes later
+            Value ret = result[0];
             return (ct, tt) -> ret;
-            // pass through placeholder
-            // implmenetation should dock the task on the main thread.
+
         });
     }
 }

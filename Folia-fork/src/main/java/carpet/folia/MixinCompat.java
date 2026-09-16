@@ -49,12 +49,6 @@ import net.minecraft.world.scores.criteria.ObjectiveCriteria;
 
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 
-/**
- * Drop-in replacement for the mixin-provided interfaces on platforms (stock Folia / Paper)
- * where Sponge Mixin cannot apply. Each method either leverages the public NMS API, uses
- * reflection, or falls back to a no-op / default value. Any behaviour that fundamentally
- * required a mixin is degraded gracefully instead of throwing {@link ClassCastException}.
- */
 public final class MixinCompat
 {
     private static final Map<MinecraftServer, CarpetScriptServer> SCRIPT_SERVERS = Collections.synchronizedMap(new WeakHashMap<>());
@@ -68,20 +62,15 @@ public final class MixinCompat
     {
     }
 
-    // ------------------------------------------------------------------
-    // MinecraftServer
-    // ------------------------------------------------------------------
-
     public static void server_forceTick(MinecraftServer server, BooleanSupplier sup)
     {
-        // Folia regional scheduler does not expose a force-tick; just poll the predicate
+
         sup.getAsBoolean();
     }
 
     public static int server_getTickCount(MinecraftServer server)
     {
-        // Folia disables MinecraftServer.getTickCount (throws), so surface the plugin's own
-        // per-tick counter instead so features relying on getTickCount keep working.
+
         return CarpetFoliaPlugin.getTick();
     }
 
@@ -109,10 +98,6 @@ public final class MixinCompat
     {
         return SCRIPT_SERVERS.get(server);
     }
-
-    // ------------------------------------------------------------------
-    // ServerLevel / ServerPlayerGameMode
-    // ------------------------------------------------------------------
 
     public static ServerLevelData level_worldProperties(ServerLevel world)
     {
@@ -189,9 +174,7 @@ public final class MixinCompat
                     && player.getAbilities().flying;
             if (hasActions || noClip)
             {
-                // Action packs execute level queries (getEntities, ray tracing), and setting
-                // noPhysics touches the player's movement state, both of which on Folia must
-                // run on the player's own region thread, not the global plugin ticker.
+
                 try
                 {
                     org.bukkit.World bukkitWorld = player.level().getWorld();
@@ -201,8 +184,7 @@ public final class MixinCompat
                     org.bukkit.Bukkit.getRegionScheduler().execute(plugin, bukkitWorld, cpos.x, cpos.z, () -> {
                         if (fNoClip)
                         {
-                            // Replicates Player_creativeNoClipMixin's tick redirect: a creative
-                            // flying player gets noPhysics so they pass through blocks.
+
                             player.noPhysics = true;
                         }
                         if (actionPack != null)
@@ -213,15 +195,11 @@ public final class MixinCompat
                 }
                 catch (Throwable ignored)
                 {
-                    // player may be between regions / level being unloaded
+
                 }
             }
         }
     }
-
-    // ------------------------------------------------------------------
-    // Mob / Entity / LivingEntity / ItemEntity / FoodData
-    // ------------------------------------------------------------------
 
     public static GoalSelector mob_getAI(Mob mob, boolean target)
     {
@@ -325,10 +303,6 @@ public final class MixinCompat
         }
     }
 
-    // ------------------------------------------------------------------
-    // World / spawn / scores
-    // ------------------------------------------------------------------
-
     public static PotentialCalculator spawnState_getPotentialCalculator(NaturalSpawner.SpawnState spawnState)
     {
         return readObject(spawnState, "spawnPotential");
@@ -403,10 +377,6 @@ public final class MixinCompat
         }
     }
 
-    // ------------------------------------------------------------------
-    // Containers / commands / unregister
-    // ------------------------------------------------------------------
-
     public static DataSlot containerMenu_getDataSlot(AbstractContainerMenu handler, int index)
     {
         List<DataSlot> dataSlots = handler.dataSlots;
@@ -447,11 +417,6 @@ public final class MixinCompat
             }
         }
     }
-
-
-    // ------------------------------------------------------------------
-    // reflection helpers
-    // ------------------------------------------------------------------
 
     @SuppressWarnings("unchecked")
     private static <T> T readObject(Object target, String fieldName)

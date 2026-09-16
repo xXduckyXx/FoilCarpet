@@ -14,5 +14,5 @@ public class CoralPlantBlock_renewableCoralMixin implements FertilizableCoral
         return CarpetSettings.renewableCoral == CarpetSettings.RenewableCoralMode.EXPANDED
                 || CarpetSettings.renewableCoral == CarpetSettings.RenewableCoralMode.TRUE;
     }
-    // Logic in FertilizableCoral
+
 }

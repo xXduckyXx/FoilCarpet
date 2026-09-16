@@ -84,7 +84,7 @@ public class CarpetScriptHost extends ScriptHost
         super(code, server, perUser, parent, override);
         this.saveTimeout = 0;
         persistenceRequired = true;
-        if (parent == null && code != null) // app, not a global host
+        if (parent == null && code != null)
         {
             globalState = loadState();
         }
@@ -103,7 +103,7 @@ public class CarpetScriptHost extends ScriptHost
     public static CarpetScriptHost create(CarpetScriptServer scriptServer, @Nullable Module module, boolean perPlayer, CommandSourceStack source, Predicate<CommandSourceStack> commandValidator, boolean isRuleApp, AppStoreManager.StoreNode storeSource, Expression.LoadOverride override)
     {
         CarpetScriptHost host = new CarpetScriptHost(scriptServer, module, perPlayer, null, Collections.emptyMap(), new HashMap<>(), commandValidator, isRuleApp, override);
-        // parse code and convert to expression
+
         if (module != null)
         {
             try
@@ -119,7 +119,7 @@ public class CarpetScriptHost extends ScriptHost
                 host.handleErrorWithStack("Error while evaluating expression", e);
                 throw new LoadException();
             }
-            catch (ArithmeticException ae) // is this branch ever reached? Seems like arithmetic exceptions are converted to CEEs earlier
+            catch (ArithmeticException ae)
             {
                 host.handleErrorWithStack("Math doesn't compute", ae);
                 throw new LoadException();
@@ -276,7 +276,7 @@ public class CarpetScriptHost extends ScriptHost
     protected void setupUserHost(ScriptHost host)
     {
         super.setupUserHost(host);
-        // transfer Events
+
         CarpetScriptHost child = (CarpetScriptHost) host;
         CarpetEventServer.Event.transferAllHostEventsToChild(child);
         FunctionValue onStart = child.getFunction("__on_start");
@@ -292,13 +292,13 @@ public class CarpetScriptHost extends ScriptHost
         super.addUserDefinedFunction(ctx, module, funName, function);
         if (ctx.host.main != module)
         {
-            return; // not dealing with automatic imports / exports /configs / apps from imports
+            return;
         }
-        if (funName.startsWith("__")) // potential fishy activity
+        if (funName.startsWith("__"))
         {
-            if (funName.startsWith("__on_")) // here we can make a determination if we want to only accept events from main module.
+            if (funName.startsWith("__on_"))
             {
-                // this is nasty, we have the host and function, yet we add it via names, but hey - works for now
+
                 String event = funName.replaceFirst("__on_", "");
                 if (CarpetEventServer.Event.byName.containsKey(event))
                 {
@@ -307,7 +307,7 @@ public class CarpetScriptHost extends ScriptHost
             }
             else if (funName.equals("__config"))
             {
-                // needs to be added as we read the code, cause other events may be affected.
+
                 if (!readConfig())
                 {
                     throw new InternalExpressionException("Invalid app config (via '__config()' function)");
@@ -335,12 +335,12 @@ public class CarpetScriptHost extends ScriptHost
             persistenceRequired = config.getOrDefault(new StringValue("stay_loaded"), Value.TRUE).getBoolean();
             strict = config.getOrDefault(StringValue.of("strict"), Value.FALSE).getBoolean();
             eventPriority = config.getOrDefault(new StringValue("event_priority"), Value.ZERO).readDoubleNumber();
-            // check requires
+
             Value loadRequirements = config.get(new StringValue("requires"));
             if (loadRequirements instanceof final FunctionValue functionValue)
             {
                 Value reqResult = callNow(functionValue, Collections.emptyList());
-                if (reqResult.getBoolean()) // != false or null
+                if (reqResult.getBoolean())
                 {
                     throw new LoadException(reqResult.getString());
                 }
@@ -404,7 +404,6 @@ public class CarpetScriptHost extends ScriptHost
         }
     }
 
-    // Used to ensure app gets marked as holding command from a central place
     private void registerCommand(LiteralArgumentBuilder<CommandSourceStack> command)
     {
         scriptServer().server.getCommands().getDispatcher().register(command);
@@ -413,7 +412,7 @@ public class CarpetScriptHost extends ScriptHost
 
     public void readCustomArgumentTypes() throws CommandSyntaxException
     {
-        // read custom arguments
+
         Value arguments = appConfig.get(StringValue.of("arguments"));
         if (arguments != null)
         {
@@ -466,7 +465,7 @@ public class CarpetScriptHost extends ScriptHost
             }
             catch (CommandSyntaxException cse)
             {
-                // failed
+
                 notifier.accept(Carpet.Messenger_compose("r Failed to build command system: ", cse.getRawMessage()));
                 return null;
             }
@@ -654,10 +653,10 @@ public class CarpetScriptHost extends ScriptHost
     public void delFunction(Module module, String funName)
     {
         super.delFunction(module, funName);
-        // mcarpet
+
         if (funName.startsWith("__on_"))
         {
-            // this is nasty, we have the host and function, yet we add it via names, but hey - works for now
+
             String event = funName.replaceFirst("__on_", "");
             scriptServer().events.removeBuiltInEvent(event, this, funName);
         }
@@ -691,7 +690,7 @@ public class CarpetScriptHost extends ScriptHost
             }
             return this;
         }
-        // user based
+
         ServerPlayer player = source.getPlayer();
         if (player == null)
         {
@@ -842,7 +841,7 @@ public class CarpetScriptHost extends ScriptHost
         }
         try
         {
-            // TODO: this is just for now - invoke would be able to invoke other hosts scripts
+
             assertAppIntegrity(function.getModule());
             Context context = new CarpetContext(this, source);
             return scriptServer().events.handleEvents.getWhileDisabled(() -> function.getExpression().evaluatePartial(
@@ -902,7 +901,7 @@ public class CarpetScriptHost extends ScriptHost
             return Value.NULL;
         }
         try
-        { // cause we can't throw checked exceptions in lambda. Left if be until need to handle these more gracefully
+        {
             fun.assertArgsOk(argv, (b) -> {
                 throw new InternalExpressionException("");
             });
@@ -943,15 +942,13 @@ public class CarpetScriptHost extends ScriptHost
         });
     }
 
-
     @Override
     public void onClose()
     {
         super.onClose();
         FunctionValue closing = getFunction("__on_close");
         if (closing != null && (parent != null || !isPerUser()))
-        // either global instance of a global task, or
-        // user host in player scoped app
+
         {
             callNow(closing, Collections.emptyList());
         }
@@ -1004,7 +1001,7 @@ public class CarpetScriptHost extends ScriptHost
     {
         if (isDefaultApp() && !fdesc.isShared)
         {
-            return false; // if belongs to an app, cannot be default host.
+            return false;
         }
 
         if (fdesc.resource != null)
@@ -1024,12 +1021,12 @@ public class CarpetScriptHost extends ScriptHost
 
     public boolean removeResourceFile(FileArgument fdesc)
     {
-        return (!isDefaultApp() || fdesc.isShared) && fdesc.dropExistingFile(main); //
+        return (!isDefaultApp() || fdesc.isShared) && fdesc.dropExistingFile(main);
     }
 
     public boolean appendLogFile(FileArgument fdesc, List<String> data)
     {
-        return (!isDefaultApp() || fdesc.isShared) && fdesc.appendToTextFile(main, data); // if belongs to an app, cannot be default host.
+        return (!isDefaultApp() || fdesc.isShared) && fdesc.appendToTextFile(main, data);
     }
 
     public List<String> readTextResource(FileArgument fdesc)
@@ -1068,7 +1065,7 @@ public class CarpetScriptHost extends ScriptHost
     public void setChatErrorSnooper(CommandSourceStack source)
     {
         responsibleSource = source;
-        errorSnooper = (expr, /*Nullable*/ token, ctx, message) ->
+        errorSnooper = (expr,   token, ctx, message) ->
         {
             if (!source.isPlayer())
             {
@@ -1108,23 +1105,11 @@ public class CarpetScriptHost extends ScriptHost
         };
     }
 
-    /**
-     * <p>Creates a {@link Component} using {@link Messenger} that has the locals in the {@code line} snippet with a hover over
-     * tooltip with the value of the local at that location</p>
-     *
-     * @param line    The line to find references to locals on
-     * @param context The {@link Context} to extract the locals from
-     * @param format  The format to apply to each part of the line, without the trailing space
-     * @return A BaseText of the given line with the given format, that is visibly the same as passing those to Messenger, but with references to the
-     * locals in the {@link Context} with a hover over tooltip text
-     * @implNote The implementation of this method is far from perfect, and won't detect actual references to variables, but try to find the strings
-     * and add the hover effect to anything that equals to any variable name, so short variable names may appear on random positions
-     */
     private static Component withLocals(String format, String line, Context context)
     {
         format += " ";
         List<String> stringsToFormat = new ArrayList<>();
-        TreeMap<Integer, String> posToLocal = new TreeMap<>(); //Holds whether a local variable name is found at a specific index
+        TreeMap<Integer, String> posToLocal = new TreeMap<>();
         for (String local : context.variables.keySet())
         {
             int pos = line.indexOf(local);
@@ -1132,7 +1117,7 @@ public class CarpetScriptHost extends ScriptHost
             {
                 posToLocal.merge(pos, local, (existingLocal, newLocal) ->
                 {
-                    // Prefer longer variable names at the same position, since else single chars everywhere
+
                     return newLocal.length() > existingLocal.length() ? local : existingLocal;
                 });
                 pos = line.indexOf(local, pos + 1);
@@ -1141,7 +1126,7 @@ public class CarpetScriptHost extends ScriptHost
         int lastPos = 0;
         for (Entry<Integer, String> foundLocal : posToLocal.entrySet())
         {
-            if (foundLocal.getKey() < lastPos) // system isn't perfect: part of another local
+            if (foundLocal.getKey() < lastPos)
             {
                 continue;
             }
@@ -1199,9 +1184,6 @@ public class CarpetScriptHost extends ScriptHost
         handleErrorWithStack(message, new CarpetExpressionException(exc.getMessage(), exc.stack));
     }
 
-    /**
-     * @deprecated Use {@link #scriptServer()} instead
-     */
     @Deprecated(forRemoval = true)
     public CarpetScriptServer getScriptServer()
     {

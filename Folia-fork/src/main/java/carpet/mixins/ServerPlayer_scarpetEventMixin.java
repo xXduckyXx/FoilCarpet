@@ -33,7 +33,6 @@ import static carpet.script.CarpetEventServer.Event.STATISTICS;
 @Mixin(ServerPlayer.class)
 public abstract class ServerPlayer_scarpetEventMixin extends Player implements ServerPlayerInterface
 {
-    // to denote if the player reference is valid
 
     @Unique
     private boolean isInvalidReference = false;
@@ -41,8 +40,6 @@ public abstract class ServerPlayer_scarpetEventMixin extends Player implements S
     public ServerPlayer_scarpetEventMixin(Level level, GameProfile gameProfile) {
         super(level, gameProfile);
     }
-
-    //@Shadow protected abstract void completeUsingItem();
 
     @Shadow public boolean wonGame;
 
@@ -56,13 +53,13 @@ public abstract class ServerPlayer_scarpetEventMixin extends Player implements S
         {
             InteractionHand hand = getUsedItemHand();
             if(!PLAYER_FINISHED_USING_ITEM.onItemAction((ServerPlayer) (Object)this, hand, getUseItem())) {
-                // do vanilla
+
                 super.completeUsingItem();
             }
         }
         else
         {
-            // do vanilla
+
             super.completeUsingItem();
         }
     }
@@ -90,7 +87,7 @@ public abstract class ServerPlayer_scarpetEventMixin extends Player implements S
     private void logPreviousCoordinates(TeleportTransition serverWorld, CallbackInfoReturnable<Entity> cir)
     {
         previousLocation = position();
-        previousDimension = level().dimension();  //dimension type
+        previousDimension = level().dimension();
     }
 
     @Inject(method = "teleport", at = @At("RETURN"))

@@ -16,13 +16,11 @@ import net.minecraft.world.entity.player.Player;
 
 public class Logger
 {
-    // The set of subscribed and online players.
+
     private Map<String, String> subscribedOnlinePlayers;
 
-    // The set of subscribed and offline players.
     private Map<String,String> subscribedOfflinePlayers;
 
-    // The logName of this log. Gets prepended to logged messages.
     private String logName;
 
     private String default_option;
@@ -81,9 +79,6 @@ public class Logger
         return logName;
     }
 
-    /**
-     * Subscribes the player with the given logName to the logger.
-     */
     public void addPlayer(String playerName, String option)
     {
         if (playerFromName(playerName) != null)
@@ -97,9 +92,6 @@ public class Logger
         LoggerRegistry.setAccess(this);
     }
 
-    /**
-     * Unsubscribes the player with the given logName from the logger.
-     */
     public void removePlayer(String playerName)
     {
         subscribedOnlinePlayers.remove(playerName);
@@ -107,9 +99,6 @@ public class Logger
         LoggerRegistry.setAccess(this);
     }
 
-    /**
-     * Returns true if there are any online subscribers for this log.
-     */
     public boolean hasOnlineSubscribers()
     {
         return subscribedOnlinePlayers.size() > 0;
@@ -126,10 +115,6 @@ public class Logger
         return acceleratorField;
     }
 
-    /**
-     * serves messages to players fetching them from the promise
-     * will repeat invocation for players that share the same option
-     */
     @FunctionalInterface
     public interface lMessage { Component [] get(String playerOption, Player player);}
     public void log(lMessage messagePromise)
@@ -146,10 +131,6 @@ public class Logger
         }
     }
 
-    /**
-     * guarantees that each message for each option will be evaluated once from the promise
-     * and served the same way to all other players subscribed to the same option
-     */
     @FunctionalInterface
     public interface lMessageIgnorePlayer { Component [] get(String playerOption);}
     public void log(lMessageIgnorePlayer messagePromise)
@@ -171,9 +152,7 @@ public class Logger
             }
         }
     }
-    /**
-     * guarantees that message is evaluated once, so independent from the player and chosen option
-     */
+
     public void log(Supplier<Component[]> messagePromise)
     {
         Component [] cannedMessages = null;
@@ -193,19 +172,14 @@ public class Logger
         Arrays.stream(messages).forEach(player::sendSystemMessage);
     }
 
-    /**
-     * Gets the {@code PlayerEntity} instance for a player given their UUID. Returns null if they are offline.
-     */
     protected ServerPlayer playerFromName(String name)
     {
         return CarpetServer.minecraft_server.getPlayerList().getPlayerByName(name);
     }
 
-    // ----- Event Handlers ----- //
-
     public void onPlayerConnect(Player player, boolean firstTime)
     {
-        // If the player was subscribed to the log and offline, move them to the set of online subscribers.
+
         String playerName = player.getName().getString();
         if (subscribedOfflinePlayers.containsKey(playerName))
         {
@@ -229,7 +203,7 @@ public class Logger
 
     public void onPlayerDisconnect(Player player)
     {
-        // If the player was subscribed to the log, move them to the set of offline subscribers.
+
         String playerName = player.getName().getString();
         if (subscribedOnlinePlayers.containsKey(playerName))
         {

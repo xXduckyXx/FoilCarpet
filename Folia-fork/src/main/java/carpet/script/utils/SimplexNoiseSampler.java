@@ -6,7 +6,6 @@ import net.minecraft.util.Mth;
 import java.util.Map;
 import java.util.Random;
 
-// extracted from import net.minecraft.util.math.noise.SimplexNoiseSampler
 public class SimplexNoiseSampler extends PerlinNoiseSampler
 {
     private static final double sqrt3 = Math.sqrt(3.0D);
@@ -85,7 +84,7 @@ public class SimplexNoiseSampler extends PerlinNoiseSampler
         double aa = this.grad(v, h, k, 0.0D, 0.5D);
         double ab = this.grad(w, p, q, 0.0D, 0.5D);
         double ac = this.grad(z, r, s, 0.0D, 0.5D);
-        //return 70.0D * (aa + ab + ac);
+
         return 35.0D * (aa + ab + ac) + 0.5;
     }
 
@@ -95,12 +94,12 @@ public class SimplexNoiseSampler extends PerlinNoiseSampler
         d = d / 2;
         e = e / 2;
         f = f / 2;
-        //final double g = 0.3333333333333333D;
+
         double h = (d + e + f) * 0.3333333333333333D;
         int i = Mth.floor(d + h);
         int j = Mth.floor(e + h);
         int k = Mth.floor(f + h);
-        //final double l = 0.16666666666666666D;
+
         double m = (i + j + k) * 0.16666666666666666D;
         double n = i - m;
         double o = j - m;

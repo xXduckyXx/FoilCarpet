@@ -49,8 +49,7 @@ public class Scoreboards
 
     public static void apply(Expression expression)
     {
-        // scoreboard(player,'objective')
-        // scoreboard(player, objective, newValue)
+
         expression.addContextFunction("scoreboard", -1, (c, t, lv) ->
         {
             CarpetContext cc = (CarpetContext) c;
@@ -123,9 +122,6 @@ public class Scoreboards
             scoreboard.resetSinglePlayerScore(key, objective);
             return previous;
         });
-
-        // objective_add('lvl','level')
-        // objective_add('counter')
 
         expression.addContextFunction("scoreboard_add", -1, (c, t, lv) ->
         {
@@ -313,7 +309,6 @@ public class Scoreboards
             return team == null ? Value.NULL : ListValue.wrap(team.getPlayers().stream().map(StringValue::of));
         });
 
-
         expression.addContextFunction("team_add", -1, (c, t, lv) ->
         {
             if (!(lv.size() < 3 && !lv.isEmpty()))
@@ -370,7 +365,6 @@ public class Scoreboards
             scoreboard.removePlayerTeam(team);
             return Value.TRUE;
         });
-
 
         expression.addContextFunction("team_leave", 1, (c, t, lv) ->
         {
@@ -730,4 +724,3 @@ public class Scoreboards
         return null;
     }
 }
-

@@ -55,7 +55,7 @@ public class BlockArgument extends Argument
         try
         {
             Value v1 = params.next();
-            //add conditional from string name
+
             if (optional && v1.isNull())
             {
                 return new MissingBlockArgument(1 + offset, null);

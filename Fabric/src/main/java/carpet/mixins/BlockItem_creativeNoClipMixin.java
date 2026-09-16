@@ -26,7 +26,7 @@ public class BlockItem_creativeNoClipMixin
         Player player = contextOuter.getPlayer();
         if (CarpetSettings.creativeNoClip && player != null && player.isCreative() && player.getAbilities().flying)
         {
-            // copy from canPlace
+
             VoxelShape voxelShape = state.getCollisionShape(world, pos, context);
             return voxelShape.isEmpty() || world.isUnobstructed(player, voxelShape.move(pos.getX(), pos.getY(), pos.getZ()));
 

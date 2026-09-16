@@ -23,7 +23,7 @@ public class BlockPredicate_scarpetMixin implements BlockPredicateInterface
 
     @Shadow @Final private BlockState state;
 
-    @Shadow @Final /*@Nullable*/ private CompoundTag nbt;
+    @Shadow @Final   private CompoundTag nbt;
 
     @Shadow @Final private Set<Property<?>> properties;
 

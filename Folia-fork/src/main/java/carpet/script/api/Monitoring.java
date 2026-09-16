@@ -47,7 +47,7 @@ public class Monitoring
             }
             throw new InternalExpressionException("'system_info' requires one or no parameters");
         });
-        // game processed snooper functions
+
         expression.addContextFunction("get_mob_counts", -1, (c, t, lv) ->
         {
             CarpetContext cc = (CarpetContext) c;

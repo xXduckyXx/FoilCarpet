@@ -34,7 +34,6 @@ public abstract class AbstractArrowMixin extends Entity
             logHelper.onTick(getX(), getY(), getZ(), getDeltaMovement());
     }
 
-    // todo should be moved on one place this is acceessed from
     @Inject(method = "onHitEntity", at = @At("RETURN"))
     private void removeOnEntity(EntityHitResult entityHitResult, CallbackInfo ci)
     {

@@ -127,9 +127,8 @@ public class Inventories
             for (Recipe<?> recipe : recipes)
             {
                 List<Value> results = new ArrayList<>();
-                //ItemStack result = recipe.display().forEach(); getResultItem(regs);
-                recipe.display().forEach(rd -> rd.result().resolveForStacks(context).forEach(is -> results.add(ValueConversions.of(is, regs))));
 
+                recipe.display().forEach(rd -> rd.result().resolveForStacks(context).forEach(is -> results.add(ValueConversions.of(is, regs))));
 
                 List<Value> ingredientValue = new ArrayList<>();
                 for (int info : recipe.placementInfo().slotsToIngredientIndex())
@@ -152,7 +151,6 @@ public class Inventories
                         ingredientValue.add(ListValue.wrap(alternatives));
                     }
                 }
-
 
                 Value recipeSpec;
                 if (recipe instanceof ShapedRecipe shapedRecipe)
@@ -218,7 +216,6 @@ public class Inventories
             return inventoryLocator == null ? Value.NULL : BooleanValue.of(!inventoryLocator.inventory().isEmpty());
         });
 
-        //inventory_get(<b, e>, <n>) -> item_triple
         expression.addContextFunction("inventory_get", -1, (c, t, lv) ->
         {
             CarpetContext cc = (CarpetContext) c;
@@ -244,7 +241,6 @@ public class Inventories
                     : ValueConversions.of(inventoryLocator.inventory().getItem(slot), regs);
         });
 
-        //inventory_set(<b,e>, <n>, <count>, <item>, <nbt>)
         expression.addContextFunction("inventory_set", -1, (c, t, lv) ->
         {
             CarpetContext cc = (CarpetContext) c;
@@ -273,7 +269,7 @@ public class Inventories
             RegistryAccess regs = cc.registryAccess();
             if (count.isPresent() && count.getAsInt() == 0)
             {
-                // clear slot
+
                 ItemStack removedStack = inventoryLocator.inventory().removeItemNoUpdate(slot);
                 syncPlayerInventory(inventoryLocator);
                 return ValueConversions.of(removedStack, regs);
@@ -287,7 +283,7 @@ public class Inventories
                 syncPlayerInventory(inventoryLocator);
                 return ValueConversions.of(previousStack, regs);
             }
-            CompoundTag nbt = null; // skipping one argument, item name
+            CompoundTag nbt = null;
             if (lv.size() > inventoryLocator.offset() + 3)
             {
                 Value nbtValue = lv.get(inventoryLocator.offset() + 3);
@@ -309,7 +305,6 @@ public class Inventories
             return ValueConversions.of(previousStack, regs);
         });
 
-        //inventory_find(<b, e>, <item> or null (first empty slot), <start_from=0> ) -> <N> or null
         expression.addContextFunction("inventory_find", -1, (c, t, lv) ->
         {
             CarpetContext cc = (CarpetContext) c;
@@ -344,7 +339,6 @@ public class Inventories
             return Value.NULL;
         });
 
-        //inventory_remove(<b, e>, <item>, <amount=1>) -> bool
         expression.addContextFunction("inventory_remove", -1, (c, t, lv) ->
         {
             CarpetContext cc = (CarpetContext) c;
@@ -363,7 +357,7 @@ public class Inventories
             {
                 amount = (int) NumericValue.asNumber(lv.get(inventoryLocator.offset() + 1)).getLong();
             }
-            // not enough
+
             if (((amount == 1) && (!inventoryLocator.inventory().hasAnyOf(Set.of(searchItem.getItem()))))
                     || (inventoryLocator.inventory().countItem(searchItem.getItem()) < amount))
             {
@@ -395,7 +389,6 @@ public class Inventories
             return Value.TRUE;
         });
 
-        //inventory_drop(<b, e>, <n>, <amount=1, 0-whatever's there>) -> entity_item (and sets slot) or null if cannot
         expression.addContextFunction("drop_item", -1, (c, t, lv) ->
         {
             CarpetContext cc = (CarpetContext) c;
@@ -449,17 +442,17 @@ public class Inventories
             }
             else if (owner instanceof LivingEntity livingEntity)
             {
-                // stolen from LookTargetUtil.give((VillagerEntity)owner, droppedStack, (LivingEntity) owner);
+
                 double dropY = livingEntity.getY() - 0.30000001192092896D + livingEntity.getEyeHeight();
                 item = new ItemEntity(livingEntity.level(), livingEntity.getX(), dropY, livingEntity.getZ(), droppedStack);
-                Vec3 vec3d = livingEntity.getViewVector(1.0F).normalize().scale(0.3);//  new Vec3d(0, 0.3, 0);
+                Vec3 vec3d = livingEntity.getViewVector(1.0F).normalize().scale(0.3);
                 item.setDeltaMovement(vec3d);
                 item.setDefaultPickUpDelay();
                 cc.level().addFreshEntity(item);
             }
             else
             {
-                Vec3 point = Vec3.atCenterOf(inventoryLocator.position()); //pos+0.5v
+                Vec3 point = Vec3.atCenterOf(inventoryLocator.position());
                 item = new ItemEntity(cc.level(), point.x, point.y, point.z, droppedStack);
                 item.setDefaultPickUpDelay();
                 cc.level().addFreshEntity(item);

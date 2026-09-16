@@ -2,9 +2,6 @@ package carpet.script.exception;
 
 import carpet.script.external.Carpet;
 
-/**
- * A type of {@link RuntimeException} that doesn't spend time producing and filling a stacktrace
- */
 public abstract class StacklessRuntimeException extends RuntimeException
 {
     public StacklessRuntimeException()

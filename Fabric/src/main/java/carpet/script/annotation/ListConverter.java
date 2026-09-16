@@ -12,17 +12,6 @@ import carpet.script.value.Value;
 
 import org.jspecify.annotations.Nullable;
 
-/**
- * <p>Converts a given {@link ListValue} into a {@link List} of values converted to {@code <T>}.</p>
- * 
- * <p>If the {@link Param.AllowSingleton} annotation is specified, allows creating a singleton from
- * a loose element compatible with the type conversion.</p> 
- * 
- * <p>Lists provided by this converter are <b>not</b> linked to the initial list, and therefore will not
- * reflect changes in either of them</p>
- *
- * @param <T> The type of the element that will be inside the list
- */
 final class ListConverter<T> implements ValueConverter<List<T>>
 {
     private final ValueConverter<T> itemConverter;
@@ -75,20 +64,6 @@ final class ListConverter<T> implements ValueConverter<List<T>>
         this.allowSingletonCreation = allowSingletonCreation;
     }
 
-    /**
-     * <p>Returns a new {@link ListConverter} to convert to the given {@link AnnotatedType}.</p>
-     * 
-     * <p>The returned {@link ValueConverter} will convert the objects inside the list to the
-     * generics specified in the {@link AnnotatedType}, and the {@link ValueConverter} will
-     * be set to accept non-list (but correct) items and make a singleton out of them
-     * if the {@link Param.AllowSingleton} annotation has been specified.</p>
-     * 
-     * @apiNote This method expects the {@link AnnotatedType} to already be of {@link List} type, and, while it will
-     *          technically accept a non-{@link List} {@link AnnotatedType}, it will fail with an {@link ArrayIndexOutOfBoundsException}
-     *          if it doesn't has at least one generic parameter. 
-     * @param annotatedType The type to get generics information from
-     * @return A new {@link ListConverter} for the data specified in the {@link AnnotatedType}
-     */
     static ListConverter<?> fromAnnotatedType(AnnotatedType annotatedType)
     {
         AnnotatedParameterizedType paramType = (AnnotatedParameterizedType) annotatedType;

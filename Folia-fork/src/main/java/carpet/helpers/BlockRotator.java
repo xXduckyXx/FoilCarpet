@@ -53,11 +53,10 @@ public class BlockRotator
     {
         Direction sourceFace = source.state().getValue(DispenserBlock.FACING);
         Level world = source.level();
-        BlockPos blockpos = source.pos().relative(sourceFace); // offset
+        BlockPos blockpos = source.pos().relative(sourceFace);
         BlockState blockstate = world.getBlockState(blockpos);
         Block block = blockstate.getBlock();
 
-        // Block rotation for blocks that can be placed in all 6 or 4 rotations.
         if (block instanceof DirectionalBlock || block instanceof DispenserBlock)
         {
             Direction face = blockstate.getValue(DirectionalBlock.FACING);
@@ -72,20 +71,20 @@ public class BlockRotator
 
             Direction rotatedFace = face.getClockWise(sourceFace.getAxis());
             if (sourceFace.get3DDataValue() % 2 == 0 || rotatedFace == face)
-            {   // Flip to make blocks always rotate clockwise relative to the dispenser
-                // when index is equal to zero. when index is equal to zero the dispenser is in the opposite direction.
+            {
+
                 rotatedFace = rotatedFace.getOpposite();
             }
             world.setBlock(blockpos, blockstate.setValue(DirectionalBlock.FACING, rotatedFace), 3);
         }
-        else if (block instanceof HorizontalDirectionalBlock) // Block rotation for blocks that can be placed in only 4 horizontal rotations.
+        else if (block instanceof HorizontalDirectionalBlock)
         {
             if (block instanceof BedBlock)
                 return stack;
             Direction face = blockstate.getValue(HorizontalDirectionalBlock.FACING).getClockWise(Direction.Axis.Y);
 
             if (sourceFace == Direction.DOWN)
-            { // same as above.
+            {
                 face = face.getOpposite();
             }
             world.setBlock(blockpos, blockstate.setValue(HorizontalDirectionalBlock.FACING, face), 3);
@@ -99,7 +98,7 @@ public class BlockRotator
                 world.setBlock(blockpos, blockstate.setValue(HopperBlock.FACING, face), 3);
             }
         }
-        // Send block update to the block that just have been rotated.
+
         world.neighborChanged(blockpos, block, null);
 
         return stack;
@@ -171,7 +170,7 @@ public class BlockRotator
         }
         if (newState != null)
         {
-            world.setBlock(pos, newState, Block.UPDATE_CLIENTS | 1024); // no constant matching 1024 in Block, what does this do?
+            world.setBlock(pos, newState, Block.UPDATE_CLIENTS | 1024);
             world.setBlocksDirty(pos, state, newState);
             return true;
         }

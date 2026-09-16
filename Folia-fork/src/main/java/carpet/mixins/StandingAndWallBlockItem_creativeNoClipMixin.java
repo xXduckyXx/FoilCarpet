@@ -28,7 +28,7 @@ public class StandingAndWallBlockItem_creativeNoClipMixin
         Player player = itemcontext.getPlayer();
         if (CarpetSettings.creativeNoClip && player != null && player.isCreative() && player.getAbilities().flying)
         {
-            // copy from canPlace
+
             VoxelShape voxelShape = state.getCollisionShape(worldView, pos, context);
             return voxelShape.isEmpty() || worldView.isUnobstructed(player, voxelShape.move(pos.getX(), pos.getY(), pos.getZ()));
 

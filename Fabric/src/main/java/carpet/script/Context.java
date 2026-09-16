@@ -89,7 +89,7 @@ public class Context
 
     protected void initialize()
     {
-        //special variables for second order functions so we don't need to check them all the time
+
         variables.put("_", (c, t) -> Value.ZERO);
         variables.put("_i", (c, t) -> Value.ZERO);
         variables.put("_a", (c, t) -> Value.ZERO);
@@ -110,10 +110,6 @@ public class Context
         return host.scriptServer();
     }
 
-    /**
-     * immutable context only for reason on reporting access violations in evaluating expressions in optimizization
-     * mode detecting any potential violations that may happen on the way
-     */
     public static class ContextForErrorReporting extends Context
     {
         public ScriptHost.ErrorSnooper optmizerEerrorSnooper;

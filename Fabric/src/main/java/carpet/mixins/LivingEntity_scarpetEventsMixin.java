@@ -46,11 +46,7 @@ public abstract class LivingEntity_scarpetEventsMixin extends Entity implements 
     private void entityTakingDamage(ServerLevel serverLevel, DamageSource source, float amount, CallbackInfo ci)
     {
         ((EntityInterface)this).getEventContainer().onEvent(EntityEventsGroup.Event.ON_DAMAGE, amount, source);
-        // this is not applicable since its not a playr for sure
-        //if (entity instanceof ServerPlayerEntity && PLAYER_TAKES_DAMAGE.isNeeded())
-        //{
-        //    PLAYER_TAKES_DAMAGE.onDamage(entity, float_2, damageSource_1);
-        //}
+
         if (source.getEntity() instanceof ServerPlayer && PLAYER_DEALS_DAMAGE.isNeeded())
         {
             if(PLAYER_DEALS_DAMAGE.onDamage(this, amount, source)) {

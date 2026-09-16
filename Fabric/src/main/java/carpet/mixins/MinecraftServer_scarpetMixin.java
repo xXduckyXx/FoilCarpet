@@ -45,8 +45,6 @@ public abstract class MinecraftServer_scarpetMixin extends ReentrantBlockableEve
 
     @Shadow @Final private Map<ResourceKey<Level>, ServerLevel> levels;
 
-    //@Shadow private ServerResources resources;
-
     @Shadow private MinecraftServer.ReloadableResources resources;
 
     @Shadow public abstract RegistryAccess.Frozen registryAccess();

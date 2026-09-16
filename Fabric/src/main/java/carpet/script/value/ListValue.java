@@ -89,7 +89,6 @@ public class ListValue extends AbstractListValue implements ContainerValueInterf
         return fromTriple((double) a, b, c);
     }
 
-
     public static ListValue wrap(Stream<Value> stream)
     {
         return wrap(stream.collect(Collectors.toList()));
@@ -190,11 +189,10 @@ public class ListValue extends AbstractListValue implements ContainerValueInterf
         return output;
     }
 
-    public void subtractFrom(Value v) // if I ever do -= then it wouod remove items
+    public void subtractFrom(Value v)
     {
-        throw new UnsupportedOperationException(); // TODO
+        throw new UnsupportedOperationException();
     }
-
 
     @Override
     public Value multiply(Value other)
@@ -297,7 +295,7 @@ public class ListValue extends AbstractListValue implements ContainerValueInterf
     public Iterator<Value> iterator()
     {
         return new ArrayList<>(items).iterator();
-    } // should be thread safe
+    }
 
     @Override
     public List<Value> unpack()
@@ -310,13 +308,6 @@ public class ListValue extends AbstractListValue implements ContainerValueInterf
         items.addAll(subList);
     }
 
-    /**
-     * Finds a proper list index >=0 and < len that correspont to the rolling index value of idx
-     *
-     * @param idx
-     * @param len
-     * @return
-     */
     public static int normalizeIndex(long idx, int len)
     {
         if (idx >= 0 && idx < len)
@@ -452,7 +443,7 @@ public class ListValue extends AbstractListValue implements ContainerValueInterf
             }
             int index = (int) ((NumericValue) ind).getLong();
             if (index < 0)
-            {// only for values < 0
+            {
                 index = normalizeIndex(index, numitems);
             }
             if (replace)
@@ -554,7 +545,6 @@ public class ListValue extends AbstractListValue implements ContainerValueInterf
         }
     }
 
-
     @Override
     public Tag toTag(boolean force, RegistryAccess regs)
     {
@@ -569,19 +559,19 @@ public class ListValue extends AbstractListValue implements ContainerValueInterf
             tag.add(items.get(0).toTag(force, regs));
             return tag;
         }
-        // figuring out the types
+
         List<Tag> tags = new ArrayList<>();
         items.forEach(v -> tags.add(v.toTag(force, regs)));
         Set<TagTypeCompat> cases = EnumSet.noneOf(TagTypeCompat.class);
         tags.forEach(t -> cases.add(TagTypeCompat.getType(t)));
-        if (cases.size() == 1) // well, one type of items
+        if (cases.size() == 1)
         {
             tag.addAll(tags);
             return tag;
         }
         if (cases.contains(TagTypeCompat.LIST)
                 || cases.contains(TagTypeCompat.MAP)
-                || cases.contains(TagTypeCompat.STRING)) // incompatible types
+                || cases.contains(TagTypeCompat.STRING))
         {
             if (!force)
             {
@@ -590,7 +580,7 @@ public class ListValue extends AbstractListValue implements ContainerValueInterf
             tags.forEach(t -> tag.add(StringTag.valueOf(t.asString().orElseThrow())));
             return tag;
         }
-        // only numbers / mixed types
+
         tags.forEach(cases.contains(TagTypeCompat.DBL)
                 ? (t -> tag.add(DoubleTag.valueOf(((NumericTag) t).doubleValue())))
                 : (t -> tag.add(LongTag.valueOf(((NumericTag) t).longValue()))));

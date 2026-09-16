@@ -21,9 +21,9 @@ import java.util.Locale;
 
 public class Functions
 {
-    public static void apply(Expression expression) // public just to get the javadoc right
+    public static void apply(Expression expression)
     {
-        // artificial construct to handle user defined functions and function definitions
+
         expression.addContextFunction("import", -1, (c, t, lv) ->
         {
             if (lv.size() < 1)
@@ -40,8 +40,6 @@ public class Functions
             return t == Context.VOID ? Value.NULL : ListValue.wrap(c.host.availableImports(moduleName).map(StringValue::new));
         });
 
-
-        // needs to be lazy because of custom context of execution of arguments as a signature
         expression.addCustomFunction("call", new Fluff.AbstractLazyFunction(-1, "call")
         {
             @Override
@@ -51,15 +49,15 @@ public class Functions
                 {
                     throw new InternalExpressionException("'call' expects at least function name to call");
                 }
-                //lv.remove(lv.size()-1); // aint gonna cut it // maybe it will because of the eager eval changes
-                if (t != Context.SIGNATURE) // just call the function
+
+                if (t != Context.SIGNATURE)
                 {
                     List<Value> args = Fluff.AbstractFunction.unpackLazy(lv, c, Context.NONE);
                     FunctionArgument functionArgument = FunctionArgument.findIn(c, expression.module, args, 0, false, true);
                     FunctionValue fun = functionArgument.function;
                     return fun.callInContext(c, t, functionArgument.args);
                 }
-                // gimme signature
+
                 String name = lv.get(0).evalValue(c, Context.NONE).getString();
                 List<String> args = new ArrayList<>();
                 List<String> globals = new ArrayList<>();
@@ -98,7 +96,7 @@ public class Functions
             @Override
             public boolean pure()
             {
-                return false; //true for sinature, but lets leave it for later
+                return false;
             }
 
             @Override
@@ -114,7 +112,6 @@ public class Functions
             }
         });
 
-
         expression.addContextFunction("outer", 1, (c, t, lv) ->
         {
             if (t != Context.LOCALIZATION)
@@ -124,8 +121,6 @@ public class Functions
             return new FunctionAnnotationValue(lv.get(0), FunctionAnnotationValue.Type.GLOBAL);
         });
 
-        //assigns const procedure to the lhs, returning its previous value
-        // must be lazy due to RHS being an expression to save to execute
         expression.addLazyBinaryOperatorWithDelegation("->", "define", Operators.precedence.get("def->"), false, false, (c, type, e, t, lv1, lv2) ->
         {
             if (type == Context.MAPDEF)

@@ -71,14 +71,14 @@ public abstract class ScriptHost
         Module parent;
         public final Map<String, FunctionValue> globalFunctions = new Object2ObjectOpenHashMap<>();
         public final Map<String, LazyValue> globalVariables = new Object2ObjectOpenHashMap<>();
-        public final Map<String, ModuleData> functionImports = new Object2ObjectOpenHashMap<>(); // imported functions string to module
-        public final Map<String, ModuleData> globalsImports = new Object2ObjectOpenHashMap<>(); // imported global variables string to module
-        public final Map<String, ModuleData> futureImports = new Object2ObjectOpenHashMap<>(); // imports not known before used
+        public final Map<String, ModuleData> functionImports = new Object2ObjectOpenHashMap<>();
+        public final Map<String, ModuleData> globalsImports = new Object2ObjectOpenHashMap<>();
+        public final Map<String, ModuleData> futureImports = new Object2ObjectOpenHashMap<>();
 
         public ModuleData(Module parent, ModuleData other)
         {
             super();
-            // imports are just pointers, but they still point to the wrong modules (point to the parent)
+
             this.parent = parent;
             globalFunctions.putAll(other.globalFunctions);
             other.globalVariables.forEach((key, value) ->
@@ -92,7 +92,7 @@ public abstract class ScriptHost
 
         public void setImportsBasedOn(ScriptHost host, ModuleData other)
         {
-            // fixing imports
+
             other.functionImports.forEach((name, targetData) -> {
                 functionImports.put(name, host.moduleData.get(targetData.parent));
             });
@@ -112,7 +112,7 @@ public abstract class ScriptHost
     }
 
     protected final Map<String, ScriptHost> userHosts = new Object2ObjectOpenHashMap<>();
-    private final Map<Module, ModuleData> moduleData = new HashMap<>(); // marking imports
+    private final Map<Module, ModuleData> moduleData = new HashMap<>();
     private final Map<String, Module> modules = new HashMap<>();
 
     protected ScriptHost parent;
@@ -169,21 +169,19 @@ public abstract class ScriptHost
     {
         if (modules.containsKey(moduleName.toLowerCase(Locale.ROOT)))
         {
-            return;  // aready imported
+            return;
         }
         Module module = getModuleOrLibraryByName(moduleName);
         if (modules.containsKey(module.name()))
         {
-            return;  // aready imported, once again, in case some discrepancies in names?
+            return;
         }
         modules.put(module.name(), module);
         ModuleData data = new ModuleData(module);
         initializeModuleGlobals(data);
         moduleData.put(module, data);
         runModuleCode(c, module);
-        //moduleData.remove(module); // we are pooped already, but doesn't hurt to clean that up.
-        //modules.remove(module.getName());
-        //throw new InternalExpressionException("Failed to import a module "+moduleName);
+
     }
 
     public void importNames(Context c, Module targetModule, String sourceModuleName, List<String> identifiers)
@@ -230,9 +228,9 @@ public abstract class ScriptHost
         ).distinct().sorted();
     }
 
-    protected abstract Module getModuleOrLibraryByName(String name); // this should be shell out in the executor
+    protected abstract Module getModuleOrLibraryByName(String name);
 
-    protected abstract void runModuleCode(Context c, Module module); // this should be shell out in the executor
+    protected abstract void runModuleCode(Context c, Module module);
 
     @Nullable
     public FunctionValue getFunction(String name)
@@ -261,7 +259,7 @@ public abstract class ScriptHost
     private FunctionValue getFunction(Module module, String name)
     {
         ModuleData local = getModuleData(module);
-        FunctionValue ret = local.globalFunctions.get(name); // most uses would be from local scope anyways
+        FunctionValue ret = local.globalFunctions.get(name);
         if (ret != null)
         {
             return ret;
@@ -275,7 +273,7 @@ public abstract class ScriptHost
                 return ret;
             }
         }
-        // not in local scope - will need to travel over import links
+
         target = local.futureImports.get(name);
         if (target == null)
         {
@@ -321,7 +319,7 @@ public abstract class ScriptHost
     public LazyValue getGlobalVariable(Module module, String name)
     {
         ModuleData local = getModuleData(module);
-        LazyValue ret = local.globalVariables.get(name); // most uses would be from local scope anyways
+        LazyValue ret = local.globalVariables.get(name);
         if (ret != null)
         {
             return ret;
@@ -335,7 +333,7 @@ public abstract class ScriptHost
                 return ret;
             }
         }
-        // not in local scope - will need to travel over import links
+
         target = local.futureImports.get(name);
         if (target == null)
         {
@@ -441,7 +439,7 @@ public abstract class ScriptHost
         ), getModuleData(module).futureImports.keySet().stream().filter(s -> !s.startsWith("global_"))).filter(predicate);
     }
 
-    public ScriptHost retrieveForExecution(String /*Nullable*/ user)
+    public ScriptHost retrieveForExecution(String   user)
     {
         if (!perUser)
         {
@@ -461,10 +459,10 @@ public abstract class ScriptHost
 
     protected void setupUserHost(ScriptHost host)
     {
-        // adding imports
+
         host.modules.putAll(this.modules);
         this.moduleData.forEach((key, value) -> host.moduleData.put(key, new ModuleData(key, value)));
-        // fixing imports
+
         host.moduleData.forEach((module, data) -> data.setImportsBasedOn(host, this.moduleData.get(data.parent)));
         host.root = this.root;
     }
@@ -515,11 +513,11 @@ public abstract class ScriptHost
                 stopper.submit(() -> {
                     try
                     {
-                        // Wait a while for existing tasks to terminate
+
                         if (!e.awaitTermination(1500, TimeUnit.MILLISECONDS))
                         {
-                            e.shutdownNow(); // Cancel currently executing tasks
-                            // Wait a while for tasks to respond to being cancelled
+                            e.shutdownNow();
+
                             if (!e.awaitTermination(1500, TimeUnit.MILLISECONDS))
                             {
                                 CarpetScriptServer.LOG.error("Failed to stop app's thread");
@@ -528,9 +526,9 @@ public abstract class ScriptHost
                     }
                     catch (InterruptedException ie)
                     {
-                        // (Re-)Cancel if current thread also interrupted
+
                         e.shutdownNow();
-                        // Preserve interrupt status
+
                         Thread.currentThread().interrupt();
                     }
                     stopper.shutdown();
@@ -554,7 +552,6 @@ public abstract class ScriptHost
     {
         return userHosts.keySet();
     }
-
 
     public void resetErrorSnooper()
     {

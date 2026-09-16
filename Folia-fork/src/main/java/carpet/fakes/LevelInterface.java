@@ -17,7 +17,7 @@ import net.minecraft.world.phys.AABB;
 public interface LevelInterface
 {
     Map<EntityType<?>, Entity> getPrecookedMobs();
-    
+
     boolean setBlockStateWithBlockEntity(BlockPos blockPos, BlockState blockState, BlockEntity newBlockEntity, int int1);
 
     List<Entity> getOtherEntitiesLimited(@Nullable Entity except, AABB box, Predicate<? super Entity> predicate, int limit);

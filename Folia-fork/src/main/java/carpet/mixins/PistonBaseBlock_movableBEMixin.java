@@ -44,22 +44,22 @@ public abstract class PistonBaseBlock_movableBEMixin extends DirectionalBlock
             Direction direction_1, boolean boolean_1, Direction direction_2, CallbackInfoReturnable<Boolean> cir)
     {
         Block block_1 = blockState_1.getBlock();
-        //Make CommandBlocks movable, either use instanceof CommandBlock or the 3 cmd block objects,
+
         if (CarpetSettings.movableBlockEntities && block_1 instanceof CommandBlock)
         {
             cir.setReturnValue(true);
         }
     }
-    
+
     private static boolean isPushableBlockEntity(Block block)
     {
-        //Making PISTON_EXTENSION (BlockPistonMoving) pushable would not work as its createNewTileEntity()-method returns null
+
         return block != Blocks.ENDER_CHEST && block != Blocks.ENCHANTING_TABLE &&
                        block != Blocks.END_GATEWAY && block != Blocks.END_PORTAL && block != Blocks.MOVING_PISTON  &&
                        block != Blocks.SPAWNER
-                       && block != Blocks.SCULK_SENSOR && block != Blocks.CALIBRATED_SCULK_SENSOR; // these have weird behaviour and crashes, #1473, also #1885
+                       && block != Blocks.SCULK_SENSOR && block != Blocks.CALIBRATED_SCULK_SENSOR;
     }
-    
+
     @Redirect(method = "isPushable", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/state/BlockState;hasBlockEntity()Z"))
     private static boolean ifHasBlockEntity(BlockState blockState)
     {
@@ -90,7 +90,7 @@ public abstract class PistonBaseBlock_movableBEMixin extends DirectionalBlock
                         List<BlockPos> list_1, List<BlockState> list_2, List<?> list_3, BlockState[] blockStates_1,
                         Direction direction_2, int int_2, @Share("blockEntities") LocalRef<List<BlockEntity>> blockEntities)
     {
-        //Get the blockEntities and remove them from the world before any magic starts to happen
+
         if (CarpetSettings.movableBlockEntities)
         {
             blockEntities.set(Lists.newArrayList());
@@ -101,8 +101,7 @@ public abstract class PistonBaseBlock_movableBEMixin extends DirectionalBlock
                 blockEntities.get().add(blockEntity);
                 if (blockEntity != null)
                 {
-                    //hopefully this call won't have any side effects in the future, such as dropping all the BlockEntity's items
-                    //we want to place this same(!) BlockEntity object into the world later when the movement stops again
+
                     world_1.removeBlockEntity(blockpos);
                     blockEntity.setChanged();
                 }

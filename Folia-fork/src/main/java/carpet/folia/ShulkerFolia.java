@@ -25,19 +25,6 @@ import java.util.List;
 
 import carpet.CarpetSettings;
 
-/**
- * Folia-native implementation of Carpet's {@code stackableShulkerBoxes} rule.
- *
- * <p>Carpet achieves this by hooking ItemStack.getMaxStackSize so empty shulker boxes stack.
- * That hook cannot run on stock Folia (the max count lives in the stack's own data components,
- * not in a field that can be patched), so this class enforces the same effect differently: every
- * few ticks it consolidates empty shulker stacks inside each player's inventory, and when an
- * empty shulker is dropped it merges it into nearby identical ones. Non-empty shulker boxes never
- * merge, exactly like Carpet.
- *
- * <p>Known limitation: containers other than the player's own inventory and automatic stacking
- * (hoppers, chests) are not covered.
- */
 public final class ShulkerFolia implements Listener
 {
     private static final int SCAN_INTERVAL = 40;

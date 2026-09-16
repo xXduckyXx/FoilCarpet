@@ -31,7 +31,7 @@ public abstract class Explosion_scarpetEventMixin
     @Shadow @Final private Explosion.BlockInteraction blockInteraction;
     @Shadow @Final private @Nullable Entity source;
 
-    @Shadow /*@Nullable*/ public abstract /*@Nullable*/ LivingEntity getIndirectSourceEntity();
+    @Shadow   public abstract   LivingEntity getIndirectSourceEntity();
 
     private List<Entity> affectedEntities = new ArrayList<>();
 

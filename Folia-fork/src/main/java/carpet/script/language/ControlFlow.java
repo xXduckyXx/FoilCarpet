@@ -19,9 +19,9 @@ import java.util.stream.Collectors;
 
 public class ControlFlow
 {
-    public static void apply(Expression expression) // public just to get the javadoc right
+    public static void apply(Expression expression)
     {
-        // needs to be lazy cause of custom contextualization
+
         expression.addLazyBinaryOperator(";", "then", Operators.precedence.get("nextop;"), true, true, t -> Context.Type.VOID, (c, t, lv1, lv2) ->
         {
             lv1.evalValue(c, Context.VOID);
@@ -37,8 +37,6 @@ public class ControlFlow
             return (cc, tt) -> v;
         });
 
-
-        // obvious lazy due to conditional evaluation of arguments
         expression.addLazyFunction("if", (c, t, lv) ->
         {
             if (lv.size() < 2)
@@ -77,7 +75,6 @@ public class ControlFlow
             }
         });
 
-        // needs to be lazy since execution of parameters but first one are conditional
         expression.addLazyFunction("try", (c, t, lv) ->
         {
             if (lv.isEmpty())
@@ -104,7 +101,7 @@ public class ControlFlow
                     throw new InternalExpressionException("Try-catch block needs the code to run, and either a catch expression for user thrown exceptions, or a number of pairs of filters and catch expressions");
                 }
 
-                Value val = null; // This is always assigned at some point, just the compiler doesn't know
+                Value val = null;
 
                 LazyValue defaultVal = c.getVariable("_");
                 c.setVariable("_", (ct, tt) -> ret.data.reboundedTo("_"));
@@ -157,7 +154,7 @@ public class ControlFlow
                 {
                     c.delVariable("_trace");
                 }
-                if (val == null)  // not handled
+                if (val == null)
                 {
                     throw ret;
                 }

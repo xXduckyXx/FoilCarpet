@@ -98,7 +98,7 @@ public class Token implements Comparable<Token> {
 
     @Override
     public int compareTo(Token o) {
-        // compare by lineno, then by linepos, then by ordinal
+
         if (lineno != o.lineno)
         {
             return lineno - o.lineno;

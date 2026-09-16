@@ -25,16 +25,9 @@ import org.jspecify.annotations.Nullable;
 
 import static java.util.Map.entry;
 
-/**
- * A series of utility functions and variables for dealing predominantly with hopper counters and determining which counter
- * to add their items to, as well as helping dealing with carpet functionality.
- */
 public class WoolTool
 {
-    /**
-     * A map from a wool {@link Block} to its {@link DyeColor} which is used in {@link WoolTool#getWoolColorAtPosition}
-     * to get the colour of wool at a position.
-     */
+
     private static final Map<Block, DyeColor> WOOL_BLOCK_TO_DYE = Map.ofEntries(
             entry(Blocks.WHITE_WOOL, DyeColor.WHITE),
             entry(Blocks.ORANGE_WOOL, DyeColor.ORANGE),
@@ -54,13 +47,6 @@ public class WoolTool
             entry(Blocks.BLACK_WOOL, DyeColor.BLACK)
     );
 
-    /**
-     * The method which gets triggered when a player places a carpet, and decides what to do based on the carpet's colour:
-     * <ul>
-     *     <li>Red - Resets the counter of the colour of wool underneath the carpet (if there is no wool, then nothing happens)</li>
-     *     <li>Green - Prints the contents of the counter of the colour of wool underneath the carpet</li>
-     * </ul>
-     */
     public static void carpetPlacedAction(DyeColor color, ServerPlayer placer, BlockPos pos, ServerLevel worldIn)
     {
         if (!CarpetSettings.carpets)
@@ -83,7 +69,7 @@ public class WoolTool
                 {
                     CommandSourceStack source = placer.createCommandSourceStack();
                     if (!DistanceCalculator.hasStartingPoint(source) || placer.isShiftKeyDown()) {
-                        DistanceCalculator.setStart(source, Vec3.atLowerCornerOf(pos) ); // zero padded pos
+                        DistanceCalculator.setStart(source, Vec3.atLowerCornerOf(pos) );
                     }
                     else {
                         DistanceCalculator.setEnd(source, Vec3.atLowerCornerOf(pos));
@@ -118,9 +104,6 @@ public class WoolTool
         }
     }
 
-    /**
-     * Gets the colour of wool at the position, for hoppers to be able to decide whether to add their items to the global counter.
-     */
     @Nullable
     public static DyeColor getWoolColorAtPosition(Level worldIn, BlockPos pos)
     {

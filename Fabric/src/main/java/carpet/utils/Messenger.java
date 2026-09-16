@@ -41,19 +41,19 @@ public class Messenger
 
         WHITE       ('w', (s, f) -> s.withColor(ChatFormatting.WHITE)),
         YELLOW      ('y', (s, f) -> s.withColor(ChatFormatting.YELLOW)),
-        LIGHT_PURPLE('m', (s, f) -> s.withColor(ChatFormatting.LIGHT_PURPLE)), // magenta
+        LIGHT_PURPLE('m', (s, f) -> s.withColor(ChatFormatting.LIGHT_PURPLE)),
         RED         ('r', (s, f) -> s.withColor(ChatFormatting.RED)),
-        AQUA        ('c', (s, f) -> s.withColor(ChatFormatting.AQUA)), // cyan
-        GREEN       ('l', (s, f) -> s.withColor(ChatFormatting.GREEN)), // lime
-        BLUE        ('t', (s, f) -> s.withColor(ChatFormatting.BLUE)), // light blue, teal
+        AQUA        ('c', (s, f) -> s.withColor(ChatFormatting.AQUA)),
+        GREEN       ('l', (s, f) -> s.withColor(ChatFormatting.GREEN)),
+        BLUE        ('t', (s, f) -> s.withColor(ChatFormatting.BLUE)),
         DARK_GRAY   ('f', (s, f) -> s.withColor(ChatFormatting.DARK_GRAY)),
         GRAY        ('g', (s, f) -> s.withColor(ChatFormatting.GRAY)),
         GOLD        ('d', (s, f) -> s.withColor(ChatFormatting.GOLD)),
-        DARK_PURPLE ('p', (s, f) -> s.withColor(ChatFormatting.DARK_PURPLE)), // purple
-        DARK_RED    ('n', (s, f) -> s.withColor(ChatFormatting.DARK_RED)),  // brown
+        DARK_PURPLE ('p', (s, f) -> s.withColor(ChatFormatting.DARK_PURPLE)),
+        DARK_RED    ('n', (s, f) -> s.withColor(ChatFormatting.DARK_RED)),
         DARK_AQUA   ('q', (s, f) -> s.withColor(ChatFormatting.DARK_AQUA)),
         DARK_GREEN  ('e', (s, f) -> s.withColor(ChatFormatting.DARK_GREEN)),
-        DARK_BLUE   ('v', (s, f) -> s.withColor(ChatFormatting.DARK_BLUE)), // navy
+        DARK_BLUE   ('v', (s, f) -> s.withColor(ChatFormatting.DARK_BLUE)),
         BLACK       ('k', (s, f) -> s.withColor(ChatFormatting.BLACK)),
 
         COLOR       ('#', (s, f) -> {
@@ -118,7 +118,7 @@ public class Messenger
             case AMBIENT -> "f";
             case WATER_CREATURE -> "v";
             case WATER_AMBIENT -> "q";
-            default -> "w"; // missing MISC and UNDERGROUND_WATER_CREATURE
+            default -> "w";
         };
     }
 
@@ -153,10 +153,10 @@ public class Messenger
             case '^' -> previousStyle.withHoverEvent(new HoverEvent.ShowText(c(message.substring(1))));
             case '@' -> previousStyle.withClickEvent(new ClickEvent.OpenUrl(URI.create(message.substring(1))));
             case '&' -> previousStyle.withClickEvent(new ClickEvent.CopyToClipboard(message.substring(1)));
-            default  -> { // Create a new component
+            default  -> {
                 ret = Component.literal(str);
                 ret.setStyle(parseStyle(desc));
-                yield previousStyle; // no op for the previous style
+                yield previousStyle;
             }
         });
         return ret;
@@ -173,7 +173,6 @@ public class Messenger
         return getCoordsTextComponent(desc, x, y, z, true);
     }
 
-    /// to be continued
     public static Component dbl(String style, double double_value)
     {
         return c(String.format("%s %.1f",style,double_value),String.format("^w %f",double_value));
@@ -215,7 +214,7 @@ public class Messenger
             components.add("^w "+dbl);
             prefix = ", ";
         }
-        //components.remove(components.size()-1);
+
         components.add(style+"  ]");
         return c(components.toArray(new Object[0]));
     }
@@ -237,7 +236,6 @@ public class Messenger
         return c(text, command);
     }
 
-    //message source
     public static void m(CommandSourceStack source, Object ... fields)
     {
         if (source != null)
@@ -248,9 +246,6 @@ public class Messenger
         ((ServerPlayer)player).sendSystemMessage(Messenger.c(fields));
     }
 
-    /*
-    composes single line, multicomponent message, and returns as one chat messagge
-     */
     public static Component c(Object ... fields)
     {
         MutableComponent message = Component.literal("");
@@ -271,8 +266,6 @@ public class Messenger
         return message;
     }
 
-    //simple text
-
     public static Component s(String text)
     {
         return s(text,"");
@@ -284,9 +277,6 @@ public class Messenger
         return message;
     }
 
-
-
-
     public static void send(Player player, Collection<Component> lines)
     {
         lines.forEach(message -> ((ServerPlayer)player).sendSystemMessage(message));
@@ -295,7 +285,6 @@ public class Messenger
     {
         lines.stream().forEachOrdered((s) -> source.sendSuccess(() -> s, false));
     }
-
 
     public static void print_server_message(MinecraftServer server, String message)
     {
@@ -319,4 +308,3 @@ public class Messenger
         }
     }
 }
-

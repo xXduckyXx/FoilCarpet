@@ -13,8 +13,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-
-//classes that override onButtonClick
 @Mixin({EnchantmentMenu.class, LecternMenu.class, LoomMenu.class, StonecutterMenu.class})
 public abstract class AbstractContainerMenuSubclasses_scarpetMixin extends AbstractContainerMenu {
     protected AbstractContainerMenuSubclasses_scarpetMixin(MenuType<?> type, int syncId) {

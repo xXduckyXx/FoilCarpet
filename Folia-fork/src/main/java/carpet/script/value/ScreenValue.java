@@ -107,7 +107,6 @@ public class ScreenValue extends Value
         screenHandlerFactories.put("stonecutter", StonecutterMenu::new);
     }
 
-
     protected interface ScarpetScreenHandlerFactory
     {
         AbstractContainerMenu create(int syncId, Inventory playerInventory);
@@ -166,7 +165,7 @@ public class ScreenValue extends Value
     {
         if (this.player.containerMenu != this.player.inventoryMenu)
         {
-            //prevent recursion when closing screen in closing screen callback by doing this before triggering event
+
             this.inventory = null;
             this.player.containerMenu = this.player.inventoryMenu;
             this.player.closeContainer();
@@ -187,7 +186,6 @@ public class ScreenValue extends Value
         this.screenHandler = null;
         return false;
     }
-
 
     private boolean callListener(ServerPlayer player, String action, Map<Value, Value> data)
     {
@@ -400,7 +398,6 @@ public class ScreenValue extends Value
         return nbtList;
     }
 
-
     public interface ScarpetScreenHandlerListener extends ContainerListener
     {
         boolean onSlotClick(ServerPlayer player, ClickType actionType, int slot, int button);
@@ -539,7 +536,6 @@ public class ScreenValue extends Value
             this.screenHandler.setCarried(ItemStack.EMPTY);
             this.setChanged();
         }
-
 
         public static ItemStack splitStack(List<Slot> slots, int slot, int amount)
         {

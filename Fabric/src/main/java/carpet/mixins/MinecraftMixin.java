@@ -14,18 +14,18 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class MinecraftMixin
 {
     @Shadow public ClientLevel level;
-    
+
     @Inject(method = "disconnect(Lnet/minecraft/client/gui/screens/Screen;Z)V", at = @At("HEAD"))
     private void onCloseGame(Screen screen, boolean b, CallbackInfo ci)
     {
         CarpetClient.disconnect();
     }
-    
+
     @Inject(at = @At("HEAD"), method = "tick")
     private void onClientTick(CallbackInfo info) {
         if (this.level != null) {
             boolean runsNormally = level.tickRateManager().runsNormally();
-            // hope server doesn't need to tick - should be handled by the server on its own
+
             if (!runsNormally)
                 CarpetClient.shapes.renewShapes();
         }

@@ -21,22 +21,22 @@ public abstract class Guardian_renewableSpongesMixin extends Monster
 
     @Override
     public void thunderHit(ServerLevel serverWorld, LightningBolt lightningEntity)
-    {                                // isRemoved()
+    {
         if (!this.level().isClientSide() && !this.isRemoved() && CarpetSettings.renewableSponges && !((Object)this instanceof ElderGuardian))
         {
             ElderGuardian elderGuardian = new ElderGuardian(EntityType.ELDER_GUARDIAN ,this.level());
             elderGuardian.snapTo(this.getX(), this.getY(), this.getZ(), this.getYRot(), this.getXRot());
             elderGuardian.finalizeSpawn(serverWorld ,serverWorld.getCurrentDifficultyAt(elderGuardian.blockPosition()), EntitySpawnReason.CONVERSION, null);
             elderGuardian.setNoAi(this.isNoAi());
-            
+
             if (this.hasCustomName())
             {
                 elderGuardian.setCustomName(this.getCustomName());
                 elderGuardian.setCustomNameVisible(this.isCustomNameVisible());
             }
-            
+
             this.level().addFreshEntity(elderGuardian);
-            this.discard(); // discard remove();
+            this.discard();
         }
         else
         {

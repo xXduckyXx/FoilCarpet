@@ -119,7 +119,6 @@ public class ValueConversions
         );
     }
 
-
     public static Value of(ObjectiveCriteria criteria)
     {
         return ListValue.of(
@@ -127,7 +126,6 @@ public class ValueConversions
                 BooleanValue.of(criteria.isReadOnly())
         );
     }
-
 
     public static Value of(ParticleOptions particle, RegistryAccess regs)
     {
@@ -167,7 +165,7 @@ public class ValueConversions
                 default -> {
                     ResourceKey<Level> dim = null;
                     Identifier id = Identifier.parse(dimString);
-                    // not using RegistryKey.of since that one creates on check
+
                     for (ResourceKey<Level> world : (server.levelKeys()))
                     {
                         if (id.equals(world.identifier()))
@@ -203,7 +201,7 @@ public class ValueConversions
 
     public static Value of(@Nullable Identifier id)
     {
-        if (id == null) // should be Value.NULL
+        if (id == null)
         {
             return Value.NULL;
         }
@@ -212,7 +210,7 @@ public class ValueConversions
 
     public static String simplify(Identifier id)
     {
-        if (id == null) // should be Value.NULL
+        if (id == null)
         {
             return "";
         }
@@ -404,7 +402,7 @@ public class ValueConversions
         throw new InternalExpressionException("Unknown property type: " + p.getName());
     }
 
-    record SlotParam(/* Nullable */ String type, int id)
+    record SlotParam(  String type, int id)
     {
         public ListValue build()
         {
@@ -415,7 +413,7 @@ public class ValueConversions
     private static final Int2ObjectMap<SlotParam> slotIdsToSlotParams = new Int2ObjectOpenHashMap<>()
     {{
         int n;
-        //covers blocks, player hotbar and inventory, and all default inventories
+
         for (n = 0; n < 54; ++n)
         {
             put(n, new SlotParam(null, n));
@@ -425,33 +423,29 @@ public class ValueConversions
             put(200 + n, new SlotParam("enderchest", n));
         }
 
-        // villager
         for (n = 0; n < 8; ++n)
         {
             put(300 + n, new SlotParam(null, n));
         }
 
-        // horse, llamas, donkeys, etc.
-        // two first slots are for saddle and armour
         for (n = 0; n < 15; ++n)
         {
             put(500 + n, new SlotParam(null, n + 2));
         }
-        // weapon main hand
+
         put(98, new SlotParam("equipment", 0));
-        // offhand
+
         put(99, new SlotParam("equipment", 5));
-        // feet, legs, chest, head
+
         for (n = 0; n < 4; ++n)
         {
             put(100 + n, new SlotParam("equipment", n + 1));
         }
-        //horse defaults saddle
+
         put(400, new SlotParam(null, 0));
-        // armor
+
         put(401, new SlotParam(null, 1));
-        // chest itself on the donkey is wierd - use NBT to alter that.
-        //hashMap.put("horse.chest", 499);
+
     }};
 
     public static Value ofVanillaSlotResult(int itemSlot)

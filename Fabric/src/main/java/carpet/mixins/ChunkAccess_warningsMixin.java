@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(ChunkAccess.class)
 public abstract class ChunkAccess_warningsMixin
 {
-    // failed to mixin into interface. need to mixin in two places that uses it
+
     @Inject(method = "markPosForPostprocessing(Lnet/minecraft/core/BlockPos;)V",
         at =@At("HEAD"), cancellable = true)
     private void squashWarnings(BlockPos blockPos_1, CallbackInfo ci)

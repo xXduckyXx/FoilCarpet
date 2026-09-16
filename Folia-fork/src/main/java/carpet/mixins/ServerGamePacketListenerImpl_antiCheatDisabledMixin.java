@@ -26,8 +26,6 @@ public abstract class ServerGamePacketListenerImpl_antiCheatDisabledMixin extend
         super(minecraftServer, connection, cci);
     }
 
-    //@Shadow protected abstract boolean isSingleplayerOwner();
-
     @Inject(method = "tick", at = @At("HEAD"))
     private void restrictFloatingBits(CallbackInfo ci)
     {
@@ -48,7 +46,7 @@ public abstract class ServerGamePacketListenerImpl_antiCheatDisabledMixin extend
         return isSingleplayerOwner() || CarpetSettings.antiCheatDisabled;
     }
 
-    @Redirect(method = "handleMovePlayer", require = 0, // don't crash with immersive portals,
+    @Redirect(method = "handleMovePlayer", require = 0,
              at = @At(
             value = "INVOKE",
             target = "Lnet/minecraft/server/level/ServerPlayer;isChangingDimension()Z"))

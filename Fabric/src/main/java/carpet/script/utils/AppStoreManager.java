@@ -36,21 +36,12 @@ import org.apache.commons.io.IOUtils;
 
 import org.jspecify.annotations.Nullable;
 
-/**
- * A class used to save scarpet app store scripts to disk
- */
 public class AppStoreManager
 {
-    /**
-     * A local copy of the scarpet repo's file structure, to avoid multiple queries to github.com while typing out the
-     * {@code /script download} command and getting the suggestions.
-     */
+
     private static StoreNode APP_STORE_ROOT = StoreNode.folder(null, "");
     private static long storeErrorTime = 0;
 
-    /**
-     * This is the base link to the scarpet app repo from the github api.
-     */
     private static String scarpetRepoLink = "https://api.github.com/repos/gnembon/scarpet/contents/programs/";
 
     public static void setScarpetRepoLink(@Nullable String link)
@@ -154,7 +145,7 @@ public class AppStoreManager
                     Carpet.Messenger_message(source, "r Scarpet app store is not available at the moment, try in a minute");
                 }
                 storeErrorTime = System.currentTimeMillis();
-                // Not sealing to allow retrying
+
                 throw new IOException("Problems fetching " + queryPath, e);
             }
             JsonArray files = JsonParser.parseString(response).getAsJsonArray();
@@ -166,7 +157,7 @@ public class AppStoreManager
                 {
                     children.put(elementName, folder(this, elementName));
                 }
-                else// if (name.matches("(\\w+\\.scl?)"))
+                else
                 {
                     String url = jo.get("download_url").getAsString();
                     children.put(elementName, scriptFile(this, elementName, url));
@@ -175,10 +166,6 @@ public class AppStoreManager
             sealed = true;
         }
 
-        /**
-         * Returns true if doing down the directory structure cannot continue since the matching element is either a leaf or
-         * a string not matching of any node.
-         */
         public boolean cannotContinueFor(String pathElement, CommandSourceStack source) throws IOException
         {
             if (isLeaf())
@@ -227,14 +214,6 @@ public class AppStoreManager
         }
     }
 
-    /**
-     * This method searches for valid file names from the user-inputted string, e.g if the user has thus far typed
-     * {@code survival/a} then it will return all the files in the {@code survival} directory of the scarpet repo (and
-     * will automatically highlight those starting with a), and the string {@code survival/} as the current most valid path.
-     *
-     * @param currentPath The path down which we want to search for files
-     * @return A pair of the current valid path, as well as the set of all the file/directory names at the end of that path
-     */
     public static List<String> suggestionsFromPath(String currentPath, CommandSourceStack source) throws IOException
     {
         String[] path = currentPath.split("/");
@@ -250,18 +229,10 @@ public class AppStoreManager
         List<String> filteredSuggestions = appKiosk.createPathSuggestions(source).stream().filter(s -> s.startsWith(currentPath)).toList();
         if (filteredSuggestions.size() == 1 && !appKiosk.isLeaf())
         {
-            return suggestionsFromPath(filteredSuggestions.get(0), source); // Start suggesting directory contents
+            return suggestionsFromPath(filteredSuggestions.get(0), source);
         }
         return filteredSuggestions;
     }
-
-
-    /**
-     * Downloads script and saves it to appropriate place.
-     *
-     * @param path The user-inputted path to the script
-     * @return {@code 1} if we succesfully saved the script, {@code 0} otherwise
-     */
 
     public static int downloadScript(CommandSourceStack source, String path)
     {
@@ -287,12 +258,6 @@ public class AppStoreManager
         return Vanilla.MinecraftServer_getScriptServer(source.getServer()).addScriptHost(source, nodeInfo.name().replaceFirst("\\.sc$", ""), null, true, false, false, nodeInfo.source(), Expression.LoadOverride.DEFAULT);
     }
 
-    /**
-     * Gets the code once the user inputs the command.
-     *
-     * @param appPath The user inputted path to the scarpet script
-     * @return Pair of app file name and content
-     */
     public static AppInfo getFileNode(String appPath, CommandSourceStack source)
     {
         return getFileNodeFrom(APP_STORE_ROOT, appPath, source);
@@ -317,7 +282,6 @@ public class AppStoreManager
             throw new CommandRuntimeException(Carpet.Messenger_compose("rb '" + appPath + "' is not a valid path to a scarpet app: " + e.getMessage()));
         }
     }
-
 
     public static boolean saveScriptToFile(CommandSourceStack source, String path, String appFileName, String code, boolean useTrash)
     {
@@ -366,15 +330,15 @@ public class AppStoreManager
 
     private static String getFullContentUrl(String original, StoreNode storeSource, CommandSourceStack source)
     {
-        if (original.matches("^https?://.*$")) // We've got a full url here: Just use it
+        if (original.matches("^https?://.*$"))
         {
             return original;
         }
-        if (original.charAt(0) == '/') // We've got an absolute path: Use app store root
+        if (original.charAt(0) == '/')
         {
             return getFileNode(original.substring(1), source).url();
         }
-        return getFileNodeFrom(storeSource, original, source).url(); // Relative path: Use download location
+        return getFileNodeFrom(storeSource, original, source).url();
     }
 
     public static void addResource(CarpetScriptHost carpetScriptHost, StoreNode storeSource, Value resource)
@@ -409,23 +373,15 @@ public class AppStoreManager
         CarpetScriptServer.LOG.info("Downloaded resource " + target + " from " + contentUrl);
     }
 
-    /**
-     * Gets a new StoreNode for an app's dependency with proper relativeness. Will be null if it comes from an external URL
-     *
-     * @param originalSource The StoreNode from the container's app
-     * @param sourceString   The string the app specified as source
-     * @param contentUrl     The full content URL, from {@link #getFullContentUrl(String, StoreNode, CommandSourceStack)}
-     * @return A {@link StoreNode} that can be used in an app that came from the provided source
-     */
     @Nullable
     private static StoreNode getNewStoreNode(CommandSourceStack commandSource, StoreNode originalSource, String sourceString, String contentUrl)
     {
         StoreNode next = originalSource;
-        if (sourceString == contentUrl) // External URL (check getFullUrlContent)
+        if (sourceString == contentUrl)
         {
             return null;
         }
-        if (sourceString.charAt(0) == '/') // Absolute URL
+        if (sourceString.charAt(0) == '/')
         {
             next = APP_STORE_ROOT;
             sourceString = sourceString.substring(1);
@@ -440,7 +396,7 @@ public class AppStoreManager
         }
         catch (IOException e)
         {
-            return null; // Should never happen, but let's not give a potentially incorrect node just in case
+            return null;
         }
         return next;
     }

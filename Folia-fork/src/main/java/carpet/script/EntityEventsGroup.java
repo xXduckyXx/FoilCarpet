@@ -42,7 +42,7 @@ public class EntityEventsGroup
     {
         if (actions.isEmpty())
         {
-            return; // most of the cases, trying to be nice
+            return;
         }
         Map<EventKey, CarpetEventServer.Callback> actionSet = actions.get(type);
         if (actionSet == null)
@@ -52,7 +52,7 @@ public class EntityEventsGroup
         CarpetScriptServer scriptServer = Vanilla.MinecraftServer_getScriptServer(entity.level().getServer());
         if (scriptServer.stopAll)
         {
-            return; // executed after world is closin down
+            return;
         }
         for (Iterator<Map.Entry<EventKey, CarpetEventServer.Callback>> iterator = actionSet.entrySet().iterator(); iterator.hasNext(); )
         {
@@ -101,7 +101,6 @@ public class EntityEventsGroup
             }
         }
     }
-
 
     public static class Event
     {
@@ -154,7 +153,7 @@ public class EntityEventsGroup
         public Event(String identifier, int args)
         {
             id = identifier;
-            argcount = args + 1; // entity is not extra
+            argcount = args + 1;
             byName.put(identifier, this);
         }
 

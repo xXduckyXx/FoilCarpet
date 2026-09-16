@@ -34,26 +34,11 @@ import org.bukkit.plugin.Plugin;
 
 import carpet.CarpetSettings;
 
-/**
- * Folia-native implementation of Carpet's {@code railPowerLimit} rule on stock Folia.
- *
- * <p>Vanilla powers a line of powered rails only 8 blocks deep through the recursion in
- * {@code PoweredRailBlock.findPoweredRailSignal} (masked with {@code railPowerLimit - 1} by
- * Carpet). Stock Folia cannot remask that constant, so this plugin emulates the rule after the
- * fact: powered rails are located per loaded chunk and, when {@code railPowerLimit} differs
- * from the vanilla default of 9, their {@code POWERED} flag is recomputed with the configured
- * limit and applied with a silent block update (flag 2, clients only - no neighbour updates,
- * so the scan never fights the vanilla redstone cascade). The scan re-asserts every 10 ticks.
- *
- * <p>Only loaded chunks participate; an unloaded chunk cannot send redstone into a loaded one,
- * and whenever a chunk (re)loads its rails are re-tracked immediately.
- */
 public final class RailFolia implements Listener
 {
     private static final int POWER_SCAN_INTERVAL = 10;
     private static final int RESCAN_INTERVAL = 600;
 
-    // world UID -> packed chunk key -> rail block positions in that chunk
     private static final ConcurrentHashMap<String, ConcurrentHashMap<Long, Set<BlockPos>>> RAILS =
             new ConcurrentHashMap<>();
 
@@ -65,8 +50,6 @@ public final class RailFolia implements Listener
     {
         this.plugin = plugin;
     }
-
-    // ---------------------------------------------------------------- events
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onRailPlace(BlockPlaceEvent event)
@@ -113,8 +96,6 @@ public final class RailFolia implements Listener
         }
     }
 
-    // ---------------------------------------------------------------- per-tick
-
     public static void tick(Plugin plugin, MinecraftServer server)
     {
         if (server == null)
@@ -125,12 +106,12 @@ public final class RailFolia implements Listener
         boolean active = limitSetting != 9;
         if (active && lastLimit == 9)
         {
-            // enable (or plugin start with the rule already set): track and apply promptly
+
             rescanAll(plugin, server);
         }
         else if (!active && lastLimit != 9)
         {
-            // disable: recompute with the vanilla limit so trailing rails get unpowered
+
             powerPass(plugin, server, 8);
         }
         lastLimit = limitSetting;
@@ -148,8 +129,6 @@ public final class RailFolia implements Listener
             rescanAll(plugin, server);
         }
     }
-
-    // ---------------------------------------------------------------- tracking
 
     private static void track(Block block)
     {
@@ -182,8 +161,6 @@ public final class RailFolia implements Listener
     {
         return ((long) x << 32) ^ (z & 0xFFFFFFFFL);
     }
-
-    // ---------------------------------------------------------------- scanning
 
     private static void rescanAll(Plugin plugin, MinecraftServer server)
     {
@@ -256,7 +233,7 @@ public final class RailFolia implements Listener
         }
         RAILS.computeIfAbsent(world.getUID().toString(), k -> new ConcurrentHashMap<>())
                 .put(packChunk(chunkX, chunkZ), found);
-        // apply the configured limit right after (re)tracking this chunk
+
         fixRails(level, found, CarpetSettings.railPowerLimit - 1);
     }
 
@@ -310,27 +287,20 @@ public final class RailFolia implements Listener
             BlockState state = level.getBlockState(pos);
             if (!state.is(Blocks.POWERED_RAIL))
             {
-                // rail was moved/removed; leave it to the periodic rescan to prune
+
                 continue;
             }
             boolean powered = level.hasNeighborSignal(pos) || chainPowered(level, pos, limit);
             boolean currently = state.getValue(BlockStateProperties.POWERED);
             if (currently != powered)
             {
-                // flag 2 = update clients only; no neighbour updates, so vanilla's redstone
-                // cascade never reacts to (and fights) our correction.
+
                 level.setBlock(pos, state.setValue(BlockStateProperties.POWERED, powered), 2);
             }
             found.remove(pos);
         }
     }
 
-    // ---------------------------------------------------------------- power chain
-
-    /**
-     * Mirrors vanilla's {@code findPoweredRailSignal} recursion: a rail is powered when it or
-     * any connected powered-rail position within {@code limit} hops carries a neighbour signal.
-     */
     private static boolean chainPowered(ServerLevel level, BlockPos start, int limit)
     {
         if (level.hasNeighborSignal(start))
@@ -377,8 +347,7 @@ public final class RailFolia implements Listener
         {
             return;
         }
-        // Powered rails only register the straight shapes (RAIL_SHAPE_STRAIGHT); querying with
-        // the full RAIL_SHAPE property fails the block state's property identity check.
+
         RailShape shape = state.getValue(PoweredRailBlock.SHAPE);
         int x = pos.getX();
         int y = pos.getY();
@@ -386,8 +355,7 @@ public final class RailFolia implements Listener
         switch (shape)
         {
             case NORTH_SOUTH:
-                // flat rails additionally reach the rail one cell below the neighbour cell,
-                // which is how a rail at the top of a step connects back down the slope
+
                 tryRail(level, seen, queue, x, y, z - 1, RailShape.NORTH_SOUTH);
                 tryRail(level, seen, queue, x, y - 1, z - 1, RailShape.NORTH_SOUTH);
                 tryRail(level, seen, queue, x, y, z + 1, RailShape.NORTH_SOUTH);
@@ -416,7 +384,7 @@ public final class RailFolia implements Listener
                 tryRail(level, seen, queue, x, y + 1, z + 1, RailShape.NORTH_SOUTH);
                 break;
             default:
-                // curves do not propagate power in vanilla, they only act as endpoints
+
                 break;
         }
     }
@@ -431,7 +399,7 @@ public final class RailFolia implements Listener
             return;
         }
         RailShape shape = state.getValue(PoweredRailBlock.SHAPE);
-        // vanilla treats a perpendicular (crossing) rail as not passing power through
+
         if (family == RailShape.EAST_WEST && (shape == RailShape.NORTH_SOUTH
                 || shape == RailShape.ASCENDING_NORTH || shape == RailShape.ASCENDING_SOUTH))
         {

@@ -33,7 +33,7 @@ public abstract class LiquidBlock_renewableBlackstoneMixin
                 for(Direction direction : Direction.values())
                 {
                     if (direction != Direction.DOWN) {
-                        BlockPos blockPos = pos.relative(direction); // offset
+                        BlockPos blockPos = pos.relative(direction);
                         if (world.getBlockState(blockPos).is(Blocks.BLUE_ICE)) {
                             world.setBlockAndUpdate(pos, Blocks.BLACKSTONE.defaultBlockState());
                             fizz(world, pos);

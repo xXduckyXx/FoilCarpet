@@ -41,13 +41,12 @@ public abstract class PistonHeadRenderer_movableBEMixin implements BlockEntityRe
             if (be != null)
             {
                 float progress = pistonMovingBlockEntity.getProgress(f);
-                //System.out.println("progress: " + progress);
-                //if (progress != 0) {
+
                     BlockEntityRenderState res = dispatcher.tryExtractRenderState(be, f, crumblingOverlay);
                     if (res != null) {
                         ((PistonHeadRenderStateInterface) pistonHeadRenderState).setMovedBERenderState(res);
                     }
-                //}
+
             }
         }
     }
@@ -56,8 +55,7 @@ public abstract class PistonHeadRenderer_movableBEMixin implements BlockEntityRe
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/SubmitNodeCollector;submitMovingBlock(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/block/MovingBlockRenderState;)V",
             ordinal = 0))
     private void endMethod(PistonHeadRenderState pistonHeadRenderState, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState cameraRenderState, CallbackInfo ci)
-    //private void endMethod(PistonMovingBlockEntity pistonBlockEntity_1, float partialTicks, PoseStack matrixStack_1, int i, int j, Vec3 vec3, ModelFeatureRenderer.CrumblingOverlay crumblingOverlay, SubmitNodeCollector submitNodeCollector, CallbackInfo ci)
-    //private void endMethod3576(PistonMovingBlockEntity pistonBlockEntity_1, float partialTicks, PoseStack matrixStack_1, MultiBufferSource layeredVertexConsumerStorage_1, int int_1, int init_2, Vec3 cameraPos, CallbackInfo ci)
+
     {
         if (pistonHeadRenderState instanceof PistonHeadRenderStateInterface mbrsi && pistonHeadRenderState.block != null)
             if (mbrsi.getMovedBERenderState() != null) {

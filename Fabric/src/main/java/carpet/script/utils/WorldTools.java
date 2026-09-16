@@ -1,9 +1,7 @@
 package carpet.script.utils;
 
-//import carpet.fakes.MinecraftServerInterface;
 import carpet.script.external.Vanilla;
-//import net.fabricmc.api.EnvType;
-//import net.fabricmc.api.Environment;
+
 import net.minecraft.util.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
@@ -73,7 +71,7 @@ public class WorldTools
         }
         if (!deepcheck)
         {
-            return true; // not using cache in this case.
+            return true;
         }
         try
         {
@@ -90,72 +88,6 @@ public class WorldTools
         }
         return true;
     }
-/*
-    public static boolean createWorld(MinecraftServer server, String worldKey, Long seed)
-    {
-        Identifier worldId = new Identifier(worldKey);
-        ServerLevel overWorld = server.overworld();
-
-        Set<ResourceKey<Level>> worldKeys = server.levelKeys();
-        for (ResourceKey<Level> worldRegistryKey : worldKeys)
-        {
-            if (worldRegistryKey.location().equals(worldId))
-            {
-                // world with this id already exists
-                return false;
-            }
-        }
-        ServerLevelData serverWorldProperties = server.getWorldData().overworldData();
-        WorldGenSettings generatorOptions = server.getWorldData().worldGenSettings();
-        boolean bl = generatorOptions.isDebug();
-        long l = generatorOptions.seed();
-        long m = BiomeManager.obfuscateSeed(l);
-        List<CustomSpawner> list = List.of();
-        Registry<LevelStem> simpleRegistry = generatorOptions.dimensions();
-        LevelStem dimensionOptions = simpleRegistry.get(LevelStem.OVERWORLD);
-        ChunkGenerator chunkGenerator2;
-        Holder<DimensionType> dimensionType2;
-        if (dimensionOptions == null) {
-            dimensionType2 = server.registryAccess().registryOrThrow(Registry.DIMENSION_TYPE_REGISTRY).getOrCreateHolder(DimensionType.OVERWORLD_LOCATION);;
-            chunkGenerator2 = WorldGenSettings.makeDefaultOverworld(server.registryAccess(), (new Random()).nextLong());
-        } else {
-            dimensionType2 = dimensionOptions.typeHolder();
-            chunkGenerator2 = dimensionOptions.generator();
-        }
-
-        ResourceKey<Level> customWorld = ResourceKey.create(Registry.DIMENSION_REGISTRY, worldId);
-
-        //chunkGenerator2 = GeneratorOptions.createOverworldGenerator(server.getRegistryManager().get(Registry.BIOME_KEY), server.getRegistryManager().get(Registry.NOISE_SETTINGS_WORLDGEN), (seed==null)?l:seed);
-
-        // from world/gen/GeneratorOptions
-        //chunkGenerator2 = new NoiseChunkGenerator(MultiNoiseBiomeSource.createVanillaSource(server.getRegistryManager().get(Registry.BIOME_KEY), seed), seed, () -> {
-        //    return server.getRegistryManager().get(Registry.CHUNK_GENERATOR_SETTINGS_KEY).getOrThrow(ChunkGeneratorSettings.OVERWORLD);
-        //});
-
-        chunkGenerator2 = new NoiseBasedChunkGenerator(
-                server.registryAccess().registryOrThrow(Registry.STRUCTURE_SET_REGISTRY),
-                server.registryAccess().registryOrThrow(Registry.NOISE_REGISTRY),
-                MultiNoiseBiomeSource.Preset.OVERWORLD.biomeSource(server.registryAccess().registryOrThrow(Registry.BIOME_REGISTRY)), seed,
-            Holder.direct(server.registryAccess().registryOrThrow(Registry.NOISE_GENERATOR_SETTINGS_REGISTRY).getOrThrow(NoiseGeneratorSettings.OVERWORLD))
-        );
-
-        ServerLevel serverWorld = new ServerLevel(
-                server,
-                Util.backgroundExecutor(),
-                ((MinecraftServerInterface) server).getCMSession(),
-                new DerivedLevelData(server.getWorldData(), serverWorldProperties),
-                customWorld,
-                dimensionType2,
-                NOOP_LISTENER,
-                chunkGenerator2,
-                bl,
-                (seed==null)?l:seed,
-                list,
-                false);
-        overWorld.getWorldBorder().addListener(new BorderChangeListener.DelegateBorderChangeListener(serverWorld.getWorldBorder()));
-        ((MinecraftServerInterface) server).getCMWorlds().put(customWorld, serverWorld);
-        return true;
-    }*/
 
     public static void forceChunkUpdate(BlockPos pos, ServerLevel world)
     {
@@ -166,38 +98,10 @@ public class WorldTools
             List<ServerPlayer> players = world.getChunkSource().chunkMap.getPlayers(chunkPos, false);
             if (!players.isEmpty())
             {
-                ClientboundLevelChunkWithLightPacket packet = new ClientboundLevelChunkWithLightPacket(worldChunk, world.getLightEngine(), null, null); // false seems to update neighbours as well.
+                ClientboundLevelChunkWithLightPacket packet = new ClientboundLevelChunkWithLightPacket(worldChunk, world.getLightEngine(), null, null);
                 players.forEach(p -> p.connection.send(packet));
             }
         }
     }
 
-/*
-    private static class NoopWorldGenerationProgressListener implements ChunkProgressListener
-    {
-        @Override
-        public void updateSpawnPos(final ChunkPos spawnPos)
-        {
-        }
-
-        @Override
-        public void onStatusChange(final ChunkPos pos, final ChunkStatus status)
-        {
-        }
-
-        //@Environment(EnvType.CLIENT)
-        @Override
-        public void start()
-        {
-        }
-
-        @Override
-        public void stop()
-        {
-        }
-    }
-
-    public static final ChunkProgressListener NOOP_LISTENER = new NoopWorldGenerationProgressListener();
-
- */
 }

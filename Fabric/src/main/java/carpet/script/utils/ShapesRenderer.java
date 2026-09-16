@@ -97,9 +97,6 @@ public class ShapesRenderer
                 float rotX = (float) (Math.atan2(x, z));
                 float rotY = (float) (Math.atan2(y, d));
 
-                // that should work somehow but it doesn't for some reason
-                //matrices.mulPose(new Quaternion( -rotY, rotX, 0, false));
-
                 poseStack.mulPose(Axis.YP.rotation(rotX));
                 poseStack.mulPose(Axis.XP.rotation(-rotY));
             }
@@ -116,7 +113,7 @@ public class ShapesRenderer
     public void render(RenderBuffers renderBuffers, LevelRenderState cameraa, Matrix4f matrix4f, float partialTick)
     {
         Runnable token = Carpet.startProfilerSection("Scarpet client");
-        // posestack is not needed anymore - left as TODO to cleanup later
+
         PoseStack matrices = new PoseStack();
 
         Camera camera = this.client.gameRenderer.getMainCamera();
@@ -128,24 +125,9 @@ public class ShapesRenderer
             return;
         }
         long currentTime = client.level.getGameTime();
-        ////RenderSystem.enableDepthTest();
-        //RenderSystem.setShader(CoreShaders.POSITION_COLOR);
-        ////RenderSystem.depthFunc(515);
-        ////RenderSystem.enableBlend();
-        ////RenderSystem.defaultBlendFunc();
-        // too bright
-        //RenderSystem.blendFuncSeparate(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE, GlStateManager.SrcFactor.ONE, GlStateManager.DstFactor.ZERO);
-        // meh
-        //RenderSystem.blendFuncSeparate(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SrcFactor.ONE, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA);
-
-        ////RenderSystem.disableCull();
-        ////RenderSystem.depthMask(false);
-        //RenderSystem.polygonOffset(-3f, -3f);
-        //RenderSystem.enablePolygonOffset();
 
         Tesselator tesselator = Tesselator.getInstance();
 
-        // render
         double cameraX = camera.position().x;
         double cameraY = camera.position().y;
         double cameraZ = camera.position().z;
@@ -163,22 +145,20 @@ public class ShapesRenderer
             matrixStack.pushMatrix();
             matrixStack.mul(matrices.last().pose());
 
-            // lines
-            //RenderSystem.lineWidth(0.5F);
             shapes.get(dimensionType).values().forEach(s -> {
                 if ((!s.shape.debug || entityBoxes) && s.shouldRender(dimensionType))
                 {
                     s.renderLines(matrices, cameraX, cameraY, cameraZ, partialTick, cameraa, s.shape.seethrough ? onTop : normal);
                 }
             });
-            // faces
+
             shapes.get(dimensionType).values().forEach(s -> {
                 if ((!s.shape.debug || entityBoxes) && s.shouldRender(dimensionType))
                 {
                     s.renderFaces(tesselator, cameraX, cameraY, cameraZ, partialTick, s.shape.seethrough ? onTop : normal);
                 }
             });
-            //RenderSystem.lineWidth(1.0F);
+
             matrixStack.popMatrix();
 
         }
@@ -197,8 +177,6 @@ public class ShapesRenderer
         MultiBufferSource.BufferSource bufferSource = renderBuffers.bufferSource();
         bufferSource.endLastBatch();
 
-
-
         normal.render(matrices, bufferSource, cameraa.cameraRenderState, matrix4f);
         bufferSource.endLastBatch();
 
@@ -212,11 +190,6 @@ public class ShapesRenderer
 
         }
 
-
-        ////RenderSystem.enableCull();
-        ////RenderSystem.depthMask(true);
-        ////RenderSystem.enableBlend();
-        ////RenderSystem.defaultBlendFunc();
         token.run();
     }
 
@@ -252,7 +225,7 @@ public class ShapesRenderer
                     rshape.stageDeux() ? labels : shapes;
             RenderedShape<?> existing = container.computeIfAbsent(dim, d -> new Long2ObjectOpenHashMap<>()).get(key);
             if (existing != null)
-            {   // promoting previous shape
+            {
                 existing.promoteWith(rshape);
             }
             else
@@ -370,7 +343,7 @@ public class ShapesRenderer
             Camera camera1 = client.gameRenderer.getMainCamera();
 
             matrices.pushPose();
-            if (!isitem)// blocks should use its center as the origin
+            if (!isitem)
             {
                 matrices.translate(0.5, 0.5, 0.5);
             }
@@ -393,12 +366,12 @@ public class ShapesRenderer
 
             if (!isitem)
             {
-                // blocks should use its center as the origin
+
                 matrices.translate(-0.5, -0.5, -0.5);
             }
             else
             {
-                // items seems to be flipped by default
+
                 matrices.mulPose(Axis.YP.rotationDegrees(180));
             }
 
@@ -417,14 +390,13 @@ public class ShapesRenderer
             MultiBufferSource.BufferSource immediate = client.renderBuffers().bufferSource();
             if (!isitem)
             {
-                // draw the block itself
+
                 if (blockState.getRenderShape() == RenderShape.MODEL)
                 {
 
                     var bakedModel = client.getBlockRenderer().getBlockModel(blockState);
                     int color = client.getBlockColors().getColor(blockState, client.level, blockPos, 0);
-                    //dont know why there is a 0. 
-                    //see https://github.com/senseiwells/EssentialClient/blob/4db1f291936f502304791ee323f369c206b3021d/src/main/java/me/senseiwells/essentialclient/utils/render/RenderHelper.java#L464
+
                     float red = (color >> 16 & 0xFF) / 255.0F;
                     float green = (color >> 8 & 0xFF) / 255.0F;
                     float blue = (color & 0xFF) / 255.0F;
@@ -437,7 +409,6 @@ public class ShapesRenderer
                     client.getBlockRenderer().getModelRenderer().renderModel(matrices.last(), immediate.getBuffer(type), bakedModel, red, green, blue, light, OverlayTexture.NO_OVERLAY);
                 }
 
-                // draw the block`s entity part
                 if (BlockEntity == null)
                 {
                     if (blockState.getBlock() instanceof EntityBlock eb)
@@ -460,14 +431,10 @@ public class ShapesRenderer
                         BlockEntityRenderer<BlockEntity, BlockEntityRenderState> blockEntityRenderer = client.getBlockEntityRenderDispatcher().getRenderer(BlockEntity);
                         BlockEntityRenderState state = client.getBlockEntityRenderDispatcher().tryExtractRenderState(BlockEntity, partialTick, null);
 
-
-
                         if (blockEntityRenderer != null && state != null)
                         {
-                            // testme partial positions
+
                             blockEntityRenderer.submit(state, matrices,client.gameRenderer.getFeatureRenderDispatcher().getSubmitNodeStorage(), levelRenderState.cameraRenderState);
-                            //blockEntityRenderer.submit(BlockEntity, partialTick,
-                            //        matrices, light, OverlayTexture.NO_OVERLAY, camera1.getPosition(), null, client.gameRenderer.getFeatureRenderDispatcher().getSubmitNodeStorage());
 
                         }
                 }
@@ -476,21 +443,15 @@ public class ShapesRenderer
             {
                 if (shape.item != null)
                 {
-                    // draw the item
 
                     final ItemStackRenderState itemState = new ItemStackRenderState();
                     client.getItemModelResolver().updateForTopItem(itemState, shape.item, ItemDisplayContext.FIXED, client.level, null, 0);
                     itemState.submit(matrices, client.gameRenderer.getFeatureRenderDispatcher().getSubmitNodeStorage(), light, OverlayTexture.NO_OVERLAY, EntityRenderState.NO_OUTLINE);
 
-                    //client.getItemRenderer().renderStatic(shape.item, transformType, light,
-                    //        OverlayTexture.NO_OVERLAY, matrices, immediate, client.level, (int) shape.key(client.level.registryAccess()));
                 }
             }
             matrices.popPose();
             immediate.endBatch();
-            ////RenderSystem.disableCull();
-            ////RenderSystem.disableDepthTest();
-            ////RenderSystem.depthMask(false);
 
         }
 
@@ -500,7 +461,6 @@ public class ShapesRenderer
             return true;
         }
     }
-
 
     public static class RenderedText extends RenderedShape<ShapeDispatcher.DisplayedText>
     {
@@ -522,11 +482,11 @@ public class ShapesRenderer
             Font textRenderer = client.font;
             if (shape.doublesided)
             {
-                //// RenderSystem.disableCull(); TODO culling
+
             }
             else
             {
-                //// RenderSystem.enableCull();
+
             }
             matrices.pushPose();
             matrices.translate(v1.x - cx, v1.y - cy, v1.z - cz);
@@ -534,7 +494,7 @@ public class ShapesRenderer
             rotatePoseStackByShapeDirection(matrices, shape.facing, camera1, v1);
 
             matrices.scale(shape.size * 0.0025f, -shape.size * 0.0025f, shape.size * 0.0025f);
-            //RenderSystem.scalef(shape.size* 0.0025f, -shape.size*0.0025f, shape.size*0.0025f);
+
             if (shape.tilt != 0.0f)
             {
                 matrices.mulPose(Axis.ZP.rotationDegrees(shape.tilt));
@@ -548,9 +508,8 @@ public class ShapesRenderer
                 matrices.mulPose(Axis.YP.rotationDegrees(shape.turn));
             }
             matrices.translate(-10 * shape.indent, -10 * shape.height - 9, (-10 * renderEpsilon) - 10 * shape.raise);
-            //if (visibleThroughWalls) RenderSystem.disableDepthTest();
+
             matrices.scale(-1, 1, 1);
-            //RenderSystem.applyModelViewMatrix(); // passed matrix directly to textRenderer.draw, not AffineTransformation.identity().getMatrix(),
 
             float text_x = 0;
             if (shape.align == 0)
@@ -564,13 +523,12 @@ public class ShapesRenderer
             try (ByteBufferBuilder bbb = new ByteBufferBuilder(RenderType.TRANSIENT_BUFFER_SIZE))
             {
 	            MultiBufferSource.BufferSource immediate = MultiBufferSource.immediate(bbb);
-	            // text doesn't appear if backgroud is set
-	            ///script run draw_shape('label', 100, 'pos', [200, 100, 200], 'text', 'Hewwo World!', 'color', 0xffffffff, 'fill', 0x33333333)
+
 	            textRenderer.drawInBatch(shape.value, text_x, 0.0F, shape.textcolor, false, matrices.last().pose(), immediate, Font.DisplayMode.SEE_THROUGH, shape.textbck, 15728880);
 	            immediate.endBatch();
             }
             matrices.popPose();
-            ////RenderSystem.enableCull();
+
         }
 
         @Override
@@ -628,8 +586,7 @@ public class ShapesRenderer
             }
             Vec3 v1 = shape.relativiseRender(client.level, shape.from, partialTick);
             Vec3 v2 = shape.relativiseRender(client.level, shape.to, partialTick);
-            // consider using built-ins
-            //DebugRenderer.drawBox(new Box(v1.x, v1.y, v1.z, v2.x, v2.y, v2.z), 0.5f, 0.5f, 0.5f, 0.5f);//shape.r, shape.g, shape.b, shape.a);
+
             drawBoxFaces(primitives,
                     (float) (v1.x  - renderEpsilon), (float) (v1.y  - renderEpsilon), (float) (v1.z  - renderEpsilon),
                     (float) (v2.x  + renderEpsilon), (float) (v2.y  + renderEpsilon), (float) (v2.z  + renderEpsilon),
@@ -661,7 +618,7 @@ public class ShapesRenderer
 
     public static class RenderedPolyface extends RenderedShape<ShapeDispatcher.Polyface>
     {
-        // mode now can only be 4, 5, or 6
+
         private static final VertexFormat.Mode[] faceIndices = new VertexFormat.Mode[]{
                 Mode.LINES, Mode.LINES, Mode.DEBUG_LINES, Mode.DEBUG_LINE_STRIP, Mode.TRIANGLES, Mode.TRIANGLE_STRIP, Mode.TRIANGLE_FAN, Mode.QUADS};
 
@@ -670,8 +627,8 @@ public class ShapesRenderer
                 RenderTypes.lines(),
                 RenderTypes.lines(),
                 RenderTypes.lines(),
-                RenderTypes.debugTriangleFan(), // TODO wrong
-                RenderTypes.debugTriangleFan(), // TODO wrong
+                RenderTypes.debugTriangleFan(),
+                RenderTypes.debugTriangleFan(),
                 RenderTypes.debugTriangleFan(),
                 RenderTypes.debugQuads()
         };
@@ -691,14 +648,13 @@ public class ShapesRenderer
 
             if (shape.doublesided)
             {
-                ////RenderSystem.disableCull(); // todo culling
+
             }
             else
             {
-                ////RenderSystem.enableCull();
+
             }
 
-            //BufferBuilder builder = tesselator.begin(faceIndices[shape.mode], DefaultVertexFormat.POSITION_COLOR);
             for (int i = 0; i < shape.vertexList.size(); i++)
             {
                 Vec3 vec = shape.vertexList.get(i);
@@ -706,14 +662,8 @@ public class ShapesRenderer
                 {
                     vec = shape.relativiseRender(client.level, vec, partialTick);
                 }
-                //builder.addVertex((float) (vec.x() - cx), (float) (vec.y() - cy), (float) (vec.z() - cz)).setColor(shape.fr, shape.fg, shape.fb, shape.fa);
+
             }
-            //drawWithShader(builder.buildOrThrow(), renderTypes[shape.mode]);
-
-            ////RenderSystem.disableCull();
-            ////RenderSystem.depthMask(false);
-            //RenderSystem.enableDepthTest();
-
 
         }
 
@@ -728,7 +678,7 @@ public class ShapesRenderer
 
             if (shape.mode == 6)
             {
-                //BufferBuilder builder = tesselator.begin(VertexFormat.Mode.DEBUG_LINE_STRIP, DefaultVertexFormat.POSITION_COLOR);
+
                 Vec3 vec0 = null;
                 for (int i = 0; i < shape.vertexList.size(); i++)
                 {
@@ -741,13 +691,12 @@ public class ShapesRenderer
                     {
                         vec0 = vec;
                     }
-                    //builder.addVertex((float) (vec.x() - cx), (float) (vec.y() - cy), (float) (vec.z() - cz)).setColor(shape.r, shape.g, shape.b, shape.a);
+
                 }
-                //builder.addVertex((float) (vec0.x() - cx), (float) (vec0.y() - cy), (float) (vec0.z() - cz)).setColor(shape.r, shape.g, shape.b, shape.a);
-                //drawWithShader(builder.buildOrThrow(), RenderType.debugLineStrip(1));
+
                 if (shape.inneredges)
                 {
-                    //BufferBuilder builderr = tesselator.begin(Mode.DEBUG_LINE_STRIP, DefaultVertexFormat.POSITION_COLOR);
+
                     for (int i = 1; i < shape.vertexList.size() - 1; i++)
                     {
                         Vec3 vec = shape.vertexList.get(i);
@@ -755,23 +704,21 @@ public class ShapesRenderer
                         {
                             vec = shape.relativiseRender(client.level, vec, partialTick);
                         }
-                        //builderr.addVertex((float) (vec0.x() - cx), (float) (vec0.y() - cy), (float) (vec0.z() - cz)).setColor(shape.r, shape.g, shape.b, shape.a);
-                        //builderr.addVertex((float) (vec.x() - cx), (float) (vec.y() - cy), (float) (vec.z() - cz)).setColor(shape.r, shape.g, shape.b, shape.a);
-                        //builderr.addVertex((float) (vec0.x() - cx), (float) (vec0.y() - cy), (float) (vec0.z() - cz)).setColor(shape.r, shape.g, shape.b, shape.a);
+
                     }
-                    //drawWithShader(builderr.buildOrThrow(), RenderType.debugLineStrip(1));
+
                 }
                 return;
             }
             if (shape.mode == 5)
             {
-                //BufferBuilder builder = tesselator.begin(VertexFormat.Mode.DEBUG_LINE_STRIP, DefaultVertexFormat.POSITION_COLOR);
+
                 Vec3 vec = shape.vertexList.get(1);
                 if (shape.relative.get(1))
                 {
                     vec = shape.relativiseRender(client.level, vec, partialTick);
                 }
-                //builder.addVertex((float) (vec.x() - cx), (float) (vec.y() - cy), (float) (vec.z() - cz)).setColor(shape.r, shape.g, shape.b, shape.a);
+
                 int i;
                 for (i = 0; i < shape.vertexList.size(); i += 2)
                 {
@@ -780,7 +727,7 @@ public class ShapesRenderer
                     {
                         vec = shape.relativiseRender(client.level, vec, partialTick);
                     }
-                    //builder.addVertex((float) (vec.x() - cx), (float) (vec.y() - cy), (float) (vec.z() - cz)).setColor(shape.r, shape.g, shape.b, shape.a);
+
                 }
                 i = shape.vertexList.size() - 1;
                 for (i -= 1 - i % 2; i > 0; i -= 2)
@@ -790,7 +737,7 @@ public class ShapesRenderer
                     {
                         vec = shape.relativiseRender(client.level, vec, partialTick);
                     }
-                    //builder.addVertex((float) (vec.x() - cx), (float) (vec.y() - cy), (float) (vec.z() - cz)).setColor(shape.r, shape.g, shape.b, shape.a);
+
                 }
                 if (shape.inneredges)
                 {
@@ -801,18 +748,18 @@ public class ShapesRenderer
                         {
                             vec = shape.relativiseRender(client.level, vec, partialTick);
                         }
-                        //builder.addVertex((float) (vec.x() - cx), (float) (vec.y() - cy), (float) (vec.z() - cz)).setColor(shape.r, shape.g, shape.b, shape.a);
+
                     }
                 }
-                //drawWithShader(builder.buildOrThrow(), RenderType.debugLineStrip(1));
+
                 return;
             }
             if (shape.mode == 4)
             {
-                //
+
                 for (int i = 0; i < shape.vertexList.size(); i++)
                 {
-                    //BufferBuilder builder = tesselator.begin(Mode.DEBUG_LINE_STRIP, DefaultVertexFormat.POSITION_COLOR);
+
                     Vec3 vecA = shape.vertexList.get(i);
                     if (shape.relative.get(i))
                     {
@@ -830,18 +777,9 @@ public class ShapesRenderer
                     {
                         vecC = shape.relativiseRender(client.level, vecC, partialTick);
                     }
-                    //builder.addVertex((float) (vecA.x() - cx), (float) (vecA.y() - cy), (float) (vecA.z() - cz)).setColor(shape.r, shape.g, shape.b, shape.a);
-                    //builder.addVertex((float) (vecB.x() - cx), (float) (vecB.y() - cy), (float) (vecB.z() - cz)).setColor(shape.r, shape.g, shape.b, shape.a);
 
-                    //builder.addVertex((float) (vecB.x() - cx), (float) (vecB.y() - cy), (float) (vecB.z() - cz)).setColor(shape.r, shape.g, shape.b, shape.a);
-                    //builder.addVertex((float) (vecC.x() - cx), (float) (vecC.y() - cy), (float) (vecC.z() - cz)).setColor(shape.r, shape.g, shape.b, shape.a);
-
-                    //builder.addVertex((float) (vecC.x() - cx), (float) (vecC.y() - cy), (float) (vecC.z() - cz)).setColor(shape.r, shape.g, shape.b, shape.a);
-                    //builder.addVertex((float) (vecA.x() - cx), (float) (vecA.y() - cy), (float) (vecA.z() - cz)).setColor(shape.r, shape.g, shape.b, shape.a);
-
-                    //drawWithShader(builder.buildOrThrow(), RenderType.debugLineStrip(1));
                 }
-                //drawWithShader(builder.buildOrThrow(), RenderType.debugLineStrip(1));
+
             }
         }
     }
@@ -923,8 +861,6 @@ public class ShapesRenderer
         }
     }
 
-    // some raw shit
-
     public static void drawBoxWireGLLines(
             DrawableGizmoPrimitives primitives,
             float x1, float y1, float z1,
@@ -993,7 +929,6 @@ public class ShapesRenderer
             }
         }
 
-        // now at least drawing one
         if (zthick && xthick)
         {
             primitives.addQuad(v111, v211, v212, v112, argb);
@@ -1020,7 +955,7 @@ public class ShapesRenderer
         {
             hsteps = (int) Math.ceil(Mth.abs(h) / (step * r)) + 1;
             hstep = h / (hsteps - 1);
-        }// draw base
+        }
 
         if (axis == Direction.Axis.Y)
         {
@@ -1058,19 +993,6 @@ public class ShapesRenderer
 
                 }
             }
-            /* else
-            {
-                BufferBuilder builder = tesselator.begin(VertexFormat.Mode.DEBUG_LINES, DefaultVertexFormat.POSITION_COLOR);
-                for (int i = 0; i <= num_steps180; i++)
-                {
-                    float theta = step * i;
-                    float x = r * Mth.cos(theta);
-                    float z = r * Mth.sin(theta);
-                    builder.addVertex(cx - x, cy, cz + z).setColor(red, grn, blu, alpha);
-                    builder.addVertex(cx + x, cy, cz - z).setColor(red, grn, blu, alpha);
-                }
-                drawWithShader(builder.buildOrThrow(), RenderType.debugLineStrip(1));
-            }*/
 
         }
         else if (axis == Direction.Axis.X)
@@ -1109,19 +1031,7 @@ public class ShapesRenderer
 
                 }
             }
-            /*else
-            {
-                BufferBuilder builder = tesselator.begin(Mode.DEBUG_LINE_STRIP, DefaultVertexFormat.POSITION_COLOR);
-                for (int i = 0; i <= num_steps360+1; i++)
-                {
-                    float theta = step * i;
-                    float y = r * Mth.cos(theta);
-                    float z = r * Mth.sin(theta);
-                    builder.addVertex(cx, cy + y, cz + z).setColor(red, grn, blu, alpha);
-                    //builder.addVertex(cx, cy + y, cz - z).setColor(red, grn, blu, alpha);
-                }
-                drawWithShader(builder.buildOrThrow(), RenderType.debugLineStrip(1));
-            }*/
+
         }
         else if (axis == Direction.Axis.Z)
         {
@@ -1157,19 +1067,7 @@ public class ShapesRenderer
                     primitives.addLine(new Vec3(cx + x, cy - y, cz + h), new Vec3(cx + x, cy - y, cz + 0), argb, width);
                 }
             }
-            /*else
-            {
-                BufferBuilder builder = tesselator.begin(VertexFormat.Mode.DEBUG_LINES, DefaultVertexFormat.POSITION_COLOR);
-                for (int i = 0; i <= num_steps180; i++)
-                {
-                    float theta = step * i;
-                    float x = r * Mth.cos(theta);
-                    float y = r * Mth.sin(theta);
-                    builder.addVertex(cx + x, cy - y, cz).setColor(red, grn, blu, alpha);
-                    builder.addVertex(cx - x, cy + y, cz).setColor(red, grn, blu, alpha);
-                }
-                drawWithShader(builder.buildOrThrow(), RenderType.debugLineStrip(1));
-            }*/
+
         }
     }
 
@@ -1179,7 +1077,7 @@ public class ShapesRenderer
                                          int argb)
     {
         float step = (float) Math.PI / (subd / 2);
-        //final int num_steps180 = (int) (Math.PI / step) + 1;
+
         int num_steps360 = (int) (2 * Math.PI / step) + 1;
 
         if (axis == Direction.Axis.Y)
@@ -1193,7 +1091,7 @@ public class ShapesRenderer
                     float z = r * Mth.sin(theta);
                     points[i + 1] = new Vec3(x + cx, cy, z + cz);
                 }
-                // for some reason triangle fans are double sided
+
                 primitives.addTriangleFan(points, argb);
             }
 
@@ -1208,7 +1106,7 @@ public class ShapesRenderer
                     float z = r * Mth.sin(theta);
                     points[i + 1] = new Vec3(x + cx, cy + h, z + cz);
                 }
-                // for some reason triangle fans are double sided
+
                 primitives.addTriangleFan(points, argb);
 
                 float xp = r * 1;

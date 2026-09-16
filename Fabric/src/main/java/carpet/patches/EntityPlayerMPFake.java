@@ -54,36 +54,29 @@ public class EntityPlayerMPFake extends ServerPlayer
     public Runnable fixStartingPosition = () -> {};
     public boolean isAShadow;
 
-    // Returns true if it was successful, false if couldn't spawn due to the player not existing in Mojang servers
     public static boolean createFake(String username, MinecraftServer server, Vec3 pos, double yaw, double pitch, ResourceKey<Level> dimensionId, GameType gamemode, boolean flying)
     {
-        //prolly half of that crap is not necessary, but it works
+
         ServerLevel worldIn = server.getLevel(dimensionId);
         server.services().nameToIdCache().resolveOfflineUsers(false);
         GameProfile gameprofile;
 
             UUID uuid = OldUsersConverter.convertMobOwnerIfNecessary(server, username);
-            //NameAndId res = server.services().nameToIdCache().get(username).orElseThrow(); //findByName  .orElse(null)
+
             if (uuid == null && CarpetSettings.allowSpawningOfflinePlayers) {
                 server.services().nameToIdCache().resolveOfflineUsers(server.isDedicatedServer() && server.usesAuthentication());
                 uuid = UUIDUtil.createOfflinePlayerUUID(username);
             }
             if (uuid == null) {
-                return false; // no uuid, no player
+                return false;
             }
             gameprofile = new GameProfile(uuid, username);
 
-
-        //GameProfile finalGP = gameprofile;
-
-        // We need to mark this player as spawning so that we do not
-        // try to spawn another player with the name while the profile
-        // is being fetched - preventing multiple players spawning
         String name = gameprofile.name();
         spawning.add(name);
 
         fetchGameProfile(server, gameprofile.id()).whenCompleteAsync((p, t) -> {
-            // Always remove the name, even if exception occurs
+
             spawning.remove(name);
             if (t != null)
             {
@@ -102,16 +95,16 @@ public class EntityPlayerMPFake extends ServerPlayer
             instance.fixStartingPosition = () -> instance.snapTo(pos.x, pos.y, pos.z, (float) yaw, (float) pitch);
             server.getPlayerList().placeNewPlayer(new FakeClientConnection(PacketFlow.SERVERBOUND), instance, new CommonListenerCookie(current, 0, instance.clientInformation(), false));
             loadPlayerData(instance);
-            instance.stopRiding(); // otherwise the created fake player will be on the vehicle
+            instance.stopRiding();
             instance.teleportTo(worldIn, pos.x, pos.y, pos.z, Set.of(), (float) yaw, (float) pitch, true);
             instance.setHealth(20.0F);
             instance.unsetRemoved();
             instance.getAttribute(Attributes.STEP_HEIGHT).setBaseValue(0.6F);
             instance.gameMode.changeGameModeForPlayer(gamemode);
-            server.getPlayerList().broadcastAll(new ClientboundRotateHeadPacket(instance, (byte) (instance.yHeadRot * 256 / 360)), dimensionId);//instance.dimension);
-            server.getPlayerList().broadcastAll(ClientboundEntityPositionSyncPacket.of(instance), dimensionId);//instance.dimension);
-            //instance.world.getChunkManager(). updatePosition(instance);
-            instance.entityData.set(DATA_PLAYER_MODE_CUSTOMISATION, (byte) 0x7f); // show all model layers (incl. capes)
+            server.getPlayerList().broadcastAll(new ClientboundRotateHeadPacket(instance, (byte) (instance.yHeadRot * 256 / 360)), dimensionId);
+            server.getPlayerList().broadcastAll(ClientboundEntityPositionSyncPacket.of(instance), dimensionId);
+
+            instance.entityData.set(DATA_PLAYER_MODE_CUSTOMISATION, (byte) 0x7f);
             instance.getAbilities().flying = flying;
         }, server);
         return true;
@@ -138,7 +131,7 @@ public class EntityPlayerMPFake extends ServerPlayer
     public static EntityPlayerMPFake createShadow(MinecraftServer server, ServerPlayer player)
     {
         player.connection.disconnect(Component.translatable("multiplayer.disconnect.duplicate_login"));
-        ServerLevel worldIn = player.level();//.getWorld(player.dimension);
+        ServerLevel worldIn = player.level();
         GameProfile gameprofile = player.getGameProfile();
         EntityPlayerMPFake playerShadow = new EntityPlayerMPFake(server, worldIn, gameprofile, player.clientInformation(), true);
         playerShadow.setChatSession(player.getChatSession());
@@ -149,14 +142,13 @@ public class EntityPlayerMPFake extends ServerPlayer
         playerShadow.connection.teleport(player.getX(), player.getY(), player.getZ(), player.getYRot(), player.getXRot());
         playerShadow.gameMode.changeGameModeForPlayer(player.gameMode.getGameModeForPlayer());
         ((ServerPlayerInterface) playerShadow).getActionPack().copyFrom(((ServerPlayerInterface) player).getActionPack());
-        // this might create problems if a player logs back in...
+
         playerShadow.getAttribute(Attributes.STEP_HEIGHT).setBaseValue(0.6F);
         playerShadow.entityData.set(DATA_PLAYER_MODE_CUSTOMISATION, player.getEntityData().get(DATA_PLAYER_MODE_CUSTOMISATION));
 
-
         server.getPlayerList().broadcastAll(new ClientboundRotateHeadPacket(playerShadow, (byte) (player.yHeadRot * 256 / 360)), playerShadow.level().dimension());
         server.getPlayerList().broadcastAll(new ClientboundPlayerInfoUpdatePacket(ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER, playerShadow));
-        //player.world.getChunkManager().updatePosition(playerShadow);
+
         playerShadow.getAbilities().flying = player.getAbilities().flying;
         return playerShadow;
     }
@@ -217,15 +209,14 @@ public class EntityPlayerMPFake extends ServerPlayer
         }
         catch (NullPointerException ignored)
         {
-            // happens with that paper port thingy - not sure what that would fix, but hey
-            // the game not gonna crash violently.
+
         }
     }
 
     @Override
     public boolean startRiding(Entity entityToRide, boolean force, boolean sendEventAndTriggers) {
         if (super.startRiding(entityToRide, force, sendEventAndTriggers)) {
-            // from ClientPacketListener.handleSetEntityPassengersPacket
+
             if (entityToRide instanceof AbstractBoat) {
                 this.yRotO = entityToRide.getYRot();
                 this.setYRot(entityToRide.getYRot());
@@ -281,8 +272,6 @@ public class EntityPlayerMPFake extends ServerPlayer
             connection.handleClientCommand(p);
         }
 
-        // If above branch was taken, *this* has been removed and replaced, the new instance has been set
-        // on 'our' connection (which is now theirs, but we still have a ref).
         if (connection.player.isChangingDimension()) {
             connection.player.hasChangedDimension();
         }

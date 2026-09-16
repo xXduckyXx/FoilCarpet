@@ -43,22 +43,6 @@ import carpet.CarpetSettings;
 import carpet.logging.LoggerRegistry;
 import carpet.logging.logHelpers.TNTLogHelper;
 
-/**
- * Folia-native implementations of Carpet's {@code tntDoNotUpdate} and {@code mergeTNT} rules,
- * plus a native feed for the {@code /log tnt} logger.
- *
- * <p>{@code tntDoNotUpdate} cannot be intercepted at the rule's real hook point on stock Folia:
- * both the {@code onPlace} and {@code neighborChanged} priming paths fire the same indistinct
- * {@code TNTPrimeEvent(REDSTONE)}. Carpet only prevents the {@code onPlace} priming, so the
- * placement is detected from the right-click that precedes it: while holding TNT, a
- * {@code PlayerInteractEvent} records the target position when that position already carries a
- * redstone signal, and the immediately following {@code onPlace} prime is cancelled. A signal
- * change arriving later (no placement flag) still ignites the TNT, matching Carpet exactly.
- *
- * <p>{@code mergeTNT} replicates Carpet's PrimedTnt merge: TNT that has had a chance to move and
- * is now stationary on the exact same position with the same fuse merges into one entity, and on
- * detonation it detonates once per merged TNT.
- */
 public final class TntFolia implements Listener
 {
     private static final int SCAN_INTERVAL = 2;
@@ -66,9 +50,6 @@ public final class TntFolia implements Listener
     private static final Map<PrimedTnt, MergeState> MERGE_STATE = Collections.synchronizedMap(new WeakHashMap<>());
     private static final Map<PrimedTnt, TNTLogHelper> TNT_LOG = Collections.synchronizedMap(new WeakHashMap<>());
 
-    // world UID -> placed TNT position -> global tick the placement was attempted on.
-    // Set by PlayerInteractEvent only when the target already had a redstone signal, so the
-    // matching TNTPrimeEvent (same synchronous placement chain) is the onPlace prime.
     private static final ConcurrentHashMap<String, ConcurrentHashMap<BlockPos, Integer>> PLACE_CANDIDATES =
             new ConcurrentHashMap<>();
 
@@ -81,8 +62,6 @@ public final class TntFolia implements Listener
     TntFolia()
     {
     }
-
-    // ---------------------------------------------------------------- tntDoNotUpdate
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onTntPlaceAttempt(PlayerInteractEvent event)
@@ -105,14 +84,12 @@ public final class TntFolia implements Listener
         {
             return;
         }
-        // TNT placed on a replaceable block goes into it, otherwise onto the facing side.
+
         Block target = clicked.getType().isAir() || clicked.isReplaceable()
                 ? clicked : clicked.getRelative(event.getBlockFace());
         ServerLevel level = ((CraftWorld) target.getWorld()).getHandle();
         BlockPos pos = new BlockPos(target.getX(), target.getY(), target.getZ());
-        // Only a placement onto an already-powered position can prime during placement, and
-        // only those are worth recording (the prime happens in the same synchronous chain).
-        // An unpowered placement is never recorded, so powering it up later still ignites it.
+
         if (!level.hasNeighborSignal(pos))
         {
             return;
@@ -137,10 +114,7 @@ public final class TntFolia implements Listener
         {
             return;
         }
-        // Carpet parity: only the placement-time priming (TntBlock.onPlace, which happens while
-        // the position already has a signal) is suppressed. prime() is invoked before the block
-        // is removed, so cancelling leaves the TNT block in place with no spark. A later signal
-        // change (neighborChanged) is NOT accompanied by a placement flag and ignites normally.
+
         Block block = event.getBlock();
         ConcurrentHashMap<BlockPos, Integer> candidates = PLACE_CANDIDATES
                 .get(block.getWorld().getUID().toString());
@@ -167,8 +141,6 @@ public final class TntFolia implements Listener
             candidates.entrySet().removeIf(entry -> now - entry.getValue() > 1);
         }
     }
-
-    // ---------------------------------------------------------------- mergeTNT
 
     public static void tickMergeScan(Plugin plugin, MinecraftServer server)
     {
@@ -258,7 +230,7 @@ public final class TntFolia implements Listener
                 state.moved = true;
                 continue;
             }
-            // only merge TNT that had a chance to move and has come to rest
+
             if (!state.moved || !tnt.isAlive())
             {
                 continue;

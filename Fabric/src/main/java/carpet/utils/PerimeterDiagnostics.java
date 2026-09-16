@@ -49,16 +49,12 @@ public class PerimeterDiagnostics
     public static Result countSpots(ServerLevel worldserver, BlockPos epos, Mob el)
     {
         BlockPos pos;
-        //List<BlockPos> samples = new ArrayList<BlockPos>();
-        //if (el != null) CarpetSettings.LOG.error(String.format("Got %s to check",el.toString()));
+
         int eY = epos.getY();
         int eX = epos.getX();
         int eZ = epos.getZ();
         Result result = new Result();
 
-        //int ground_spawns = 0;
-        //int liquid_spawns = 0;
-        //int specific_spawns = 0;
         boolean add_water = false;
         boolean add_ground = false;
         MobCategory ctype = null;
@@ -94,7 +90,7 @@ public class PerimeterDiagnostics
         {
             for (int z = -128; z <= 128; ++z)
             {
-                if (x*x + z*z > 128*128) // cut out a cyllinder first
+                if (x*x + z*z > 128*128)
                 {
                     continue;
                 }
@@ -115,7 +111,7 @@ public class PerimeterDiagnostics
                     BlockState iblockstate_down = worldserver.getBlockState(pos.below());
                     BlockState iblockstate_up = worldserver.getBlockState(pos.above());
 
-                    if ( iblockstate.getFluidState().is(FluidTags.WATER) && !iblockstate_up.isRedstoneConductor(worldserver, pos)) // isSimpleFUllBLock
+                    if ( iblockstate.getFluidState().is(FluidTags.WATER) && !iblockstate_up.isRedstoneConductor(worldserver, pos))
                     {
                         result.liquid++;
                         if (add_water && diagnostic.check_entity_spawn(pos))
@@ -129,7 +125,7 @@ public class PerimeterDiagnostics
                     }
                     else
                     {
-                        if (iblockstate_down.isRedstoneConductor(worldserver, pos)) // isSimpleFUllBLock
+                        if (iblockstate_down.isRedstoneConductor(worldserver, pos))
                         {
                             Block block = iblockstate_down.getBlock();
                             boolean flag = block != Blocks.BEDROCK && block != Blocks.BARRIER;
@@ -150,13 +146,9 @@ public class PerimeterDiagnostics
                 }
             }
         }
-        //ashMap<String,Integer> result= new HashMap<>();
-        //result.put("Potential in-water spawning spaces", liquid_spawns);
-        //result.put("Potential on-ground spawning spaces", ground_spawns);
-        //if (el != null) result.put(String.format("%s spawning spaces",el.getDisplayName().getUnformattedText()),specific_spawns);
+
         return result;
     }
-
 
     private boolean check_entity_spawn(BlockPos pos)
     {
@@ -183,7 +175,7 @@ public class PerimeterDiagnostics
             el.snapTo(pos.getX() + 0.5F, pos.getY(), pos.getZ()+0.5F, 0.0F, 0.0F);
             return el.checkSpawnObstruction(worldServer) && el.checkSpawnRules(worldServer, EntitySpawnReason.NATURAL) &&
                     SpawnPlacements.checkSpawnRules(el.getType(),(ServerLevel)el.level(), EntitySpawnReason.NATURAL, el.blockPosition(), el.level().random) &&
-                    worldServer.noCollision(el); // check collision rules once they stop fiddling with them after 1.14.1
+                    worldServer.noCollision(el);
         }
         return false;
     }

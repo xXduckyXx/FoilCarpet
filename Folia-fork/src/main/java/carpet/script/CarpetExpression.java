@@ -31,7 +31,6 @@ public class CarpetExpression
     private final BlockPos origin;
     private final Expression expr;
 
-    // these are for extensions
     public Expression getExpr()
     {
         return expr;

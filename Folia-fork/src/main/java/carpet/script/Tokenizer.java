@@ -6,35 +6,21 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-/**
- * Expression tokenizer that allows to iterate over a {@link String}
- * expression token by token. Blank characters will be skipped.
- */
 public class Tokenizer
 {
-    /**
-     * What character to use for decimal separators.
-     */
+
     private static final char decimalSeparator = '.';
-    /**
-     * What character to use for minus sign (negative values).
-     */
+
     private static final char minusSign = '-';
-    /**
-     * Actual position in expression string.
-     */
+
     private int pos = 0;
     private int lineno = 0;
     private int linepos = 0;
     private final boolean comments;
     private final boolean newLinesMarkers;
-    /**
-     * The original input expression.
-     */
+
     private final String input;
-    /**
-     * The previous token or <code>null</code> if none.
-     */
+
     private Token previousToken;
 
     private final Expression expression;
@@ -65,7 +51,7 @@ public class Tokenizer
             {
                 continue;
             }
-            // skipping comments
+
             if (!isSemicolon(current)
                     || (last != null && last.type != Token.TokenType.CLOSE_PAREN && last.type != Token.TokenType.COMMA && !isSemicolon(last)))
             {
@@ -76,7 +62,7 @@ public class Tokenizer
                 }
                 if (current.type == Token.TokenType.MARKER)
                 {
-                    // dealing with tokens in reversed order
+
                     if ("{".equals(current.surface))
                     {
                         cleanedTokens.add(current.morphedInto(Token.TokenType.OPEN_PAREN, "("));
@@ -118,11 +104,6 @@ public class Tokenizer
         return (pos < input.length());
     }
 
-    /**
-     * Peek at the next character, without advancing the iterator.
-     *
-     * @return The next character or character 0, if at end of string.
-     */
     private char peekNextChar()
     {
         return (pos < (input.length() - 1)) ? input.charAt(pos + 1) : 0;
@@ -165,8 +146,8 @@ public class Tokenizer
 
         boolean isHex = false;
 
-        if (Character.isDigit(ch)) // || (ch == decimalSeparator && Character.isDigit(peekNextChar())))
-        // decided to no support this notation to favour element access via . operator
+        if (Character.isDigit(ch))
+
         {
             if (ch == '0' && (peekNextChar() == 'x' || peekNextChar() == 'X'))
             {
@@ -211,15 +192,14 @@ public class Tokenizer
                     }
                     else if (nextChar == 't')
                     {
-                        //throw new ExpressionException(context, this.expression, token,
-                        //        "Tab character is not supported");
+
                         token.append('\t');
                     }
                     else if (nextChar == 'r')
                     {
                         throw new ExpressionException(context, this.expression, token,
                                 "Carriage return character is not supported");
-                        //token.append('\r');
+
                     }
                     else if (nextChar == '\\' || nextChar == '\'')
                     {
@@ -267,7 +247,7 @@ public class Tokenizer
                 linepos++;
                 ch = pos == input.length() ? 0 : input.charAt(pos);
             }
-            // Remove optional white spaces after function or variable name
+
             if (Character.isWhitespace(ch))
             {
                 while (Character.isWhitespace(ch) && pos < input.length())
@@ -347,7 +327,7 @@ public class Tokenizer
                     }
                     token.append(greedyMatch);
                     token.type = Token.TokenType.MARKER;
-                    return token; // skipping setting previous
+                    return token;
                 }
                 pos++;
                 linepos++;
@@ -363,7 +343,7 @@ public class Tokenizer
                 linepos = 0;
                 token.type = Token.TokenType.MARKER;
                 token.append('$');
-                return token; // skipping previous token lookback
+                return token;
             }
             if (validOperatorSeenUntil != -1)
             {

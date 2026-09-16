@@ -22,7 +22,7 @@ public class TagPredicate_scarpetMixin implements BlockPredicateInterface
 
     @Shadow @Final private Map<String, String> vagueProperties;
 
-    @Shadow @Final /*@Nullable*/ private CompoundTag nbt;
+    @Shadow @Final   private CompoundTag nbt;
 
     @Override
     public BlockState getCMBlockState()
@@ -33,7 +33,7 @@ public class TagPredicate_scarpetMixin implements BlockPredicateInterface
     @Override
     public TagKey<Block> getCMBlockTagKey()
     {
-        // might be good to explose the holder set nature of it.
+
         return tag.unwrap().left().orElse(null);
     }
 

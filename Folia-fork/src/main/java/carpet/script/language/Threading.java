@@ -39,7 +39,6 @@ public class Threading
             return thread;
         });
 
-
         expression.addContextFunction("task_count", -1, (c, t, lv) ->
                 (!lv.isEmpty()) ? new NumericValue(c.host.taskCount(lv.get(0))) : new NumericValue(c.host.taskCount()));
 
@@ -62,8 +61,7 @@ public class Threading
         });
 
         expression.addLazyFunction("task_dock", 1, (c, t, lv) ->
-            // pass through placeholder
-            // implmenetation should dock the task on the main thread.
+
             lv.get(0)
         );
 
@@ -76,7 +74,6 @@ public class Threading
             return BooleanValue.of(tv.isFinished());
         });
 
-        // lazy cause expr is evaluated in the same type
         expression.addLazyFunction("synchronize", (c, t, lv) ->
         {
             if (lv.isEmpty())
@@ -97,7 +94,6 @@ public class Threading
             }
         });
 
-        // lazy since exception expression is very conditional
         expression.addLazyFunction("sleep", (c, t, lv) ->
         {
             long time = lv.isEmpty() ? 0L : NumericValue.asNumber(lv.get(0).evalValue(c)).getLong();
@@ -127,7 +123,7 @@ public class Threading
                 }
                 throw new ExitStatement(exceptionally);
             }
-            return (cc, tt) -> new NumericValue(time); // pass through for variables
+            return (cc, tt) -> new NumericValue(time);
         });
 
         expression.addLazyFunction("yield", (c, t, lv) ->

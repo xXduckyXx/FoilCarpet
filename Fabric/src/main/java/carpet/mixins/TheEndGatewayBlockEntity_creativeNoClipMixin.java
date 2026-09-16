@@ -11,5 +11,5 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(TheEndGatewayBlockEntity.class)
 public class TheEndGatewayBlockEntity_creativeNoClipMixin
 {
-    // removeme
+
 }

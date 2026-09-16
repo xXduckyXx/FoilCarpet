@@ -95,7 +95,6 @@ public class ExplosionLogHelper
         impactedEntities.put(ent, impactedEntities.getOrDefault(ent, 0)+1);
     }
 
-
     public static record EntityChangedStatusWithCount(Vec3 pos, EntityType<?> type, Vec3 accel)
     {
         public EntityChangedStatusWithCount(Entity e, Vec3 accel)

@@ -28,4 +28,3 @@ public class Level_scarpetPlopMixin
         return chunk.getHeight(type, x, z);
     }
 }
-

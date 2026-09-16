@@ -61,7 +61,7 @@ public abstract class ServerLevel_scarpetMixin extends Level implements ServerWo
             ordinal = 1
     ))
     private void onNaturalLightinig(LevelChunk chunk, CallbackInfo ci,
-                                    //ChunkPos chunkPos, boolean bl, int i, int j, Profiler profiler, BlockPos blockPos, boolean bl2)
+
                                     ChunkPos chunkPos, boolean bl, int i, int j, ProfilerFiller profiler, BlockPos blockPos, DifficultyInstance localDifficulty, boolean bl2, LightningBolt lightningEntity)
     {
         if (LIGHTNING.isNeeded()) LIGHTNING.onWorldEventFlag((ServerLevel) (Object)this, blockPos, bl2?1:0);

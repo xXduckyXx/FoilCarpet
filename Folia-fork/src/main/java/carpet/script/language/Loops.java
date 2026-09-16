@@ -19,9 +19,7 @@ public class Loops
 {
     public static void apply(Expression expression)
     {
-        // condition and expression will get a bound '_i'
-        // returns last successful expression or false
-        // while(cond, limit, expr) => ??
+
         expression.addImpureFunction("break", lv ->
         {
             if (lv.isEmpty())
@@ -48,15 +46,14 @@ public class Loops
             throw new InternalExpressionException("'continue' can only be called with zero or one argument");
         });
 
-        // lazy
         expression.addLazyFunction("while", -1, (c, t, lv) ->
         {
-            if (lv.size() == 2) { // lets do nasty way so performance is not affected (might be super unnecessary, but hey)
+            if (lv.size() == 2) {
                 LazyValue condition = lv.get(0);
                 LazyValue expr = lv.get(1);
                 long i = 0;
                 Value lastOne = Value.NULL;
-                //scoping
+
                 LazyValue defaultVal = c.getVariable("_");
                 c.setVariable("_", (cc, tt) -> new NumericValue(0).bindTo("_"));
                 while (condition.evalValue(c, Context.BOOLEAN).getBoolean())
@@ -80,7 +77,7 @@ public class Loops
                     long seriously = i;
                     c.setVariable("_", (cc, tt) -> new NumericValue(seriously).bindTo("_"));
                 }
-                //revering scope
+
                 c.setVariable("_", defaultVal);
                 Value lastValueNoKidding = lastOne;
                 return (cc, tt) -> lastValueNoKidding;
@@ -90,7 +87,7 @@ public class Loops
             LazyValue expr = lv.get(2);
             long i = 0;
             Value lastOne = Value.NULL;
-            //scoping
+
             LazyValue defaultVal = c.getVariable("_");
             c.setVariable("_", (cc, tt) -> new NumericValue(0).bindTo("_"));
             while (i < limit && condition.evalValue(c, Context.BOOLEAN).getBoolean())
@@ -114,20 +111,18 @@ public class Loops
                 long seriously = i;
                 c.setVariable("_", (cc, tt) -> new NumericValue(seriously).bindTo("_"));
             }
-            //revering scope
+
             c.setVariable("_", defaultVal);
             Value lastValueNoKidding = lastOne;
             return (cc, tt) -> lastValueNoKidding;
         });
 
-        // loop(Num, expr) => lastdefaultValue
-        // expr receives bounded variable '_' indicating iteration
         expression.addLazyFunction("loop", 2, (c, t, lv) ->
         {
             long limit = NumericValue.asNumber(lv.get(0).evalValue(c, Context.NONE)).getLong();
             Value lastOne = Value.NULL;
             LazyValue expr = lv.get(1);
-            //scoping
+
             LazyValue defaultVal = c.getVariable("_");
             for (long i = 0; i < limit; i++)
             {
@@ -149,14 +144,12 @@ public class Loops
                     }
                 }
             }
-            //revering scope
+
             c.setVariable("_", defaultVal);
             Value trulyLastOne = lastOne;
             return (cc, tt) -> trulyLastOne;
         });
 
-        // map(list or Num, expr) => list_results
-        // receives bounded variable '_' with the expression
         expression.addLazyFunction("map", 2, (c, t, lv) ->
         {
             Value rval = lv.get(0).evalValue(c, Context.NONE);
@@ -170,7 +163,7 @@ public class Loops
             }
             Iterator<Value> iterator = alv.iterator();
             LazyValue expr = lv.get(1);
-            //scoping
+
             LazyValue defaultVal = c.getVariable("_");
             LazyValue iterVal = c.getVariable("_i");
             List<Value> result = new ArrayList<>();
@@ -205,15 +198,12 @@ public class Loops
             }
             ((AbstractListValue) rval).fatality();
             Value ret = ListValue.wrap(result);
-            //revering scope
+
             c.setVariable("_", defaultVal);
             c.setVariable("_i", iterVal);
             return (cc, tt) -> ret;
         });
 
-        // grep(list or num, expr) => list
-        // receives bounded variable '_' with the expression, and "_i" with index
-        // produces list of values for which the expression is true
         expression.addLazyFunction("filter", 2, (c, t, lv) ->
         {
             Value rval = lv.get(0).evalValue(c, Context.NONE);
@@ -227,7 +217,7 @@ public class Loops
             }
             Iterator<Value> iterator = alv.iterator();
             LazyValue expr = lv.get(1);
-            //scoping
+
             LazyValue defaultVal = c.getVariable("_");
             LazyValue iterVal = c.getVariable("_i");
             List<Value> result = new ArrayList<>();
@@ -265,15 +255,12 @@ public class Loops
             }
             ((AbstractListValue) rval).fatality();
             Value ret = ListValue.wrap(result);
-            //revering scope
+
             c.setVariable("_", defaultVal);
             c.setVariable("_i", iterVal);
             return (cc, tt) -> ret;
         });
 
-        // first(list, expr) => elem or null
-        // receives bounded variable '_' with the expression, and "_i" with index
-        // returns first element on the list for which the expr is true
         expression.addLazyFunction("first", 2, (c, t, lv) ->
         {
             Value rval = lv.get(0).evalValue(c, Context.NONE);
@@ -287,7 +274,7 @@ public class Loops
             }
             Iterator<Value> iterator = alv.iterator();
             LazyValue expr = lv.get(1);
-            //scoping
+
             LazyValue defaultVal = c.getVariable("_");
             LazyValue iterVal = c.getVariable("_i");
             Value result = Value.NULL;
@@ -323,7 +310,7 @@ public class Loops
                 }
                 next.boundVariable = variable;
             }
-            //revering scope
+
             ((AbstractListValue) rval).fatality();
             Value whyWontYouTrustMeJava = result;
             c.setVariable("_", defaultVal);
@@ -331,9 +318,6 @@ public class Loops
             return (cc, tt) -> whyWontYouTrustMeJava;
         });
 
-        // all(list, expr) => boolean
-        // receives bounded variable '_' with the expression, and "_i" with index
-        // returns true if expr is true for all items
         expression.addLazyFunction("all", 2, (c, t, lv) ->
         {
             Value rval = lv.get(0).evalValue(c, Context.NONE);
@@ -347,7 +331,7 @@ public class Loops
             }
             Iterator<Value> iterator = alv.iterator();
             LazyValue expr = lv.get(1);
-            //scoping
+
             LazyValue defaultVal = c.getVariable("_");
             LazyValue iterVal = c.getVariable("_i");
             LazyValue result = LazyValue.TRUE;
@@ -370,14 +354,13 @@ public class Loops
                 }
                 next.boundVariable = variable;
             }
-            //revering scope
+
             ((AbstractListValue) rval).fatality();
             c.setVariable("_", defaultVal);
             c.setVariable("_i", iterVal);
             return result;
         });
 
-        // runs traditional for(init, condition, increment, body) tri-argument for loop with body in between
         expression.addLazyFunction("c_for", 4, (c, t, lv) ->
         {
             LazyValue initial = lv.get(0);
@@ -404,9 +387,6 @@ public class Loops
             return (cc, tt) -> new NumericValue(finalIterations);
         });
 
-        // similar to map, but returns total number of successes
-        // for(list, expr) => success_count
-        // can be substituted for first and all, but first is more efficient and all doesn't require knowing list size
         expression.addLazyFunction("for", 2, (c, t, lv) ->
         {
             Value rval = lv.get(0).evalValue(c, Context.NONE);
@@ -420,7 +400,7 @@ public class Loops
             }
             Iterator<Value> iterator = alv.iterator();
             LazyValue expr = lv.get(1);
-            //scoping
+
             LazyValue defaultVal = c.getVariable("_");
             LazyValue iterVal = c.getVariable("_i");
             int successCount = 0;
@@ -458,7 +438,7 @@ public class Loops
                 }
                 next.boundVariable = variable;
             }
-            //revering scope
+
             ((AbstractListValue) rval).fatality();
             c.setVariable("_", defaultVal);
             c.setVariable("_i", iterVal);
@@ -466,11 +446,6 @@ public class Loops
             return (cc, tt) -> new NumericValue(promiseWontChange);
         });
 
-
-        // reduce(list, expr, ?acc) => value
-        // reduces values in the list with expression that gets accumulator
-        // each iteration expr receives acc - accumulator, and '_' - current list value
-        // returned value is substituted to the accumulator
         expression.addLazyFunction("reduce", 3, (c, t, lv) ->
         {
 
@@ -493,7 +468,6 @@ public class Loops
                 return (cc, tt) -> seriouslyWontChange;
             }
 
-            //scoping
             LazyValue defaultVal = c.getVariable("_");
             LazyValue accumulatorVal = c.getVariable("_a");
             LazyValue iterVal = c.getVariable("_i");
@@ -529,7 +503,7 @@ public class Loops
                 }
                 next.boundVariable = variable;
             }
-            //reverting scope
+
             ((AbstractListValue) rval).fatality();
             c.setVariable("_a", accumulatorVal);
             c.setVariable("_", defaultVal);

@@ -51,7 +51,6 @@ public class BlockValue extends Value
     private final ServerLevel world;
     private CompoundTag data;
 
-    // we only care for null values a few times, most of the time we would assume its all present
     public static final BlockValue NONE = new BlockValue(Blocks.AIR.defaultBlockState(), null, BlockPos.ZERO, null);
 
     public static BlockValue fromCoords(CarpetContext c, int x, int y, int z)
@@ -66,7 +65,7 @@ public class BlockValue extends Value
     {
         try
         {
-            BlockValue bv = bvCache.get(str); // [SCARY SHIT] persistent caches over server reloads
+            BlockValue bv = bvCache.get(str);
             if (bv != null)
             {
                 return bv;
@@ -125,7 +124,6 @@ public class BlockValue extends Value
         return null;
     }
 
-
     public CompoundTag getData()
     {
         if (data != null)
@@ -145,7 +143,6 @@ public class BlockValue extends Value
         }
         return null;
     }
-
 
     public BlockValue(BlockState state, ServerLevel world, BlockPos position)
     {
@@ -194,7 +191,6 @@ public class BlockValue extends Value
         pos = position;
         data = nbt;
     }
-
 
     @Override
     public String getString()
@@ -246,7 +242,7 @@ public class BlockValue extends Value
         {
             throw new NBTSerializableValue.IncompatibleTypeException(this);
         }
-        // follows falling block convertion
+
         CompoundTag tag = new CompoundTag();
         CompoundTag state = new CompoundTag();
         BlockState s = getBlockState();
@@ -286,7 +282,6 @@ public class BlockValue extends Value
         DOWNEAST("down-east", 0.6, 1.0, 0.5, Direction.DOWN),
         DOWNWEST("down-west", 0.4, 1.0, 0.5, Direction.DOWN),
 
-
         NORTH("north", 0.5, 0.4, 1.0, Direction.NORTH),
         SOUTH("south", 0.5, 0.4, 0.0, Direction.SOUTH),
         EAST("east", 0.0, 0.4, 0.5, Direction.EAST),
@@ -302,7 +297,6 @@ public class BlockValue extends Value
         public final Direction facing;
 
         private static final Map<String, SpecificDirection> DIRECTION_MAP = Arrays.stream(values()).collect(Collectors.toMap(SpecificDirection::getName, d -> d));
-
 
         SpecificDirection(String name, double hitx, double hity, double hitz, Direction blockFacing)
         {

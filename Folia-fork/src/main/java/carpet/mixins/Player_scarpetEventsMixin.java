@@ -40,7 +40,7 @@ public abstract class Player_scarpetEventsMixin extends LivingEntity
     ))
     private void playerTakingDamage(ServerLevel serverLevel, DamageSource source, float amount, CallbackInfo ci)
     {
-        // version of LivingEntity_scarpetEventsMixin::entityTakingDamage
+
         ((EntityInterface)this).getEventContainer().onEvent(EntityEventsGroup.Event.ON_DAMAGE, amount, source);
         if (PLAYER_TAKES_DAMAGE.isNeeded())
         {
@@ -92,7 +92,7 @@ public abstract class Player_scarpetEventsMixin extends LivingEntity
     private boolean dontUnmountFromIfPermanentVehicle(boolean original)
     {
         if (this.getVehicle() == null) {
-            // may also be called when leaving entity camera in spectator
+
             return original;
         }
         return original && !((EntityInterface) this.getVehicle()).isPermanentVehicle();

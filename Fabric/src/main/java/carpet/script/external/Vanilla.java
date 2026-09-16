@@ -73,12 +73,12 @@ public class Vanilla
 
     public static void ChunkMap_relightChunk(ChunkMap chunkMap, ChunkPos pos)
     {
-        //((ThreadedAnvilChunkStorageInterface) chunkMap).relightChunk(pos);
+
     }
 
     public static Map<String, Integer> ChunkMap_regenerateChunkRegion(ChunkMap chunkMap, List<ChunkPos> requestedChunks)
     {
-        return Map.of(); //return ((ThreadedAnvilChunkStorageInterface) chunkMap).regenerateChunkRegion(requestedChunks);
+        return Map.of();
     }
 
     public static int NaturalSpawner_MAGIC_NUMBER()
@@ -132,12 +132,12 @@ public class Vanilla
     }
 
     public static ThreadLocal<Boolean> skipGenerationChecks(ServerLevel level)
-    { // not sure does vanilla care at all - needs checking
+    {
         return CarpetSettings.skipGenerationChecks;
     }
 
     public static void sendScarpetShapesDataToPlayer(ServerPlayer player, Tag data)
-    { // dont forget to add the packet to vanilla packed handler and call ShapesRenderer.addShape to handle on client
+    {
         ServerNetworkHandler.sendCustomCommand(player, "scShapes", data);
     }
 

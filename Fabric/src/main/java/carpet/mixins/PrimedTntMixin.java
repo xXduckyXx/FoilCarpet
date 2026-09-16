@@ -31,7 +31,6 @@ public abstract class PrimedTntMixin extends Entity implements TntEntityInterfac
         super(entityType_1, world_1);
     }
 
-
     @Inject(method = "<init>(Lnet/minecraft/world/level/Level;DDDLnet/minecraft/world/entity/LivingEntity;)V",
                 at = @At("RETURN"))
     private void modifyTNTAngle(Level world, double x, double y, double z, LivingEntity entity, CallbackInfo ci)
@@ -57,7 +56,6 @@ public abstract class PrimedTntMixin extends Entity implements TntEntityInterfac
             logHelper.onPrimed(getX(), getY(), getZ(), getDeltaMovement());
         }
     }
-
 
     @Inject(method = "<init>(Lnet/minecraft/world/level/Level;DDDLnet/minecraft/world/entity/LivingEntity;)V",
             at = @At(value = "RETURN"))
@@ -87,7 +85,7 @@ public abstract class PrimedTntMixin extends Entity implements TntEntityInterfac
                                         ordinal = 1))
     private void tryMergeTnt(CallbackInfo ci)
     {
-        // Merge code for combining tnt into a single entity if they happen to exist in the same spot, same fuse, no motion CARPET-XCOM
+
         if(CarpetSettings.mergeTNT){
             Vec3 velocity = getDeltaMovement();
             if(!level().isClientSide() && mergeBool && velocity.x == 0 && velocity.y == 0 && velocity.z == 0){
@@ -100,7 +98,7 @@ public abstract class PrimedTntMixin extends Entity implements TntEntityInterfac
                                 && this.getX() == entityTNTPrimed.getX() && this.getZ() == entityTNTPrimed.getZ() && this.getY() == entityTNTPrimed.getY()
                                 && getFuse() == entityTNTPrimed.getFuse()){
                             mergedTNT += ((TntEntityInterface) entityTNTPrimed).getMergedTNT();
-                            entityTNTPrimed.discard(); // discard remove();
+                            entityTNTPrimed.discard();
                         }
                     }
                 }
@@ -111,7 +109,7 @@ public abstract class PrimedTntMixin extends Entity implements TntEntityInterfac
     @Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/item/PrimedTnt;setFuse(I)V"))
     private void setMergeable(CallbackInfo ci)
     {
-        // Merge code, merge only tnt that have had a chance to move CARPET-XCOM
+
         Vec3 velocity = getDeltaMovement();
         if(!level().isClientSide() && (velocity.y != 0 || velocity.x != 0 || velocity.z != 0)){
             mergeBool = true;

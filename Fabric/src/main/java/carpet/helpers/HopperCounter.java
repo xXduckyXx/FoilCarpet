@@ -42,21 +42,10 @@ import java.util.stream.Collectors;
 
 import static java.util.Map.entry;
 
-/**
- * The actual object residing in each hopper counter which makes them count the items and saves them. There is one for each
- * colour in MC.
- */
-
 public class HopperCounter
 {
-    /**
-     * A map of all the {@link HopperCounter} counters.
-     */
-    private static final Map<DyeColor, HopperCounter> COUNTERS;
 
-    /**
-     * The default display colour of each item, which makes them look nicer when printing the counter contents to the chat
-     */
+    private static final Map<DyeColor, HopperCounter> COUNTERS;
 
     public static final TextColor WHITE = TextColor.fromLegacyFormat(ChatFormatting.WHITE);
 
@@ -70,37 +59,21 @@ public class HopperCounter
         COUNTERS = Collections.unmodifiableMap(counterMap);
     }
 
-    /**
-     * The counter's colour, determined by the colour of wool it's pointing into
-     */
     public final DyeColor color;
-    /**
-     * The string which is passed into {@link Messenger#m} which makes each counter name be displayed in the colour of
-     * that counter.
-     */
+
     private final String coloredName;
-    /**
-     * All the items stored within the counter, as a map of {@link Item} mapped to a {@code long} of the amount of items
-     * stored thus far of that item type.
-     */
+
     private final Object2LongMap<Item> counter = new Object2LongLinkedOpenHashMap<>();
-    /**
-     * The starting tick of the counter, used to calculate in-game time. Only initialised when the first item enters the
-     * counter
-     */
+
     private long startTick;
-    /**
-     * The starting millisecond of the counter, used to calculate IRl time. Only initialised when the first item enters
-     * the counter
-     */
+
     private long startMillis;
-    // private PubSubInfoProvider<Long> pubSubProvider;
 
     private HopperCounter(DyeColor color)
     {
         startTick = -1;
         this.color = color;
-        String hexColor = Integer.toHexString(color.getTextColor() & 0xFFFFFF); // don't get alpha
+        String hexColor = Integer.toHexString(color.getTextColor() & 0xFFFFFF);
         if (hexColor.length() < 6)
         {
             hexColor = "0".repeat(6 - hexColor.length()) + hexColor;
@@ -108,11 +81,6 @@ public class HopperCounter
         this.coloredName = '#' + hexColor + ' ' + color.getName();
     }
 
-    /**
-     * Method used to add items to the counter. Note that this is when the {@link HopperCounter#startTick} and
-     * {@link HopperCounter#startMillis} variables are initialised, so you can place the counters and then start the farm
-     * after all the collection is sorted out.
-     */
     public void add(MinecraftServer server, ItemStack stack)
     {
         if (startTick < 0)
@@ -122,25 +90,17 @@ public class HopperCounter
         }
         Item item = stack.getItem();
         counter.put(item, counter.getLong(item) + stack.getCount());
-        // pubSubProvider.publish();
+
     }
 
-    /**
-     * Resets the counter, clearing its items but keeping the clock running.
-     */
     public void reset(MinecraftServer server)
     {
         counter.clear();
         startTick = server.overworld().getGameTime();
         startMillis = System.currentTimeMillis();
-        // pubSubProvider.publish();
+
     }
 
-    /**
-     * Resets all counters, clearing their items.
-     *
-     * @param fresh Whether or not to start the clocks going immediately or later.
-     */
     public static void resetAll(MinecraftServer server, boolean fresh)
     {
         for (HopperCounter counter : COUNTERS.values())
@@ -153,9 +113,6 @@ public class HopperCounter
         }
     }
 
-    /**
-     * Prints all the counters to chat, nicely formatted, and you can choose whether to diplay in in game time or IRL time
-     */
     public static List<Component> formatAll(MinecraftServer server, boolean realtime)
     {
         List<Component> text = new ArrayList<>();
@@ -179,10 +136,6 @@ public class HopperCounter
         return text;
     }
 
-    /**
-     * Prints a single counter's contents and timings to chat, with the option to keep it short (so no item breakdown,
-     * only rates). Again, realtime displays IRL time as opposed to in game time.
-     */
     public List<Component> format(MinecraftServer server, boolean realTime, boolean brief)
     {
         long ticks = Math.max(realTime ? (System.currentTimeMillis() - startMillis) / 50 : server.overworld().getGameTime() - startTick, 1);
@@ -235,10 +188,6 @@ public class HopperCounter
         return items;
     }
 
-    /**
-     * Converts a colour to have a low brightness and uniform colour, so when it prints the items in different colours
-     * it's not too flashy and bright, but enough that it's not dull to look at.
-     */
     public static int appropriateColor(int color)
     {
         if (color == 0)
@@ -263,10 +212,6 @@ public class HopperCounter
         return (r << 16) + (g << 8) + b;
     }
 
-    /**
-     * Maps items that don't get a good block to reference for colour, or those that colour is wrong to a number of blocks, so we can get their colours easily with the
-     * {@link Block#defaultMapColor()} method as these items have those same colours.
-     */
     private static final Map<Item, Block> DEFAULTS = Map.ofEntries(
             entry(Items.DANDELION, Blocks.YELLOW_WOOL),
             entry(Items.POPPY, Blocks.RED_WOOL),
@@ -350,13 +295,10 @@ public class HopperCounter
             entry(Items.GHAST_TEAR, Blocks.WHITE_WOOL),
             entry(Items.PHANTOM_MEMBRANE, Blocks.BONE_BLOCK),
             entry(Items.EGG, Blocks.BONE_BLOCK),
-            //entry(Items.,Blocks.),
+
             entry(Items.COPPER_INGOT, Blocks.COPPER_BLOCK),
             entry(Items.AMETHYST_SHARD, Blocks.AMETHYST_BLOCK));
 
-    /**
-     * Gets the colour to print an item in when printing its count in a hopper counter.
-     */
     public static TextColor fromItem(Item item, RegistryAccess registryAccess)
     {
         if (DEFAULTS.containsKey(item))
@@ -394,10 +336,6 @@ public class HopperCounter
         return null;
     }
 
-    /**
-     * Guesses the item's colour from the item itself. It first calls {@link HopperCounter#fromItem} to see if it has a
-     * valid colour there, if not just makes a guess, and if that fails just returns null
-     */
     public static TextColor guessColor(Item item, Level level)
     {
         RegistryAccess registryAccess = level.registryAccess();
@@ -432,17 +370,11 @@ public class HopperCounter
         return null;
     }
 
-    /**
-     * Returns the hopper counter for the given color
-     */
     public static HopperCounter getCounter(DyeColor color)
     {
         return COUNTERS.get(color);
     }
 
-    /**
-     * Returns the hopper counter from the colour name, if not null
-     */
     public static HopperCounter getCounter(String color)
     {
         try
@@ -456,9 +388,6 @@ public class HopperCounter
         }
     }
 
-    /**
-     * The total number of items in the counter
-     */
     public long getTotalItems()
     {
         return counter.isEmpty() ? 0 : counter.values().longStream().sum();

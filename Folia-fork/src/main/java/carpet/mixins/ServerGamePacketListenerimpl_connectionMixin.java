@@ -23,9 +23,7 @@ public class ServerGamePacketListenerimpl_connectionMixin
     private void onCustomCarpetPayload(ServerboundCustomPayloadPacket serverboundCustomPayloadPacket, CallbackInfo ci)
     {
         if (serverboundCustomPayloadPacket.payload() instanceof CarpetClient.CarpetPayload cpp) {
-            // We should force onto the main thread here
-            // ServerNetworkHandler.handleData can possibly mutate data that isn't
-            // thread safe, and also allows for client commands to be executed
+
             PacketUtils.ensureRunningOnSameThread(serverboundCustomPayloadPacket, (ServerGamePacketListener) this, player.level());
             ServerNetworkHandler.onClientData(player, cpp.data());
             ci.cancel();

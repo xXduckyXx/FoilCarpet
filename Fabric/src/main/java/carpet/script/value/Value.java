@@ -49,7 +49,7 @@ public abstract class Value implements Comparable<Value>, Cloneable
         }
         catch (CloneNotSupportedException e)
         {
-            // should not happen
+
             CarpetScriptServer.LOG.error("Failed to clone variable", e);
             throw new InternalExpressionException("Variable of type " + getTypeString() + " is not cloneable. Tell gnembon about it, this shoudn't happen");
         }
@@ -69,7 +69,6 @@ public abstract class Value implements Comparable<Value>, Cloneable
     {
         return getString();
     }
-
 
     public abstract boolean getBoolean();
 
@@ -119,7 +118,7 @@ public abstract class Value implements Comparable<Value>, Cloneable
                 : getString().compareTo(o.getString());
     }
 
-    @Override // for hashmap key access, and == operator
+    @Override
     public boolean equals(Object o)
     {
         if (o instanceof Value v)
@@ -131,12 +130,9 @@ public abstract class Value implements Comparable<Value>, Cloneable
 
     public void assertAssignable()
     {
-        if (boundVariable == null)// || boundVariable.startsWith("_"))
+        if (boundVariable == null)
         {
-            /*if (boundVariable != null)
-            {
-                throw new InternalExpressionException(boundVariable+ " cannot be assigned a new value");
-            }*/
+
             throw new InternalExpressionException(getString() + " is not a variable");
         }
     }
@@ -250,7 +246,7 @@ public abstract class Value implements Comparable<Value>, Cloneable
         }
         catch (CloneNotSupportedException e)
         {
-            // should never happen
+
             throw new InternalExpressionException("Cannot make a copy of value: " + this);
         }
     }
@@ -267,11 +263,6 @@ public abstract class Value implements Comparable<Value>, Cloneable
         return false;
     }
 
-    /**
-     * @return retrieves useful in-run value of an optimized code-base value.
-     * For immutable values (most of them) it can return itself,
-     * but for mutables, it needs to be its copy or deep copy.
-     */
     public Value fromConstant()
     {
         return this;

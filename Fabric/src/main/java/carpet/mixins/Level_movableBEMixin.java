@@ -27,10 +27,10 @@ public abstract class Level_movableBEMixin implements LevelInterface, LevelAcces
 
     @Shadow
     public abstract LevelChunk getChunkAt(BlockPos blockPos_1);
-    
+
     @Shadow
     public abstract void setBlocksDirty(BlockPos blockPos_1, BlockState s1, BlockState s2);
-    
+
     @Shadow
     public abstract void sendBlockUpdated(BlockPos var1, BlockState var2, BlockState var3, int var4);
 
@@ -40,9 +40,6 @@ public abstract class Level_movableBEMixin implements LevelInterface, LevelAcces
 
     @Shadow public abstract void updatePOIOnBlockStateChange(final BlockPos blockPos, final BlockState blockState, final BlockState blockState2);
 
-    /**
-     * @author 2No2Name
-     */
     @Override
     public boolean setBlockStateWithBlockEntity(BlockPos blockPos_1, BlockState blockState_1, BlockEntity newBlockEntity, int int_1)
     {
@@ -95,9 +92,9 @@ public abstract class Level_movableBEMixin implements LevelInterface, LevelAcces
             if ((int_1 & 16) == 0)
             {
                 int int_2 = int_1 & -34;
-                blockState_2.updateIndirectNeighbourShapes(this, blockPos_1, int_2); // prepare
-                blockState_1.updateNeighbourShapes(this, blockPos_1, int_2); // updateNeighbours
-                blockState_1.updateIndirectNeighbourShapes(this, blockPos_1, int_2); // prepare
+                blockState_2.updateIndirectNeighbourShapes(this, blockPos_1, int_2);
+                blockState_1.updateNeighbourShapes(this, blockPos_1, int_2);
+                blockState_1.updateIndirectNeighbourShapes(this, blockPos_1, int_2);
             }
             updatePOIOnBlockStateChange(blockPos_1, blockState_2, blockState_3);
         }

@@ -69,7 +69,7 @@ public class Vanilla
 
     public static void ChunkMap_relightChunk(ChunkMap chunkMap, ChunkPos pos)
     {
-        // not supported on Folia (Moonrise chunk system)
+
     }
 
     public static Map<String, Integer> ChunkMap_regenerateChunkRegion(ChunkMap chunkMap, List<ChunkPos> requestedChunks)
@@ -128,12 +128,12 @@ public class Vanilla
     }
 
     public static ThreadLocal<Boolean> skipGenerationChecks(ServerLevel level)
-    { // not sure does vanilla care at all - needs checking
+    {
         return CarpetSettings.skipGenerationChecks;
     }
 
     public static void sendScarpetShapesDataToPlayer(ServerPlayer player, Tag data)
-    { // dont forget to add the packet to vanilla packed handler and call ShapesRenderer.addShape to handle on client
+    {
         ServerNetworkHandler.sendCustomCommand(player, "scShapes", data);
     }
 

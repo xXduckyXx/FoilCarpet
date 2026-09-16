@@ -14,12 +14,6 @@ import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.plugin.Plugin;
 
-/**
- * Folia-safe source of currently loaded chunks. {@code World#getLoadedChunks()} throws
- * "No currently ticking region" when invoked from the plugin's global tick thread, so loaded
- * chunks are instead tracked via {@link ChunkLoadEvent}/{@link ChunkUnloadEvent}. Chunks that
- * were already loaded before the plugin enabled are picked up whenever they reload.
- */
 public final class ChunkRegistry
 {
     private static final ConcurrentHashMap<String, Set<Long>> LOADED = new ConcurrentHashMap<>();

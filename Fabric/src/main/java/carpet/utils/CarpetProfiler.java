@@ -27,11 +27,10 @@ public class CarpetProfiler
     private static final Object2LongOpenHashMap<Pair<Level,Object>> ENTITY_TIMES = new Object2LongOpenHashMap<>();
     private static final Object2LongOpenHashMap<Pair<Level,Object>> ENTITY_COUNT = new Object2LongOpenHashMap<>();
 
-
     private static CommandSourceStack currentRequester = null;
     public static int tick_health_requested = 0;
     private static int tick_health_elapsed = 0;
-    private static TYPE test_type = TYPE.NONE; //1 for ticks, 2 for entities
+    private static TYPE test_type = TYPE.NONE;
     private static long current_tick_start = 0;
     private static final Map<String, String> GENERAL_SECTIONS = Map.of(
         "Network",     "Packet sending, player logins, disconnects, kicks, anti-cheat check for player movement, etc.",
@@ -84,8 +83,8 @@ public class CarpetProfiler
 
     public static void prepare_tick_report(CommandSourceStack source, int ticks)
     {
-        //maybe add so it only spams the sending player, but honestly - all may want to see it
-        SECTION_STATS.clear(); // everything then defaults to 0
+
+        SECTION_STATS.clear();
         ENTITY_COUNT.clear();
         ENTITY_TIMES.clear();
         test_type = TYPE.GENERAL;
@@ -98,7 +97,7 @@ public class CarpetProfiler
 
     public static void prepare_entity_report(CommandSourceStack source, int ticks)
     {
-        //maybe add so it only spams the sending player, but honestly - all may want to see it
+
         SECTION_STATS.clear();
         ENTITY_COUNT.clear();
         ENTITY_TIMES.clear();
@@ -195,7 +194,7 @@ public class CarpetProfiler
 
     public static void finalize_tick_report_for_time(MinecraftServer server)
     {
-        //print stats
+
         if (currentRequester == null)
             return;
         long total_tick_time = SECTION_STATS.getLong("tick");

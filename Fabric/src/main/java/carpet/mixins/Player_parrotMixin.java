@@ -37,7 +37,5 @@ public abstract class Player_parrotMixin extends LivingEntity
             removeEntitiesOnShoulder();
         }
     }
-    
-
 
 }

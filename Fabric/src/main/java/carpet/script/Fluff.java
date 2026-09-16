@@ -42,21 +42,11 @@ public abstract class Fluff
 
     public interface EvalNode
     {
-        /**
-         * @return true if function has constant output if arguments are constant and can be evaluated
-         * statically (without context)
-         */
+
         boolean pure();
 
-        /**
-         * @return true if function has constant output if arguments are constant and can be evaluated
-         * statically (without context)
-         */
         boolean transitive();
 
-        /**
-         * @return required argument eval type in case its evaluated statically without context but with a given context type
-         */
         default Context.Type staticType(Context.Type outerType)
         {
             return transitive() ? outerType : Context.NONE;
@@ -79,7 +69,7 @@ public abstract class Fluff
                 throw new InternalExpressionException("Thread interrupted");
             }
         }
-        // lazy function has a chance to change execution based on context
+
     }
 
     public interface IFunction extends ILazyFunction
@@ -112,7 +102,6 @@ public abstract class Fluff
             this.numParams = numParams;
             this.name = name;
         }
-
 
         public String getName()
         {
@@ -191,7 +180,7 @@ public abstract class Fluff
         {
 
             return new LazyValue()
-            { // eager evaluation always ignores the required type and evals params by none default
+            {
                 private List<Value> params;
 
                 @Override
@@ -212,7 +201,7 @@ public abstract class Fluff
                 {
                     if (params == null)
                     {
-                        // very likely needs to be dynamic, so not static like here, or remember if it was.
+
                         params = unpackArgs(lazyParams, c, Context.Type.NONE);
                     }
                     else

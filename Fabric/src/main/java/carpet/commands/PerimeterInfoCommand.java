@@ -76,7 +76,7 @@ public class PerimeterInfoCommand
         {
             Messenger.m(source, "w   ", entityliving.getDisplayName() ,"w : ","wb "+res.specific);
             res.samples.forEach(bp -> Messenger.m(source, "w   ", Messenger.tp("c", bp)));
-            entityliving.discard(); // dicard // remove();
+            entityliving.discard();
         }
         return 1;
     }

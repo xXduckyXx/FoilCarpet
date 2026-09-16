@@ -28,7 +28,7 @@ import java.util.regex.PatternSyntaxException;
 public class Sys
 {
     public static final Random randomizer = new Random();
-    // %[argument_index$][flags][width][.precision][t]conversion
+
     private static final Pattern formatPattern = Pattern.compile("%(\\d+\\$)?([-#+ 0,(<]*)?(\\d+)?(\\.\\d+)?([tT])?([a-zA-Z%])");
 
     public static void apply(Expression expression)
@@ -95,10 +95,7 @@ public class Sys
             {
                 if (m.find(i))
                 {
-                    // Anything between the start of the string and the beginning
-                    // of the format specifier is either fixed text or contains
-                    // an invalid format string.
-                    // [[scarpet]] but we skip it and let the String.format fail
+
                     char fmt = m.group(6).toLowerCase().charAt(0);
                     if (fmt == 's')
                     {
@@ -145,9 +142,7 @@ public class Sys
                 }
                 else
                 {
-                    // No more valid format specifiers.  Check for possible invalid
-                    // format specifiers.
-                    // [[scarpet]] but we skip it and let the String.format fail
+
                     break;
                 }
             }
@@ -334,7 +329,7 @@ public class Sys
         expression.addUnaryFunction("print", v ->
         {
             System.out.println(v.getString());
-            return v; // pass through for variables
+            return v;
         });
 
         expression.addContextFunction("time", 0, (c, t, lv) ->
@@ -405,7 +400,6 @@ public class Sys
             return new NumericValue(cal.getTimeInMillis());
         });
 
-        // lazy cause evaluates expression multiple times
         expression.addLazyFunction("profile_expr", 1, (c, t, lv) ->
         {
             LazyValue lazy = lv.get(0);
@@ -464,7 +458,6 @@ public class Sys
             return Value.NULL;
         });
 
-        //deprecate
         expression.addContextFunction("vars", 1, (c, t, lv) ->
         {
             String prefix = lv.get(0).getString();
@@ -480,7 +473,6 @@ public class Sys
             return ListValue.wrap(values);
         });
 
-        // lazy cause default expression may not be executed if not needed
         expression.addLazyFunction("system_variable_get", (c, t, lv) ->
         {
             if (lv.isEmpty())

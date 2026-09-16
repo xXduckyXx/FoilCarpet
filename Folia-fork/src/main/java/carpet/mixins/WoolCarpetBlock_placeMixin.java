@@ -9,7 +9,7 @@ import net.minecraft.world.level.block.WoolCarpetBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import org.spongepowered.asm.mixin.Mixin;
 
-@Mixin(WoolCarpetBlock.class) // WoolCarpetBlock
+@Mixin(WoolCarpetBlock.class)
 public abstract class WoolCarpetBlock_placeMixin extends Block
 {
 
@@ -23,7 +23,7 @@ public abstract class WoolCarpetBlock_placeMixin extends Block
     {
         BlockState state = super.getStateForPlacement(context);
         if (context.getPlayer() != null && !context.getLevel().isClientSide())
-        { // getColor()
+        {
             WoolTool.carpetPlacedAction(((WoolCarpetBlock)(Object)this).getColor(), (ServerPlayer) context.getPlayer(), context.getClickedPos(), (ServerLevel) context.getLevel());
         }
         return state;

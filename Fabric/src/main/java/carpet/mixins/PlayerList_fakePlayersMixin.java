@@ -32,7 +32,6 @@ public abstract class PlayerList_fakePlayersMixin
     @Final
     private MinecraftServer server;
 
-    // may need to be invoked in the configuration phase on prepareSpawn Task
     @Inject(method = "placeNewPlayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;level()Lnet/minecraft/server/level/ServerLevel;"))
     private void fixStartingPos(Connection connection, ServerPlayer serverPlayer, CommonListenerCookie commonListenerCookie, CallbackInfo ci)
     {

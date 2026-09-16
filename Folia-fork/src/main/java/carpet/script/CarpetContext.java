@@ -11,9 +11,7 @@ import net.minecraft.server.level.ServerLevel;
 
 public class CarpetContext extends Context
 {
-    /**
-     * @deprecated Use {@link #source()} or the new methods to access stuff in it instead
-     */
+
     @Deprecated(forRemoval = true)
     public CommandSourceStack s;
     private final BlockPos origin;

@@ -24,7 +24,7 @@ public class BlockInput_fillUpdatesMixin
         {
             return state;
         }
-        
+
         return Block.updateFromNeighbourShapes(state, serverWorld, blockPos);
     }
 }

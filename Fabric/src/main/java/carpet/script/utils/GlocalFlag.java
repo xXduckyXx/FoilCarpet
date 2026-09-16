@@ -18,13 +18,6 @@ public class GlocalFlag extends ThreadLocal<Boolean>
         return initial;
     }
 
-    /**
-     * Allows to thread-safely wrap a call while disabling a global flag and setting it back up right after.
-     *
-     * @param action - callback to invoke when the wrapping is all setup
-     * @param <T>    - returned value of that action, whatever that might be
-     * @return result of the action
-     */
     public <T> T getWhileDisabled(Supplier<T> action)
     {
         return whileValueReturn(!initial, action);

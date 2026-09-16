@@ -27,9 +27,9 @@ public class BiomeInfo
     {{
         put("tags", (w, b) -> ListValue.wrap(w.registryAccess().lookupOrThrow(Registries.BIOME).getTags().filter(p -> p.stream().anyMatch(h -> h.value() == b)).map(ValueConversions::of)));
         put("temperature", (w, b) -> NumericValue.of(b.getBaseTemperature()));
-        // todo add per postion query for environmental attributes as well
+
         put("fog_color", (w, b) -> fromEnvironmentalAttribute(w, b, EnvironmentAttributes.FOG_COLOR));
-        put("foliage_color", (w, b) -> ValueConversions.ofRGB(b.getSpecialEffects().foliageColorOverride().orElse(4764952))); // client Biome.getDefaultFoliageColor
+        put("foliage_color", (w, b) -> ValueConversions.ofRGB(b.getSpecialEffects().foliageColorOverride().orElse(4764952)));
         put("sky_color", (w, b) -> fromEnvironmentalAttribute(w, b, EnvironmentAttributes.SKY_COLOR));
         put("water_color", (w, b) ->  ValueConversions.ofRGB(b.getSpecialEffects().waterColor()));
         put("water_fog_color", (w, b) -> fromEnvironmentalAttribute(w, b, EnvironmentAttributes.WATER_FOG_COLOR));

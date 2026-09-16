@@ -45,32 +45,25 @@ public abstract class RedstoneWireBlock_fastMixin implements RedstoneWireBlockIn
 
     private RedstoneWireEvaluator legacy = new DefaultRedstoneWireEvaluator((RedStoneWireBlock)(Object) this);
 
-    // =
-
     private RedstoneWireTurbo wireTurbo = null;
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void onRedstoneWireBlockCTOR(BlockBehaviour.Properties settings, CallbackInfo ci) {
-        //noinspection ConstantConditions
+
         wireTurbo = new RedstoneWireTurbo((RedStoneWireBlock) (Object) this);
     }
 
-    // =
-
     public void fastUpdate(Level world, BlockPos pos, BlockState state, Orientation o, boolean sup) {
-        // [CM] fastRedstoneDust -- update based on carpet rule
+
         if (CarpetSettings.fastRedstoneDust) {
-            BlockPos source = null; // todo this probably removes all improvements from the original method
-            // so needs to be evaluated if its worth keeping
+            BlockPos source = null;
+
             wireTurbo.updateSurroundingRedstone(world, pos, state, source);
             return;
         }
         updatePowerStrength(world, pos, state, o, sup);
     }
 
-    /**
-     * @author theosib, soykaf, gnembon
-     */
     @Inject(method = "updatePowerStrength", at = @At("HEAD"), cancellable = true)
     private void updateLogicAlternative(Level world, BlockPos pos, BlockState state, Orientation orientation, boolean sup, CallbackInfo cir) {
         if (CarpetSettings.fastRedstoneDust) {
@@ -86,8 +79,7 @@ public abstract class RedstoneWireBlock_fastMixin implements RedstoneWireBlockIn
         if (blockState_1.getValue(POWER) != i) {
             blockState_1 = blockState_1.setValue(POWER, i);
             if (world_1.getBlockState(blockPos_1) == blockState) {
-                // [Space Walker] suppress shape updates and emit those manually to
-                // bypass the new neighbor update stack.
+
                 if (world_1.setBlock(blockPos_1, blockState_1, Block.UPDATE_KNOWN_SHAPE | Block.UPDATE_CLIENTS))
                     wireTurbo.updateNeighborShapes(world_1, blockPos_1, blockState_1);
             }
@@ -111,9 +103,6 @@ public abstract class RedstoneWireBlock_fastMixin implements RedstoneWireBlockIn
         return blockState_1;
     }
 
-    // =
-
-
     @Redirect(method = "onPlace", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/RedStoneWireBlock;updatePowerStrength(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/redstone/Orientation;Z)V"))
     private void redirectOnBlockAddedUpdate(RedStoneWireBlock self, Level world_1, BlockPos blockPos_1, BlockState blockState_1, Orientation o, boolean sup) {
         fastUpdate(world_1, blockPos_1, blockState_1, o, sup);
@@ -126,10 +115,9 @@ public abstract class RedstoneWireBlock_fastMixin implements RedstoneWireBlockIn
 
     @Redirect(method = "neighborChanged", at = @At(value = "INVOKE", target =
             "Lnet/minecraft/world/level/block/RedStoneWireBlock;updatePowerStrength(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/redstone/Orientation;Z)V"
-            //"Lnet/minecraft/world/level/block/RedStoneWireBlock;updatePowerStrength(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/redstone/Orientation;)V"
+
     ))
-    //private void red(final RedStoneWireBlock instance, final Level level,
-    //                 final BlockPos blockPos, final BlockState blockState, final Orientation orientation)
+
     private void redirectNeighborUpdateUpdate(
             RedStoneWireBlock self,
             Level world_1,

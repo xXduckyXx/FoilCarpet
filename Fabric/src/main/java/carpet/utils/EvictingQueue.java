@@ -13,8 +13,7 @@ public class EvictingQueue<K> extends LinkedHashMap<K,Integer>
     @Override
      protected boolean removeEldestEntry(Map.Entry<K, Integer> eldest)
      {
-        return this.size() > 10; 
+        return this.size() > 10;
      }
-
 
 }

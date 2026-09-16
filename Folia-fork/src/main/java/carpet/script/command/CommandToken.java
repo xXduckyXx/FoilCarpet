@@ -35,7 +35,7 @@ public class CommandToken implements Comparable<CommandToken>
     @Nullable
     public static CommandToken getToken(String source, CarpetScriptHost host)
     {
-        // todo add more type checking and return null
+
         if (!source.startsWith("<"))
         {
             return source.matches("[_a-zA-Z]+") ? new CommandToken(source, null) : null;

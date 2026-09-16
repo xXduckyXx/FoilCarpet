@@ -41,16 +41,13 @@ public abstract class LevelChunk_movableBEMixin extends ChunkAccess implements W
     }
 
     @Shadow
-    /* @Nullable */
+
     public abstract BlockEntity getBlockEntity(BlockPos blockPos_1, LevelChunk.EntityCreationType worldChunk$CreationType_1);
 
     @Shadow protected abstract <T extends BlockEntity> void updateBlockEntityTicker(T blockEntity);
 
     @Shadow public abstract void addAndRegisterBlockEntity(BlockEntity blockEntity);
 
-    // Fix Failure: If a moving BlockEntity is placed while BlockEntities are ticking, this will not find it and then replace it with a new TileEntity!
-    // blockEntity_2 = this.getBlockEntity(blockPos_1, WorldChunk.CreationType.CHECK);
-    // question is - with the changes in the BE handling this might not be a case anymore
     @Redirect(method = "setBlockState", at = @At(value = "INVOKE", ordinal = 0,
             target = "Lnet/minecraft/world/level/chunk/LevelChunk;getBlockEntity(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/chunk/LevelChunk$EntityCreationType;)Lnet/minecraft/world/level/block/entity/BlockEntity;"))
     private BlockEntity ifGetBlockEntity(LevelChunk worldChunk, BlockPos blockPos_1,
@@ -65,16 +62,7 @@ public abstract class LevelChunk_movableBEMixin extends ChunkAccess implements W
             return this.level.getBlockEntity(blockPos_1);
         }
     }
-    
-    
-    /**
-     * Sets the Blockstate and the BlockEntity.
-     * Only sets BlockEntity if Block is BlockEntityProvider, but doesn't check if it actually matches (e.g. can assign beacon to chest entity).
-     *
-     * @author 2No2Name
-     */
-    /* @Nullable */
-    // todo update me to the new version
+
     @Override
     public BlockState setBlockStateWithBlockEntity(BlockPos blockPos_1, BlockState newBlockState, BlockEntity newBlockEntity,
             int flags)
@@ -119,7 +107,7 @@ public abstract class LevelChunk_movableBEMixin extends ChunkAccess implements W
         }
 
         boolean blockChanged = !oldBlockState.is(newBlock);
-        boolean movedByPiston = (flags & Block.UPDATE_MOVE_BY_PISTON) != 0; // moved by pistons
+        boolean movedByPiston = (flags & Block.UPDATE_MOVE_BY_PISTON) != 0;
         boolean sideEffects = (flags & Block.UPDATE_SKIP_BLOCK_ENTITY_SIDEEFFECTS) == 0;
 
         if (blockChanged && oldBlockState.hasBlockEntity()) {
@@ -145,14 +133,13 @@ public abstract class LevelChunk_movableBEMixin extends ChunkAccess implements W
             }
         }
 
-
                 if (chunkSection.getBlockState(x, chunkY, z).getBlock() != newBlock)
         {
             return null;
         }
 
         if (!level.isClientSide() && sideEffects) {
-            // this updates stuff, schedule ticks - do we want that since its only be called from MovingPistonBlock really?
+
             newBlockState.onPlace(level, blockPos_1, oldBlockState, movedByPiston);
         }
 

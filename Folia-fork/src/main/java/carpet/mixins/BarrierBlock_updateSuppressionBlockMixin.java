@@ -32,7 +32,7 @@ public class BarrierBlock_updateSuppressionBlockMixin extends Block {
     @Override
     public void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, Orientation fromPos, boolean notify) {
         if (CarpetSettings.updateSuppressionBlock != -1) {
-            if (true/*fromPos.equals(pos.above())*/) { // todo neighbour updates don't have source
+            if (true ) {
                 BlockState stateAbove = level.getBlockState(pos.above());
                 if (stateAbove.is(Blocks.ACTIVATOR_RAIL) && !stateAbove.getValue(PoweredRailBlock.POWERED)) {
                     level.scheduleTick(pos, this, 1);

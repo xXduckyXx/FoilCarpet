@@ -52,8 +52,6 @@ public class ServerGamePacketListenerImpl_scarpetEventsMixin
 {
     @Shadow public ServerPlayer player;
 
-
-
     @Inject(method = "handlePlayerInput", at = @At(
             value = "INVOKE",
             target = "Lnet/minecraft/server/level/ServerPlayer;setLastClientInput(Lnet/minecraft/world/entity/player/Input;)V"
@@ -61,8 +59,7 @@ public class ServerGamePacketListenerImpl_scarpetEventsMixin
     private void checkMovement(ServerboundPlayerInputPacket packet, CallbackInfo ci)
     {
         Input input = packet.input();
-        
-        // sneak events
+
         boolean wasDown = player.isShiftKeyDown();
         boolean isDown = input.shift();
         if (wasDown != isDown)
@@ -77,7 +74,6 @@ public class ServerGamePacketListenerImpl_scarpetEventsMixin
             }
         }
 
-        // ride event, which should check for mount?
         if (PLAYER_RIDES.isNeeded() && (input.jump() || input.shift() || input.forward() || input.backward() || input.left() || input.right()))
         {
             PLAYER_RIDES.onMountControls(player, input.left() == input.right() ? 0 : (input.left() ? -1 : 1 ), input.forward() == input.backward() ? 0 : (input.forward() ? 1 : -1), input.jump(), input.shift());
@@ -86,7 +82,7 @@ public class ServerGamePacketListenerImpl_scarpetEventsMixin
 
     @Inject(method = "handlePlayerAction", cancellable = true, at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/server/level/ServerPlayer;drop(Z)V", // dropSelectedItem
+            target = "Lnet/minecraft/server/level/ServerPlayer;drop(Z)V",
             ordinal = 0,
             shift = At.Shift.BEFORE
     ))
@@ -100,7 +96,7 @@ public class ServerGamePacketListenerImpl_scarpetEventsMixin
     @Inject(method = "handlePlayerAction", cancellable = true, at = @At(
             value = "INVOKE",
             target = "Lnet/minecraft/server/level/ServerPlayer;getItemInHand(Lnet/minecraft/world/InteractionHand;)Lnet/minecraft/world/item/ItemStack;",
-            ordinal = 1, // not very robust, see spear
+            ordinal = 1,
             shift = At.Shift.BEFORE
     ))
     private void onHandSwap(ServerboundPlayerActionPacket playerActionC2SPacket_1, CallbackInfo ci)
@@ -110,7 +106,7 @@ public class ServerGamePacketListenerImpl_scarpetEventsMixin
 
     @Inject(method = "handlePlayerAction", cancellable = true, at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/server/level/ServerPlayer;drop(Z)V", // dropSelectedItem
+            target = "Lnet/minecraft/server/level/ServerPlayer;drop(Z)V",
             ordinal = 1,
             shift = At.Shift.BEFORE
     ))
@@ -120,7 +116,6 @@ public class ServerGamePacketListenerImpl_scarpetEventsMixin
             ci.cancel();
         }
     }
-
 
     @Inject(method = "handleMovePlayer", at = @At(
             value = "INVOKE",
@@ -221,7 +216,7 @@ public class ServerGamePacketListenerImpl_scarpetEventsMixin
     ))
     private void onWakeUp(ServerboundPlayerCommandPacket clientCommandC2SPacket_1, CallbackInfo ci)
     {
-        //weird one - doesn't seem to work, maybe MP
+
         if (player.isSleeping())
             PLAYER_WAKES_UP.onPlayerEvent(player);
         else
@@ -242,8 +237,7 @@ public class ServerGamePacketListenerImpl_scarpetEventsMixin
     @Inject(method = "handleContainerButtonClick", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;resetLastActionTime()V"))
     private void onItemBeingPickedFromInventory(ServerboundContainerButtonClickPacket packet, CallbackInfo ci)
     {
-        // crafts not int the crafting window
-        //CarpetSettings.LOG.error("Player clicks button "+packet.getButtonId());
+
     }
     @Inject(method = "handlePlaceRecipe", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;resetLastActionTime()V"))
     private void onRecipeSelectedInRecipeManager(ServerboundPlaceRecipePacket packet, CallbackInfo ci)
@@ -280,7 +274,7 @@ public class ServerGamePacketListenerImpl_scarpetEventsMixin
         }
     }
 
-    @Inject(method = "method_44356", // lambda of handleChatCommand(ServerboundChatCommandPacket)
+    @Inject(method = "method_44356",
             at = @At(value = "HEAD")
     )
     private void onChatCommandMessage(ServerboundChatCommandPacket serverboundChatCommandPacket, CallbackInfo ci) {

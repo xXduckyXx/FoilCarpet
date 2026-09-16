@@ -24,7 +24,6 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 import static carpet.script.CarpetEventServer.Event.PLAYER_BREAK_BLOCK;
 import static carpet.script.CarpetEventServer.Event.PLAYER_INTERACTS_WITH_BLOCK;
 
-
 @Mixin(ServerPlayerGameMode.class)
 public class ServerPlayerGameMode_scarpetEventsMixin implements ServerPlayerInteractionManagerInterface
 {

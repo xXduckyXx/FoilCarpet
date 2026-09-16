@@ -9,9 +9,6 @@ import java.util.List;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.phys.Vec3;
 
-/**
- * A generic log helper for logging the trajectory of things like blocks and throwables.
- */
 public class TrajectoryLogHelper
 {
     private static final int MAX_TICKS_PER_LINE = 20;
@@ -72,4 +69,3 @@ public class TrajectoryLogHelper
         doLog = false;
     }
 }
-

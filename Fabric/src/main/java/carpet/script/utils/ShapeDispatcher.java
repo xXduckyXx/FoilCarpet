@@ -162,7 +162,7 @@ public class ShapeDispatcher
             int tagcount = 0;
             for (ShapeWithConfig s : shapes)
             {
-                tag.add(ExpiringShape.toTag(s.config(), regs));  // 4000 shapes limit boxes
+                tag.add(ExpiringShape.toTag(s.config(), regs));
                 if (tagcount++ > 1000)
                 {
                     tagcount = 0;
@@ -199,7 +199,7 @@ public class ShapeDispatcher
 
     public static Map<String, Value> parseParams(List<Value> items)
     {
-        // parses params from API function
+
         if (items.size() % 2 == 1)
         {
             throw new InternalExpressionException("Shape parameters list needs to be of even size");
@@ -235,7 +235,6 @@ public class ShapeDispatcher
         return factory.apply(userParams, server.registryAccess());
     }
 
-    // client
     @Nullable
     public static ExpiringShape fromTag(CompoundTag tag, Level level)
     {
@@ -314,7 +313,6 @@ public class ShapeDispatcher
         protected boolean debug;
         protected boolean seethrough;
 
-
         protected ExpiringShape()
         {
         }
@@ -355,10 +353,9 @@ public class ShapeDispatcher
         }
 
         private int rgba2argb(int color) {
-            // return shift bits from alpha
+
             return ((color & 0xFF) << 24) + (color >> 8 & 0xFFFFFF);
         }
-
 
         protected void init(Map<String, Value> options, RegistryAccess regs)
         {
@@ -457,7 +454,6 @@ public class ShapeDispatcher
             return new DustParticleOptions(ARGB.colorFromFloat(1.0f, (bg ?r:fr), (bg ?r:fr), (bg ?r:fr)), 1);
         }
 
-
         public abstract Consumer<ServerPlayer> alternative();
 
         public long key(RegistryAccess regs)
@@ -471,7 +467,7 @@ public class ShapeDispatcher
         }
 
         protected long calcKey(RegistryAccess regs)
-        { // using FNV-1a algorithm
+        {
             long hash = -3750763034362895579L;
             hash ^= shapeDimension.hashCode();
             hash *= 1099511628211L;
@@ -506,7 +502,6 @@ public class ShapeDispatcher
             return vec.add(xdif, ydif, zdif).hashCode();
         }
 
-        // list of params that need to be there
         private final Set<String> required = Set.of("duration", "shape", "dim");
         private final Map<String, Value> optional = Map.of(
                 "color", new NumericValue(-1),
@@ -523,7 +518,6 @@ public class ShapeDispatcher
             return required;
         }
 
-        // list of params that can be there, with defaults
         protected Set<String> optionalParams()
         {
             return optional.keySet();
@@ -849,7 +843,6 @@ public class ShapeDispatcher
         }
     }
 
-
     public static class Box extends ExpiringShape
     {
         private final Set<String> required = Set.of("from", "to");
@@ -1165,21 +1158,21 @@ public class ShapeDispatcher
                 Iterator<Value> it = abl.iterator();
                 for (long i = 0L; i < vertexList.size(); i++)
                 {
-                    relative.add(it.hasNext() && it.next().getBoolean());//if part of it got defined.
+                    relative.add(it.hasNext() && it.next().getBoolean());
                 }
             }
             else if (options.getOrDefault("relative", optional.get("relative")) instanceof final BooleanValue boolv)
             {
                 for (long i = 0L; i < vertexList.size(); i++)
                 {
-                    relative.add(boolv.getBoolean());//if it is a boolean.
+                    relative.add(boolv.getBoolean());
                 }
             }
             else
             {
                 for (long i = 0L; i < vertexList.size(); i++)
                 {
-                    relative.add(true);//if there is nothing defined at all.
+                    relative.add(true);
                 }
             }
 
@@ -1389,7 +1382,6 @@ public class ShapeDispatcher
             axis = Direction.Axis.byName(options.getOrDefault("axis", optional.get("axis")).getString());
         }
 
-
         @Override
         public Consumer<ServerPlayer> alternative()
         {
@@ -1430,7 +1422,7 @@ public class ShapeDispatcher
                         world.sendParticles(p, particle, true, true, x + ccx, y + ccy, z + ccz, 1, 0.0, 0.0, 0.0, 0.0);
                     }
                 }
-                else  // Z
+                else
                 {
                     for (int i = 0; i < partno; i++)
                     {
@@ -1462,7 +1454,6 @@ public class ShapeDispatcher
             return hash;
         }
     }
-
 
     public abstract static class Param
     {
@@ -1553,9 +1544,9 @@ public class ShapeDispatcher
         }
 
         @Nullable
-        public abstract Tag toTag(Value value, final RegistryAccess regs); //validates value, returning null if not necessary to keep it and serialize
+        public abstract Tag toTag(Value value, final RegistryAccess regs);
 
-        public abstract Value validate(Map<String, Value> options, MinecraftServer server, Value value); // makes sure the value is proper
+        public abstract Value validate(Map<String, Value> options, MinecraftServer server, Value value);
 
         public abstract Value decode(Tag tag, Level level);
     }
@@ -1746,7 +1737,6 @@ public class ShapeDispatcher
             return FormattedTextValue.deserialize(tag, level.registryAccess());
         }
     }
-
 
     public static class StringChoiceParam extends StringParam
     {
@@ -1984,7 +1974,6 @@ public class ShapeDispatcher
         }
     }
 
-
     public static class Vec3Param extends Param
     {
         private final boolean roundsUpForBlocks;
@@ -2129,7 +2118,6 @@ public class ShapeDispatcher
             return ltag;
         }
     }
-
 
     public static class ColorParam extends NumericParam
     {

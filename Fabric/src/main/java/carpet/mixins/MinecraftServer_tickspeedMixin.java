@@ -20,9 +20,6 @@ public abstract class MinecraftServer_tickspeedMixin extends ReentrantBlockableE
 
     CarpetProfiler.ProfilerToken currentSection;
 
-    // Replaced the above cancelled while statement with this one
-    // could possibly just inject that mspt selection at the beginning of the loop, but then adding all mspt's to
-    // replace 50L will be a hassle
     @Inject(method = "runServer", at = @At(value = "INVOKE", shift = At.Shift.AFTER,
             target = "Lnet/minecraft/util/profiling/Profiler;get()Lnet/minecraft/util/profiling/ProfilerFiller;"))
     private void modifiedRunLoop(CallbackInfo ci)
@@ -33,10 +30,9 @@ public abstract class MinecraftServer_tickspeedMixin extends ReentrantBlockableE
         }
     }
 
-
     @Inject(method = "autoSave", at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/server/MinecraftServer;saveEverything(ZZZ)Z", // save
+            target = "Lnet/minecraft/server/MinecraftServer;saveEverything(ZZZ)Z",
             shift = At.Shift.BEFORE
     ))
     private void startAutosave(final CallbackInfo ci)

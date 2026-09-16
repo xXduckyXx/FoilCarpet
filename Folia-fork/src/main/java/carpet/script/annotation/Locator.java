@@ -26,97 +26,44 @@ import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.ElementType.TYPE_USE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-/**
- * <p>Class that holds the annotations for {@link Argument} locators, in order for them to be used in Scarpet functions.</p>
- */
 public interface Locator
 {
-    /**
-     * <p>Represents that the annotated argument must be gotten by passing the arguments in there into a {@link BlockArgument} locator.</p>
-     * 
-     * <p>Must be used in either {@link BlockArgument}, {@link BlockValue}, {@link BlockPos} or {@link BlockState} parameters</p>
-     */
+
     @Documented
     @Retention(RUNTIME)
     @Target({ PARAMETER, TYPE_USE })
     @interface Block
     {
-        /**
-         * <p>Whether or not should the locator accept a single {@link String} as the parameter and let parsing to {@link BlockValue}.</p>
-         */
+
         boolean acceptString() default false;
 
-        /**
-         * <p>Whether or not should the {@link BlockValue} argument be optional.</p> <p>Requires the annotation to be present in a
-         * {@link BlockArgument} type, since it may return that the {@link BlockValue} is {@code null}, which would be considered as an incorrect
-         * type.</p>
-         */
         boolean optional() default false;
 
-        /**
-         * <p>Whether or not should the {@link BlockArgument} locator accept any string as the argument.</p> <p>Requires the annotation to be present
-         * in a {@link BlockArgument} type, since it may just return a {@link String}</p>
-         */
         boolean anyString() default false;
     }
 
-    /**
-     * <p>Represents that the annotated argument must be gotten by passing the arguments in there into a {@link Vector3Argument} locator.</p>
-     * 
-     * <p>Must be used in either a {@link Vector3Argument} or a {@link net.minecraft.world.phys.Vec3 Vec3d} parameter.</p>
-     */
     @Documented
     @Retention(RUNTIME)
     @Target({ PARAMETER, TYPE_USE })
     @interface Vec3d
     {
-        /**
-         * <p>Whether or not should the {@link Vector3Argument} locator accept an optional direction aside from the
-         * {@link net.minecraft.world.phys.Vec3}</p> <p>This parameter can only be used in a {@link Vector3Argument} type, since else there is no way
-         * to get the direction too.</p>
-         */
+
         boolean optionalDirection() default false;
 
-        /**
-         * <p>Whether or not should the {@link Vector3Argument} locator accept an entity aside to get the {@link Vec3d} from and return that entity
-         * too</p> <p>Note that you will only be able to get that entity if the annotation is present in a {@link Vector3Argument}</p>
-         */
         boolean optionalEntity() default false;
     }
 
-    /**
-     * <p>Represents that the annotated argument must be gotten by passing the arguments in this annotation into a {@link FunctionArgument}
-     * locator</p>
-     * 
-     * <p>Can be used in both {@link FunctionArgument} and {@link FunctionValue} types, but the last won't have access to arguments provided to the
-     * function, even though they will still be consumed from the arguments the function was called with.</p>
-     * 
-     * <p><b>This will consume any remaining parameters passed to the function, therefore any other parameter after this will throw.</b></p>
-     */
     @Documented
     @Retention(RUNTIME)
     @Target({ PARAMETER, TYPE_USE })
     @interface Function
     {
-        /**
-         * <p>Whether this Locator should allow no function to be passed.</p> <p>This is not compatible with {@link FunctionValue} type, since a
-         * converter returning {@code null} will throw as if the passed argument was incorrect. You can still use it when targeting
-         * {@link FunctionArgument}</p>
-         */
+
         boolean allowNone() default false;
 
-        /**
-         * <p>Whether the locator should check that the number of arguments passed along with the function matches the number of arguments that the
-         * located function requires. Note that FunctionLocators consume all remaining arguments even if this is set to {@code false}.</p>
-         */
         boolean checkArgs();
     }
 
-    /**
-     * <p>Class that holds locators and methods to get them</p>
-     * 
-     * <p>Not part of the public API, just that interfaces must have all members public</p>
-     */
     final class Locators
     {
         private Locators()
@@ -211,7 +158,7 @@ public interface Locator
             {
                 this.optionalDirection = annotation.optionalDirection();
                 this.optionalEntity = annotation.optionalEntity();
-                this.returnVec3d = type == net.minecraft.world.phys.Vec3.class; // Because of the locator
+                this.returnVec3d = type == net.minecraft.world.phys.Vec3.class;
                 if (returnVec3d && optionalDirection)
                 {
                     throw new IllegalArgumentException("optionalDirection Locator.Vec3d cannot be used for Vec3d type, use Vector3Argument instead");

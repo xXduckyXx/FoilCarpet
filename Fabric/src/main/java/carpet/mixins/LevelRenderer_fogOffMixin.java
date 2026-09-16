@@ -2,7 +2,7 @@ package carpet.mixins;
 
 import carpet.CarpetSettings;
 import net.minecraft.client.renderer.GameRenderer;
-//import net.minecraft.world.dimension.Dimension;
+
 import net.minecraft.world.attribute.EnvironmentAttribute;
 import net.minecraft.world.attribute.EnvironmentAttributeProbe;
 import org.spongepowered.asm.mixin.Mixin;

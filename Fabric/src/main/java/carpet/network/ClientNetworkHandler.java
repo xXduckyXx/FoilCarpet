@@ -52,7 +52,7 @@ public class ClientNetworkHandler
                         }
                     }
                 }
-                else // Backwards compatibility
+                else
                 {
                     manager = CarpetServer.settingsManager;
                     ruleName = ruleKey;
@@ -71,7 +71,7 @@ public class ClientNetworkHandler
                 }
             }
         });
-        dataHandlers.put("scShape", (p, t) -> { // deprecated // and unused // should remove for 1.17
+        dataHandlers.put("scShape", (p, t) -> {
             if (CarpetClient.shapes != null)
             {
                 CarpetClient.shapes.addShape((CompoundTag) t);
@@ -86,8 +86,6 @@ public class ClientNetworkHandler
         dataHandlers.put("clientCommand", (p, t) -> CarpetClient.onClientCommand(t));
     }
 
-    // Ran on the Main Minecraft Thread
-
     private static void onHi(String version)
     {
         CarpetClient.setCarpet();
@@ -100,8 +98,7 @@ public class ClientNetworkHandler
         {
             CarpetSettings.LOG.warn("Joined carpet server with another carpet version: " + CarpetClient.serverCarpetVersion);
         }
-        // We can ensure that this packet is
-        // processed AFTER the player has joined
+
         respondHello();
     }
 

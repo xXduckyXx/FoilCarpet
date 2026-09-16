@@ -24,7 +24,7 @@ abstract class TickRateManager_fakePlayersMixin {
         if (alreadyFrozen) return true;
         if (runsNormally()) return false;
 
-        return !isActualPlayer(entity) && // not carrying players
+        return !isActualPlayer(entity) &&
                 ((EntityInterface) entity)
                     .cm$getIndirectPassengersStream()
                     .noneMatch(TickRateManager_fakePlayersMixin::isActualPlayer);

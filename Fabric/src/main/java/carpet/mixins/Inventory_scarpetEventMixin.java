@@ -29,7 +29,7 @@ public abstract class Inventory_scarpetEventMixin
         int count = stack.getCount();
         ItemStack previous = stack.copy();
         boolean res = playerInventory.add(-1, stack);
-        if (count != stack.getCount()) // res returns false for larger item adding to a almost full ineventory
+        if (count != stack.getCount())
         {
             ItemStack diffStack = previous.copyWithCount(count - stack.getCount());
             PLAYER_PICKS_UP_ITEM.onItemAction((ServerPlayer) player, null, diffStack);

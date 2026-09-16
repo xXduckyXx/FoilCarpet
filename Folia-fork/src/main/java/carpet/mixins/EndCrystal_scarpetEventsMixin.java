@@ -22,7 +22,7 @@ public abstract class EndCrystal_scarpetEventsMixin extends Entity
     @Inject(method = "tick", at = @At("HEAD"))
     private void onTickCall(CallbackInfo ci)
     {
-        // calling extra on_tick because falling blocks do not fall back to super tick call
+
         ((EntityInterface)this).getEventContainer().onEvent(EntityEventsGroup.Event.ON_TICK);
     }
 }

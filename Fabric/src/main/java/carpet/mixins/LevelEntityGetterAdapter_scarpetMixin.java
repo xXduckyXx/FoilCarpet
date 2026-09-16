@@ -24,5 +24,3 @@ public class LevelEntityGetterAdapter_scarpetMixin<T extends EntityAccess> imple
         return this.sectionStorage.getExistingSectionsInChunk(chpos.toLong()).flatMap(EntitySection::getEntities).collect(Collectors.toList());
     }
 }
-
-

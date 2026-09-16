@@ -150,11 +150,10 @@ public class NBTSerializableValue extends Value implements ContainerValueInterfa
         return result;
     }
 
-
     @Override
     public Value clone()
     {
-        // sets only nbttag, even if emtpy;
+
         NBTSerializableValue copy = new NBTSerializableValue(nbtTag);
         copy.nbtSupplier = this.nbtSupplier;
         copy.nbtString = this.nbtString;
@@ -177,7 +176,6 @@ public class NBTSerializableValue extends Value implements ContainerValueInterfa
         return deepcopy();
     }
 
-    // stolen from HopperBlockEntity, adjusted for threaded operation
     public static Container getInventoryAt(ServerLevel world, BlockPos blockPos)
     {
         Container inventory = null;
@@ -203,7 +201,7 @@ public class NBTSerializableValue extends Value implements ContainerValueInterfa
         if (inventory == null)
         {
             List<Entity> list = world.getEntities(
-                    (Entity) null, //TODO check this matches the correct method
+                    (Entity) null,
                     new AABB(
                             blockPos.getX() - 0.5D, blockPos.getY() - 0.5D, blockPos.getZ() - 0.5D,
                             blockPos.getX() + 0.5D, blockPos.getY() + 0.5D, blockPos.getZ() + 0.5D),
@@ -258,7 +256,7 @@ public class NBTSerializableValue extends Value implements ContainerValueInterfa
                 boolean isEnder = strVal.startsWith("enderchest_");
                 if (isEnder)
                 {
-                    strVal = strVal.substring(11); // len("enderchest_")
+                    strVal = strVal.substring(11);
                 }
                 ServerPlayer player = c.server().getPlayerList().getPlayerByName(strVal);
                 if (player == null)
@@ -291,7 +289,7 @@ public class NBTSerializableValue extends Value implements ContainerValueInterfa
                 }
                 else if (e instanceof final AbstractHorse ibi)
                 {
-                    inv = Vanilla.AbstractHorse_getInventory(ibi); // horse only
+                    inv = Vanilla.AbstractHorse_getInventory(ibi);
                 }
                 else if (e instanceof final LivingEntity le)
                 {
@@ -351,7 +349,7 @@ public class NBTSerializableValue extends Value implements ContainerValueInterfa
         }
         try
         {
-            ItemInput res = itemCache.get(itemString);  // [SCARY SHIT] persistent caches over server reloads
+            ItemInput res = itemCache.get(itemString);
             if (res != null)
             {
                 return res.createItemStack(1, false);
@@ -379,14 +377,14 @@ public class NBTSerializableValue extends Value implements ContainerValueInterfa
         {
             slot = invSize + slot;
         }
-        return slot < 0 || slot >= invSize ? inv.getContainerSize() : slot; // outside of inventory
+        return slot < 0 || slot >= invSize ? inv.getContainerSize() : slot;
     }
 
     private static Value decodeSimpleTag(Tag t)
     {
         if (t instanceof final NumericTag number)
         {
-            // short and byte will never exceed float's precision, even int won't
+
             return t instanceof LongTag || t instanceof IntTag ? NumericValue.of(number.longValue()) : NumericValue.of(number.asNumber().orElseThrow());
         }
         if (t instanceof StringTag stringTag)
@@ -516,7 +514,7 @@ public class NBTSerializableValue extends Value implements ContainerValueInterfa
     @Override
     public boolean put(Value where, Value value, Value conditions)
     {
-        /// WIP
+
         ensureOwnership();
         NbtPathArgument.NbtPath path = cachePath(where.getString());
         Tag tagToInsert = value instanceof final NBTSerializableValue nbtsv
@@ -549,7 +547,6 @@ public class NBTSerializableValue extends Value implements ContainerValueInterfa
         }
         return modifiedTag;
     }
-
 
     private boolean modifyInsert(int index, NbtPathArgument.NbtPath nbtPath, Tag newElement)
     {
@@ -590,8 +587,7 @@ public class NBTSerializableValue extends Value implements ContainerValueInterfa
         return modified;
     }
 
-
-    private boolean modifyMerge(NbtPathArgument.NbtPath nbtPath, Tag replacement) //nbtPathArgumentType$NbtPath_1, list_1)
+    private boolean modifyMerge(NbtPathArgument.NbtPath nbtPath, Tag replacement)
     {
         if (!(replacement instanceof final CompoundTag replacementCompound))
         {
@@ -616,11 +612,11 @@ public class NBTSerializableValue extends Value implements ContainerValueInterfa
         return true;
     }
 
-    private boolean modifyReplace(NbtPathArgument.NbtPath nbtPath, Tag replacement) //nbtPathArgumentType$NbtPath_1, list_1)
+    private boolean modifyReplace(NbtPathArgument.NbtPath nbtPath, Tag replacement)
     {
         Tag tag = getTag();
         String pathText = nbtPath.toString();
-        if (pathText.endsWith("]")) // workaround for array replacement or item in the array replacement
+        if (pathText.endsWith("]"))
         {
             if (nbtPath.remove(tag) == 0)
             {
@@ -628,13 +624,13 @@ public class NBTSerializableValue extends Value implements ContainerValueInterfa
             }
             Pattern pattern = Pattern.compile("\\[[^\\[]*]$");
             Matcher matcher = pattern.matcher(pathText);
-            if (!matcher.find()) // malformed path
+            if (!matcher.find())
             {
                 return false;
             }
             String arrAccess = matcher.group();
             int pos;
-            if (arrAccess.length() == 2) // we just removed entire array
+            if (arrAccess.length() == 2)
             {
                 pos = 0;
             }
@@ -699,7 +695,7 @@ public class NBTSerializableValue extends Value implements ContainerValueInterfa
         {
             nbtTag = getTag().copy();
             nbtString = null;
-            nbtSupplier = null;  // just to be sure
+            nbtSupplier = null;
             owned = true;
         }
     }
@@ -762,7 +758,6 @@ public class NBTSerializableValue extends Value implements ContainerValueInterfa
     {
         return "nbt";
     }
-
 
     @Override
     public Tag toTag(boolean force, RegistryAccess regs)

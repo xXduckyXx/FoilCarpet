@@ -152,7 +152,7 @@ public class WorldAccess
             "teleport", TicketType.ENDER_PEARL,
             "unknown", TicketType.UNKNOWN
     );
-    // dummy entity for dummy requirements in the loot tables (see snowball)
+
     private static FallingBlockEntity DUMMY_ENTITY = null;
 
     private static Value booleanStateTest(
@@ -269,7 +269,7 @@ public class WorldAccess
                 throw new InternalExpressionException("Block requires at least one parameter");
             }
             BlockValue retval = BlockArgument.findIn(cc, lv, 0, true).block;
-            // fixing block state and data
+
             retval.getBlockState();
             retval.getData();
             return retval;
@@ -284,7 +284,6 @@ public class WorldAccess
             return NBTSerializableValue.of(BlockArgument.findIn((CarpetContext) c, lv, 0, true).block.getData());
         });
 
-        // poi_get(pos, radius?, type?, occupation?, column_mode?)
         expression.addContextFunction("poi", -1, (c, t, lv) ->
         {
             CarpetContext cc = (CarpetContext) c;
@@ -305,9 +304,6 @@ public class WorldAccess
                 }
                 PoiType poiType = foo.get().value();
 
-                // this feels wrong, but I don't want to mix-in more than I really need to.
-                // also distance adds 0.5 to each point which screws up accurate distance calculations
-                // you shoudn't be using POI with that in mind anyways, so I am not worried about it.
                 PoiRecord poi = store.getInRange(
                         type -> type.value() == poiType,
                         pos,
@@ -371,7 +367,6 @@ public class WorldAccess
             ));
         });
 
-        //poi_set(pos, null) poi_set(pos, type, occupied?,
         expression.addContextFunction("set_poi", -1, (c, t, lv) ->
         {
             CarpetContext cc = (CarpetContext) c;
@@ -388,7 +383,7 @@ public class WorldAccess
             Value poi = lv.get(locator.offset);
             PoiManager store = cc.level().getPoiManager();
             if (poi.isNull())
-            {   // clear poi information
+            {
                 if (store.getType(pos).isEmpty())
                 {
                     return Value.FALSE;
@@ -417,8 +412,7 @@ public class WorldAccess
                 store.remove(pos);
             }
             store.add(pos, holder);
-            // setting occupancy for a
-            // again - don't want to mix in unnecessarily - peeps not gonna use it that often so not worries about it.
+
             if (occupancy > 0)
             {
                 int finalO = occupancy;
@@ -433,11 +427,10 @@ public class WorldAccess
             return Value.TRUE;
         });
 
-
         expression.addContextFunction("weather", -1, (c, t, lv) -> {
             ServerLevel world = ((CarpetContext) c).level();
 
-            if (lv.isEmpty())//cos it can thunder when raining or when clear.
+            if (lv.isEmpty())
             {
                 return new StringValue(world.isThundering() ? "thunder" : (world.isRaining() ? "rain" : "clear"));
             }
@@ -449,8 +442,8 @@ public class WorldAccess
                 return new NumericValue(switch (weather.getString().toLowerCase(Locale.ROOT))
                 {
                     case "clear" -> worldProperties.getClearWeatherTime();
-                    case "rain" -> world.isRaining() ? worldProperties.getRainTime() : 0;//cos if not it gives 1 for some reason
-                    case "thunder" -> world.isThundering() ? worldProperties.getThunderTime() : 0;//same dealio here
+                    case "rain" -> world.isRaining() ? worldProperties.getRainTime() : 0;
+                    case "thunder" -> world.isThundering() ? worldProperties.getThunderTime() : 0;
                     default -> throw new InternalExpressionException("Weather can only be 'clear', 'rain' or 'thunder'");
                 });
             }
@@ -463,7 +456,7 @@ public class WorldAccess
                     case "rain" -> world.setWeatherParameters(0, ticks, true, false);
                     case "thunder" -> world.setWeatherParameters(
                             0,
-                            ticks,//this is used to set thunder time, idk why...
+                            ticks,
                             true,
                             true
                     );
@@ -520,7 +513,7 @@ public class WorldAccess
         });
 
         expression.addContextFunction("solid", -1, (c, t, lv) ->
-                genericStateTest(c, "solid", lv, (s, p, w) -> BooleanValue.of(s.isRedstoneConductor(w, p)))); // isSimpleFullBlock
+                genericStateTest(c, "solid", lv, (s, p, w) -> BooleanValue.of(s.isRedstoneConductor(w, p))));
 
         expression.addContextFunction("air", -1, (c, t, lv) ->
                 booleanStateTest(c, "air", lv, (s, p) -> s.isAir()));
@@ -533,12 +526,6 @@ public class WorldAccess
 
         expression.addContextFunction("transparent", -1, (c, t, lv) ->
                 booleanStateTest(c, "transparent", lv, (s, p) -> !s.isSolid()));
-
-        /*this.expr.addContextFunction("opacity", -1, (c, t, lv) ->
-                genericStateTest(c, "opacity", lv, (s, p, w) -> new NumericValue(s.getOpacity(w, p))));
-
-        this.expr.addContextFunction("blocks_daylight", -1, (c, t, lv) ->
-                genericStateTest(c, "blocks_daylight", lv, (s, p, w) -> new NumericValue(s.propagatesSkylightDown(w, p))));*/ // investigate
 
         expression.addContextFunction("emitted_light", -1, (c, t, lv) ->
                 genericStateTest(c, "emitted_light", lv, (s, p, w) -> new NumericValue(s.getLightEmission())));
@@ -583,7 +570,7 @@ public class WorldAccess
             String type = lv.get(0).getString().toLowerCase(Locale.ROOT);
             Heightmap.Types htype = switch (type)
             {
-                //case "light": htype = Heightmap.Type.LIGHT_BLOCKING; break;  //investigate
+
                 case "motion" -> Heightmap.Types.MOTION_BLOCKING;
                 case "terrain" -> Heightmap.Types.MOTION_BLOCKING_NO_LEAVES;
                 case "ocean_floor" -> Heightmap.Types.OCEAN_FLOOR;
@@ -600,7 +587,6 @@ public class WorldAccess
         expression.addContextFunction("loaded", -1, (c, t, lv) ->
                 BooleanValue.of((((CarpetContext) c).level().hasChunkAt(BlockArgument.findIn((CarpetContext) c, lv, 0).block.getPos()))));
 
-        // Deprecated, use loaded_status as more indicative
         expression.addContextFunction("loaded_ep", -1, (c, t, lv) ->
         {
             c.host.issueDeprecation("loaded_ep(...)");
@@ -684,7 +670,7 @@ public class WorldAccess
         });
 
         expression.addContextFunction("suffocates", -1, (c, t, lv) ->
-                genericStateTest(c, "suffocates", lv, (s, p, w) -> BooleanValue.of(s.isSuffocating(w, p)))); // canSuffocate
+                genericStateTest(c, "suffocates", lv, (s, p, w) -> BooleanValue.of(s.isSuffocating(w, p))));
 
         expression.addContextFunction("power", -1, (c, t, lv) ->
                 genericStateTest(c, "power", lv, (s, p, w) -> new NumericValue(w.getBestNeighborSignal(p))));
@@ -718,7 +704,6 @@ public class WorldAccess
                     return true;
                 }));
 
-        // lazy cause its parked execution
         expression.addLazyFunction("without_updates", 1, (c, t, lv) ->
         {
             if (Carpet.getImpendingFillSkipUpdates().get())
@@ -910,7 +895,7 @@ public class WorldAccess
             if (playerBreak)
             {
                 boolean isUsingEffectiveTool = !state.requiresCorrectToolForDrops() || tool.isCorrectToolForDrops(state);
-                //postMine() durability from item classes
+
                 float hardness = state.getDestroySpeed(world, where);
                 int damageAmount = 0;
                 if ((tool.is(ItemTags.PICKAXES) && hardness > 0.0) || item instanceof ShearsItem)
@@ -948,7 +933,7 @@ public class WorldAccess
                     Block.dropResources(state, world, where, be, DUMMY_ENTITY, tool);
                 }
             }
-            if (!playerBreak) // no tool info - block brokwn
+            if (!playerBreak)
             {
                 return Value.TRUE;
             }
@@ -994,7 +979,6 @@ public class WorldAccess
             return BooleanValue.of(success);
         });
 
-        // from ServerLevel = don't wanna mixin this in, as it is PITA
         WeightedList<ExplosionParticleInfo> DEFAULT_EXPLOSION_BLOCK_PARTICLES = WeightedList.<ExplosionParticleInfo>builder()
                 .add(new ExplosionParticleInfo(ParticleTypes.POOF, 0.5F, 1.0F))
                 .add(new ExplosionParticleInfo(ParticleTypes.SMOKE, 1.0F, 1.0F))
@@ -1008,7 +992,7 @@ public class WorldAccess
             }
             CarpetContext cc = (CarpetContext) c;
             float powah = 4.0f;
-            Explosion.BlockInteraction mode = Explosion.BlockInteraction.DESTROY; // should probably read the gamerule for default behaviour
+            Explosion.BlockInteraction mode = Explosion.BlockInteraction.DESTROY;
             boolean createFire = false;
             Entity source = null;
             LivingEntity attacker = null;
@@ -1079,7 +1063,6 @@ public class WorldAccess
             }
             LivingEntity theAttacker = attacker;
 
-            // copy of ServerWorld.createExplosion #TRACK#
             ServerExplosion serverExplosion = new ServerExplosion(cc.level(), source, null, null, pos, powah, createFire, mode)
             {
                 @Override
@@ -1102,7 +1085,6 @@ public class WorldAccess
             return Value.TRUE;
         });
 
-        // TODO rename to use_item
         expression.addContextFunction("place_item", -1, (c, t, lv) ->
         {
             if (lv.size() < 2)
@@ -1114,7 +1096,7 @@ public class WorldAccess
             Vector3Argument locator = Vector3Argument.findIn(lv, 1);
             ItemStack stackArg = NBTSerializableValue.parseItem(itemString, cc.registryAccess());
             BlockPos where = BlockPos.containing(locator.vec);
-            // Paintings throw an exception if their direction is vertical, therefore we change the default here
+
             String facing = lv.size() > locator.offset
                     ? lv.get(locator.offset).getString()
                     : stackArg.getItem() != Items.PAINTING ? "up" : "north";
@@ -1135,7 +1117,7 @@ public class WorldAccess
                 }
             }
             else
-            { // not sure we need special case for block items, since useOnBlock can do that as well
+            {
                 if (!ctx.canPlace())
                 {
                     return Value.FALSE;
@@ -1165,7 +1147,7 @@ public class WorldAccess
                         Colors.soundName.get(s.getSoundType())));
 
         expression.addContextFunction("material", -1, (c, t, lv) -> {
-            c.host.issueDeprecation("material(...)"); // deprecated for block_state()
+            c.host.issueDeprecation("material(...)");
             return StringValue.of("unknown");
         });
 
@@ -1173,7 +1155,6 @@ public class WorldAccess
                 stateStringQuery(c, "map_colour", lv, (s, p) ->
                         Colors.mapColourName.get(s.getMapColor(((CarpetContext) c).level(), p))));
 
-        // Deprecated for block_state()
         expression.addContextFunction("property", -1, (c, t, lv) ->
         {
             c.host.issueDeprecation("property(...)");
@@ -1189,7 +1170,6 @@ public class WorldAccess
             return property == null ? Value.NULL : new StringValue(state.getValue(property).toString().toLowerCase(Locale.ROOT));
         });
 
-        // Deprecated for block_state()
         expression.addContextFunction("block_properties", -1, (c, t, lv) ->
         {
             c.host.issueDeprecation("block_properties(...)");
@@ -1201,8 +1181,6 @@ public class WorldAccess
             );
         });
 
-        // block_state(block)
-        // block_state(block, property)
         expression.addContextFunction("block_state", -1, (c, t, lv) ->
         {
             BlockArgument locator = BlockArgument.findIn((CarpetContext) c, lv, 0, true);
@@ -1314,7 +1292,7 @@ public class WorldAccess
             {
                 biome = world.getBiome(locator.block.getPos()).value();
             }
-            // in locatebiome
+
             if (locator.offset == lv.size())
             {
                 Identifier biomeId = cc.registry(Registries.BIOME).getKey(biome);
@@ -1338,7 +1316,7 @@ public class WorldAccess
                 throw new InternalExpressionException("'set_biome' needs a biome name as an argument");
             }
             String biomeName = lv.get(locator.offset).getString();
-            // from locatebiome command code
+
             Holder<Biome> biome = cc.registry(Registries.BIOME).get(ResourceKey.create(Registries.BIOME, InputValidator.identifierOf(biomeName)))
                     .orElseThrow(() -> new ThrowStatement(biomeName, Throwables.UNKNOWN_BIOME));
             boolean doImmediateUpdate = true;
@@ -1348,7 +1326,7 @@ public class WorldAccess
             }
             ServerLevel world = cc.level();
             BlockPos pos = locator.block.getPos();
-            ChunkAccess chunk = world.getChunk(pos); // getting level chunk instead of protochunk with biomes
+            ChunkAccess chunk = world.getChunk(pos);
             int biomeX = QuartPos.fromBlock(pos.getX());
             int biomeY = QuartPos.fromBlock(pos.getY());
             int biomeZ = QuartPos.fromBlock(pos.getZ());
@@ -1358,7 +1336,7 @@ public class WorldAccess
                 int j = i + QuartPos.fromBlock(chunk.getHeight()) - 1;
                 int k = Mth.clamp(biomeY, i, j);
                 int l = chunk.getSectionIndex(QuartPos.toBlock(k));
-                // accessing outside of the interface - might be dangerous in the future.
+
                 ((PalettedContainer<Holder<Biome>>) chunk.getSection(l).getBiomes()).set(biomeX & 3, k & 3, biomeZ & 3, biome);
             }
             catch (Throwable var8)
@@ -1413,13 +1391,12 @@ public class WorldAccess
         });
 
         expression.addContextFunction("structure_eligibility", -1, (c, t, lv) ->
-        {// TODO rename structureName to class
+        {
             CarpetContext cc = (CarpetContext) c;
             BlockArgument locator = BlockArgument.findIn(cc, lv, 0);
 
             ServerLevel world = cc.level();
 
-            // well, because
             theBooYah(world);
 
             BlockPos pos = locator.block.getPos();
@@ -1542,9 +1519,9 @@ public class WorldAccess
             {
                 throw new ThrowStatement(structureName, Throwables.UNKNOWN_STRUCTURE);
             }
-            // good 'ol pointer
+
             Value[] result = new Value[]{Value.NULL};
-            // technically a world modification. Even if we could let it slide, we will still park it
+
             ((CarpetContext) c).server().executeBlocking(() ->
             {
                 Map<Structure, StructureStart> structures = world.getChunk(pos).getAllStarts();
@@ -1555,7 +1532,7 @@ public class WorldAccess
                     return;
                 }
                 Value newValue = lv.get(locator.offset + 1);
-                if (newValue.isNull()) // remove structure
+                if (newValue.isNull())
                 {
                     if (!structures.containsKey(configuredStructure))
                     {
@@ -1564,12 +1541,12 @@ public class WorldAccess
                     StructureStart start = structures.get(configuredStructure);
                     ChunkPos structureChunkPos = start.getChunkPos();
                     BoundingBox box = start.getBoundingBox();
-                    for (int chx = box.minX() / 16; chx <= box.maxX() / 16; chx++)  // minx maxx
+                    for (int chx = box.minX() / 16; chx <= box.maxX() / 16; chx++)
                     {
-                        for (int chz = box.minZ() / 16; chz <= box.maxZ() / 16; chz++) //minZ maxZ
+                        for (int chz = box.minZ() / 16; chz <= box.maxZ() / 16; chz++)
                         {
                             ChunkPos chpos = new ChunkPos(chx, chz);
-                            // getting a chunk will convert it to full, allowing to modify references
+
                             Map<Structure, LongSet> references =
                                     world.getChunk(chpos.getWorldPosition()).getAllReferences();
                             if (references.containsKey(configuredStructure) && references.get(configuredStructure) != null)
@@ -1582,73 +1559,13 @@ public class WorldAccess
                     result[0] = Value.TRUE;
                 }
             });
-            return result[0]; // preventing from lazy evaluating of the result in case a future completes later
+            return result[0];
         });
 
-        // todo maybe enable chunk blending?
         expression.addContextFunction("reset_chunk", -1, (c, t, lv) ->
         {
             return Value.NULL;
-            /*
-            CarpetContext cc = (CarpetContext) c;
-            List<ChunkPos> requestedChunks = new ArrayList<>();
-            if (lv.size() == 1)
-            {
-                //either one block or list of chunks
-                Value first = lv.get(0);
-                if (first instanceof final ListValue list)
-                {
-                    List<Value> listVal = list.getItems();
-                    BlockArgument locator = BlockArgument.findIn(cc, listVal, 0);
-                    requestedChunks.add(new ChunkPos(locator.block.getPos()));
-                    while (listVal.size() > locator.offset)
-                    {
-                        locator = BlockArgument.findIn(cc, listVal, locator.offset);
-                        requestedChunks.add(new ChunkPos(locator.block.getPos()));
-                    }
-                }
-                else
-                {
-                    BlockArgument locator = BlockArgument.findIn(cc, Collections.singletonList(first), 0);
-                    requestedChunks.add(new ChunkPos(locator.block.getPos()));
-                }
-            }
-            else
-            {
-                BlockArgument locator = BlockArgument.findIn(cc, lv, 0);
-                ChunkPos from = new ChunkPos(locator.block.getPos());
-                if (lv.size() > locator.offset)
-                {
-                    locator = BlockArgument.findIn(cc, lv, locator.offset);
-                    ChunkPos to = new ChunkPos(locator.block.getPos());
-                    int xmax = Math.max(from.x, to.x);
-                    int zmax = Math.max(from.z, to.z);
-                    for (int x = Math.min(from.x, to.x); x <= xmax; x++)
-                    {
-                        for (int z = Math.min(from.z, to.z); z <= zmax; z++)
-                        {
-                            requestedChunks.add(new ChunkPos(x, z));
-                        }
-                    }
-                }
-                else
-                {
-                    requestedChunks.add(from);
-                }
-            }
-            ServerLevel world = cc.level();
-            Value[] result = new Value[]{Value.NULL};
-            ((CarpetContext) c).server().executeBlocking(() ->
-            {
-                Map<String, Integer> report = Vanilla.ChunkMap_regenerateChunkRegion(world.getChunkSource().chunkMap, requestedChunks);
-                result[0] = MapValue.wrap(report.entrySet().stream().collect(Collectors.toMap(
-                        e -> new StringValue(e.getKey()),
-                        e -> new NumericValue(e.getValue())
-                )));
-            });
-            return result[0];
 
-             */
         });
 
         expression.addContextFunction("inhabited_time", -1, (c, t, lv) ->
@@ -1694,13 +1611,13 @@ public class WorldAccess
             {
                 throw new InternalExpressionException("Ticket radius should be between 1 and 32 chunks");
             }
-            // due to types we will wing it:
+
             ChunkPos target = new ChunkPos(pos);
-            if (ticket == TicketType.PORTAL) // portal
+            if (ticket == TicketType.PORTAL)
             {
                 cc.level().getChunkSource().addTicketWithRadius(TicketType.PORTAL, target, radius);
             }
-            else if (ticket == TicketType.ENDER_PEARL) // post teleport
+            else if (ticket == TicketType.ENDER_PEARL)
             {
                 cc.level().getChunkSource().addTicketWithRadius(TicketType.ENDER_PEARL, target, radius);
             }
@@ -1757,7 +1674,6 @@ public class WorldAccess
         return densityFunction.compute(new DensityFunction.SinglePointContext(pos.getX(), pos.getY(), pos.getZ()));
     }
 
-    // to be used with future seedable noise
     public static final Function<Pair<ServerLevel, String>, DensityFunction> stupidWorldgenNoiseCacheGetter = Util.memoize(pair -> {
         ServerLevel level = pair.getKey();
         String densityFunctionQuery = pair.getValue();

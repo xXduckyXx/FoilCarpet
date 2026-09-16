@@ -65,8 +65,6 @@ public abstract class Explosion_optimizedTntMixin
         }
     }
 
-    //optional due to Overwrite in Lithium
-    //should kill most checks if no block damage is requested
     @Redirect(method = "calculateExplodedPositions", require = 0, at = @At(value = "INVOKE",
             target ="Lnet/minecraft/world/level/ExplosionDamageCalculator;getBlockExplosionResistance(Lnet/minecraft/world/level/Explosion;Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/material/FluidState;)Ljava/util/Optional;"))
     private Optional<Float> noBlockCalcsWithNoBLockDamage(final ExplosionDamageCalculator instance, final Explosion explosion, final BlockGetter blockGetter, final BlockPos blockPos, final BlockState blockState, final FluidState fluidState)

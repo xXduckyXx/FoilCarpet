@@ -32,7 +32,7 @@ public class Arithmetic
             {
                 return NumericValue.of(Double.MAX_VALUE);
             }
-            // values over 21 will exceed long limits
+
             double factorial = 1.0;
             for (int i = 1; i <= number; i++)
             {
@@ -51,16 +51,16 @@ public class Arithmetic
         expression.addMathematicalUnaryFunction("sinh", Math::sinh);
         expression.addMathematicalUnaryFunction("cosh", Math::cosh);
         expression.addMathematicalUnaryFunction("tanh", Math::tanh);
-        expression.addMathematicalUnaryFunction("sec", d -> 1.0 / Math.cos(Math.toRadians(d))); // Formula: sec(x) = 1 / cos(x)
-        expression.addMathematicalUnaryFunction("csc", d -> 1.0 / Math.sin(Math.toRadians(d))); // Formula: csc(x) = 1 / sin(x)
-        expression.addMathematicalUnaryFunction("sech", d -> 1.0 / Math.cosh(d));                // Formula: sech(x) = 1 / cosh(x)
-        expression.addMathematicalUnaryFunction("csch", d -> 1.0 / Math.sinh(d));                // Formula: csch(x) = 1 / sinh(x)
-        expression.addMathematicalUnaryFunction("cot", d -> 1.0 / Math.tan(Math.toRadians(d))); // Formula: cot(x) = cos(x) / sin(x) = 1 / tan(x)
-        expression.addMathematicalUnaryFunction("acot", d -> Math.toDegrees(Math.atan(1.0 / d)));// Formula: acot(x) = atan(1/x)
-        expression.addMathematicalUnaryFunction("coth", d -> 1.0 / Math.tanh(d));                // Formula: coth(x) = 1 / tanh(x)
-        expression.addMathematicalUnaryFunction("asinh", d -> Math.log(d + (Math.sqrt(Math.pow(d, 2) + 1))));  // Formula: asinh(x) = ln(x + sqrt(x^2 + 1))
-        expression.addMathematicalUnaryFunction("acosh", d -> Math.log(d + (Math.sqrt(Math.pow(d, 2) - 1))));  // Formula: acosh(x) = ln(x + sqrt(x^2 - 1))
-        expression.addMathematicalUnaryFunction("atanh", d ->                                       // Formula: atanh(x) = 0.5*ln((1 + x)/(1 - x))
+        expression.addMathematicalUnaryFunction("sec", d -> 1.0 / Math.cos(Math.toRadians(d)));
+        expression.addMathematicalUnaryFunction("csc", d -> 1.0 / Math.sin(Math.toRadians(d)));
+        expression.addMathematicalUnaryFunction("sech", d -> 1.0 / Math.cosh(d));
+        expression.addMathematicalUnaryFunction("csch", d -> 1.0 / Math.sinh(d));
+        expression.addMathematicalUnaryFunction("cot", d -> 1.0 / Math.tan(Math.toRadians(d)));
+        expression.addMathematicalUnaryFunction("acot", d -> Math.toDegrees(Math.atan(1.0 / d)));
+        expression.addMathematicalUnaryFunction("coth", d -> 1.0 / Math.tanh(d));
+        expression.addMathematicalUnaryFunction("asinh", d -> Math.log(d + (Math.sqrt(Math.pow(d, 2) + 1))));
+        expression.addMathematicalUnaryFunction("acosh", d -> Math.log(d + (Math.sqrt(Math.pow(d, 2) - 1))));
+        expression.addMathematicalUnaryFunction("atanh", d ->
         {
             if (Math.abs(d) > 1 || Math.abs(d) == 1)
             {

@@ -8,7 +8,7 @@ import net.minecraft.nbt.Tag;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 
-public class NullValue extends NumericValue // TODO check nonsingleton code
+public class NullValue extends NumericValue
 {
     public static final NullValue NULL = new NullValue();
 

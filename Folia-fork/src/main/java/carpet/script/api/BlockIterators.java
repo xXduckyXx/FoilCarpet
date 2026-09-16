@@ -33,7 +33,7 @@ public class BlockIterators
 {
     public static void apply(Expression expression)
     {
-        // lazy cause of lazy expression
+
         expression.addLazyFunction("scan", (c, t, llv) ->
         {
             if (llv.size() < 3)
@@ -64,7 +64,7 @@ public class BlockIterators
                 );
             }
             Vec3i upperRange = range;
-            if (lv.size() > rangeLocator.offset + 1) // +1 cause we still need the expression
+            if (lv.size() > rangeLocator.offset + 1)
             {
                 rangeLocator = Vector3Argument.findIn(lv, rangeLocator.offset);
                 if (rangeLocator.fromBlock)
@@ -99,7 +99,6 @@ public class BlockIterators
             int yprange = upperRange.getY();
             int zprange = upperRange.getZ();
 
-            //saving outer scope
             LazyValue xVal = c.getVariable("_x");
             LazyValue yVal = c.getVariable("_y");
             LazyValue zVal = c.getVariable("_z");
@@ -141,7 +140,7 @@ public class BlockIterators
                     }
                 }
             }
-            //restoring outer scope
+
             c.setVariable("_x", xVal);
             c.setVariable("_y", yVal);
             c.setVariable("_z", zVal);
@@ -150,7 +149,6 @@ public class BlockIterators
             return (ct, tt) -> new NumericValue(finalSCount);
         });
 
-        // must be lazy
         expression.addLazyFunction("volume", (c, t, llv) ->
         {
             CarpetContext cc = (CarpetContext) c;
@@ -179,7 +177,6 @@ public class BlockIterators
             int maxz = max(z1, z2);
             LazyValue expr = llv.get(pos2Locator.offset);
 
-            //saving outer scope
             LazyValue xVal = c.getVariable("_x");
             LazyValue yVal = c.getVariable("_y");
             LazyValue zVal = c.getVariable("_z");
@@ -220,7 +217,7 @@ public class BlockIterators
                     }
                 }
             }
-            //restoring outer scope
+
             c.setVariable("_x", xVal);
             c.setVariable("_y", yVal);
             c.setVariable("_z", zVal);
@@ -336,7 +333,7 @@ public class BlockIterators
                 public Value next()
                 {
                     Value r = BlockValue.fromCoords(cc, x, y, z);
-                    //possibly reroll context
+
                     x++;
                     if (x > maxx)
                     {
@@ -346,7 +343,7 @@ public class BlockIterators
                         {
                             z = minz;
                             y++;
-                            // hasNext should fail if we went over
+
                         }
                     }
 
@@ -356,7 +353,7 @@ public class BlockIterators
                 @Override
                 public void fatality()
                 {
-                    // possibly return original x, y, z
+
                     super.fatality();
                 }
 
@@ -450,8 +447,7 @@ public class BlockIterators
                             curradius = 1;
                             return BlockValue.fromCoords(cc, cx, cy, cz);
                         }
-                        // x = 3-|i-6|
-                        // z = |( (i-3)%12-6|-3
+
                         Value block = BlockValue.fromCoords(cc, cx + (curradius - abs(curpos - 2 * curradius)), cy, cz - curradius + abs(abs(curpos - curradius) % (4 * curradius) - 2 * curradius));
                         curpos++;
                         if (curpos >= curradius * 4)
@@ -507,8 +503,6 @@ public class BlockIterators
                             curradius++;
                             return BlockValue.fromCoords(cc, cx, cy + curheight, cz);
                         }
-                        // x = 3-|i-6|
-                        // z = |( (i-3)%12-6|-3
 
                         Value block = BlockValue.fromCoords(cc, cx + (curradius - abs(curpos - 2 * curradius)), cy + curheight, cz - curradius + abs(abs(curpos - curradius) % (4 * curradius) - 2 * curradius));
                         curpos++;

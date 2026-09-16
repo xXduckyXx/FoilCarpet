@@ -38,6 +38,3 @@ public class NetHandlerPlayServerFake extends ServerGamePacketListenerImpl
     }
 
 }
-
-
-

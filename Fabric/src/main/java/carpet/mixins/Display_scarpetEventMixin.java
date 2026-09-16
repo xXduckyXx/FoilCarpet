@@ -22,7 +22,7 @@ public abstract class Display_scarpetEventMixin extends Entity
     @Inject(method = "tick", at = @At("HEAD"))
     private void onTickCall(CallbackInfo ci)
     {
-        // calling extra on_tick because displays don't tick
+
         ((EntityInterface)this).getEventContainer().onEvent(EntityEventsGroup.Event.ON_TICK);
     }
 }

@@ -34,7 +34,6 @@ public abstract class ServerPlayer_parrotMixin extends Player {
         super(level, gameProfile);
     }
 
-
     protected void dismount_left()
     {
         respawnEntityOnShoulder(this.getShoulderEntityLeft());
@@ -62,7 +61,6 @@ public abstract class ServerPlayer_parrotMixin extends Player {
             }
         }
     }
-
 
     @Redirect(method = "handleShoulderEntities", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;removeEntitiesOnShoulder()V"))
     private void onRespawnParrotsInstead(ServerPlayer serverPlayer)

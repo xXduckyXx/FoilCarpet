@@ -6,7 +6,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.ModifyConstant;
 
-@Mixin(value = PistonStructureResolver.class, priority = 420)  // piston push limit is important for carpet
+@Mixin(value = PistonStructureResolver.class, priority = 420)
 public class PistonStructureResolver_pushLimitMixin
 {
     @ModifyConstant(method = "addBlockLine", constant = @Constant(intValue = PistonStructureResolver.MAX_PUSH_DEPTH), expect = 3)

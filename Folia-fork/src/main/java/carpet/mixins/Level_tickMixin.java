@@ -61,5 +61,4 @@ public abstract class Level_tickMixin implements LevelInterface
         CarpetProfiler.end_current_entity_section(entitySection);
     }
 
-
 }

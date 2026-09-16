@@ -26,20 +26,15 @@ public class HUDController
 {
     private static final List<Consumer<MinecraftServer>> HUDListeners = new ArrayList<>();
 
-    // Folia replaces the vanilla server tick counter; keep our own
     private static int hudTick = 0;
 
-    /**
-     * Adds listener to be called when HUD is updated for logging information
-     * @param listener - a method to be called when new HUD inforation are collected
-     */
     public static void register(Consumer<MinecraftServer> listener)
     {
         HUDListeners.add(listener);
     }
 
     public static final Map<ServerPlayer, List<Component>> player_huds = new HashMap<>();
-//keyed with player names so unlogged players don't hold the reference
+
     public static final Map<String, Component> scarpet_headers = new HashMap<>();
 
     public static final Map<String, Component> scarpet_footers = new HashMap<>();
@@ -68,7 +63,6 @@ public class HUDController
         ClientboundTabListPacket packet = new ClientboundTabListPacket(Component.literal(""), Component.literal(""));
         player.connection.send(packet);
     }
-
 
     public static void update_hud(MinecraftServer server, List<ServerPlayer> force)
     {
@@ -102,7 +96,6 @@ public class HUDController
         if (LoggerRegistry.__packets)
             LoggerRegistry.getLogger("packets").log(HUDController::packetCounter);
 
-        // extensions have time to pitch in.
         HUDListeners.forEach(l -> l.accept(server));
 
         Set<ServerPlayer> targets = new HashSet<>(player_huds.keySet());

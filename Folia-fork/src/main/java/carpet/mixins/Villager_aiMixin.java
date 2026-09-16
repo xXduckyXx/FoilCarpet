@@ -76,22 +76,18 @@ public abstract class Villager_aiMixin extends AbstractVillager
             }
             boolean recentlySeen = time > 0;
             Optional<Long> optional_11 = this.brain.getMemory(MemoryModuleType.LAST_SLEPT);
-            //Optional<Timestamp> optional_22 = this.brain.getOptionalMemory(MemoryModuleType.LAST_WORKED_AT_POI);
-            //boolean work = false;
+
             boolean sleep = false;
             boolean panic = this.brain.isActive(Activity.PANIC);
             long currentTime = this.level().getGameTime();
             if (optional_11.isPresent()) {
                 sleep = (currentTime - optional_11.get()) < 24000L;
             }
-            //if (optional_22.isPresent()) {
-            //    work = (currentTime - optional_22.get().getTime()) < 36000L;
-            //}
 
             this.setCustomName(Messenger.c(
                     (sleep?"eb ":"fb ")+"\u263d ",
-                    //(work?"eb ":"fb ")+"\u2692 ",//"\u26CF ",
-                    (panic?"lb ":"fb ")+"\u2623 ",//"\u2622 \u2620 \u26A1 ",
+
+                    (panic?"lb ":"fb ")+"\u2623 ",
                     (recentlySeen?"rb ":"lb ")+time ));
             this.setCustomNameVisible(true);
         }
@@ -107,7 +103,7 @@ public abstract class Villager_aiMixin extends AbstractVillager
             if (Math.abs(displayAge) < 100 && displayAge !=0) displayAge = getAge();
 
             this.setCustomName(Messenger.c(
-                    (hasBed?"eb ":"fb ")+"\u2616 ",//"\u263d ",
+                    (hasBed?"eb ":"fb ")+"\u2616 ",
                     (totalFood>0?"eb ":"fb ")+"\u2668",(totalFood>0?"e ":"f ")+totalFood+" ",
                     (displayAge==0?"eb ":"fb ")+"\u2661",(displayAge==0?"e ":"f "+displayAge)
             ));
@@ -124,7 +120,7 @@ public abstract class Villager_aiMixin extends AbstractVillager
             if (itemStack_1.getItem() == Items.EMERALD)
             {
                 GlobalPos bedPos = this.brain.getMemory(MemoryModuleType.HOME).orElse(null);
-                if (bedPos == null || bedPos.dimension() != level().dimension()) // get Dimension
+                if (bedPos == null || bedPos.dimension() != level().dimension())
                 {
                     setUnhappy();
                     ((ServerLevel) level()).sendParticles(new BlockParticleOption(ParticleTypes.BLOCK_MARKER, Blocks.BARRIER.defaultBlockState()), getX(), getY() + getEyeHeight() + 1, getZ(), 1, 0.1, 0.1, 0.1, 0.0);
@@ -132,7 +128,7 @@ public abstract class Villager_aiMixin extends AbstractVillager
                 else
                 {
 
-                    ParticleDisplay.drawParticleLine((ServerPlayer) playerEntity_1, position(), Vec3.atCenterOf(bedPos.pos()), new DustParticleOptions(0xff000000, 1),  ParticleTypes.HAPPY_VILLAGER, 100, 0.2); // pos+0.5v
+                    ParticleDisplay.drawParticleLine((ServerPlayer) playerEntity_1, position(), Vec3.atCenterOf(bedPos.pos()), new DustParticleOptions(0xff000000, 1),  ParticleTypes.HAPPY_VILLAGER, 100, 0.2);
                 }
             }
             else if (itemStack_1.getItem() == Items.ROTTEN_FLESH)
@@ -170,12 +166,10 @@ public abstract class Villager_aiMixin extends AbstractVillager
         }
     }
 
-    // stolen from VillagerMakeLove
     private boolean canReachHome(Villager villager, BlockPos pos, PoiRecord poi) {
         Path path = villager.getNavigation().createPath(pos, poi.getPoiType().value().validRange());
         return path != null && path.canReach();
     }
-
 
     @Inject(method = "spawnGolemIfNeeded", at = @At(
             value = "INVOKE",
@@ -189,6 +183,5 @@ public abstract class Villager_aiMixin extends AbstractVillager
             ((ServerLevel) level()).sendParticles(new BlockParticleOption(ParticleTypes.BLOCK_MARKER, Blocks.BARRIER.defaultBlockState()), getX(), getY()+3, getZ(), 1, 0.1, 0.1, 0.1, 0.0);
         }
     }
-
 
 }

@@ -6,7 +6,6 @@ import net.minecraft.util.Mth;
 import java.util.Map;
 import java.util.Random;
 
-// extracted from import net.minecraft.util.math.noise.PerlinNoiseSampler
 public class PerlinNoiseSampler
 {
     protected static final int[][] gradients3d = new int[][]{
@@ -16,7 +15,6 @@ public class PerlinNoiseSampler
             {1, 1, 0}, {0, -1, 1}, {-1, 1, 0}, {0, -1, -1}
     };
     protected static final int[][] gradients2d = new int[][]{{1, 1}, {-1, 1}, {1, -1}, {-1, -1}};
-
 
     private final byte[] permutations;
     public final double originX;
@@ -54,9 +52,9 @@ public class PerlinNoiseSampler
             this.permutations[j + k] = b;
         }
     }
-    //3D
+
     public double sample3d(double x, double y, double z)
-    {//, double d, double e) {
+    {
         double f = x + this.originX;
         double g = y + this.originY;
         double h = z + this.originZ;
@@ -69,15 +67,7 @@ public class PerlinNoiseSampler
         double o = perlinFade(l);
         double p = perlinFade(m);
         double q = perlinFade(n);
-        //double t;
-        /*
-        if (d != 0.0D) {
-            double r = Math.min(e, m);
-            t = (double)Mth.floor(r / d) * d;
-        } else {
-            t = 0.0D;
-        }*/
-        //return this.sample(i, j, k, l, m - t, n, o, p, q);
+
         return this.sample3d(i, j, k, l, m, n, o, p, q) / 2 + 0.5;
     }
 
@@ -116,7 +106,6 @@ public class PerlinNoiseSampler
         return lerp(deltaZ, lerp2(deltaX, deltaY, d, e, f, g), lerp2(deltaX, deltaY, h, i, j, k));
     }
 
-    //2D
     public double sample2d(double x, double y)
     {
         double f = x + this.originX;
@@ -158,7 +147,6 @@ public class PerlinNoiseSampler
         return lerp(deltaY, lerp(deltaX, d, e), lerp(deltaX, f, g));
     }
 
-    // 1D
     public double sample1d(double x)
     {
         double f = x + this.originX;
@@ -185,7 +173,6 @@ public class PerlinNoiseSampler
         return first + delta * (second - first);
     }
 
-    // shared
     public int getGradient(int hash)
     {
         return this.permutations[hash & 255] & 255;

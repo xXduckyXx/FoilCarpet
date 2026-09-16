@@ -26,8 +26,7 @@ public class BuddingAmethystBlock_movableAmethystMixin extends Block {
     @Override
     public void playerDestroy(Level world, Player player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity, ItemStack stack) {
         super.playerDestroy(world, player, pos, state, blockEntity, stack);
-        // doing it here rather than though loottables since loottables are loaded on reload
-        // drawback - not controlled via loottables, but hey
+
         if (CarpetSettings.movableAmethyst &&
                 stack.is(ItemTags.PICKAXES) &&
                 EnchantmentHelper.getItemEnchantmentLevel(world.registryAccess().lookupOrThrow(Registries.ENCHANTMENT).getOrThrow(Enchantments.SILK_TOUCH), stack) > 0

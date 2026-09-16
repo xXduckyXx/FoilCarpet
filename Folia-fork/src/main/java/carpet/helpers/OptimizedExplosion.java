@@ -1,5 +1,4 @@
 package carpet.helpers;
-//Author: masa
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -21,7 +20,7 @@ import org.apache.commons.lang3.tuple.Pair;
 
 public class OptimizedExplosion
 {
-    // masa's optimizations
+
     private static Object2DoubleOpenHashMap<Pair<Vec3, AABB>> densityCache = new Object2DoubleOpenHashMap<>();
     private static Object2ObjectOpenHashMap<BlockPos, BlockState> stateCache = new Object2ObjectOpenHashMap<>();
     private static Object2ObjectOpenHashMap<BlockPos, FluidState> fluidCache = new Object2ObjectOpenHashMap<>();
@@ -38,12 +37,12 @@ public class OptimizedExplosion
         if (!CarpetSettings.explosionNoBlockDamage && eAccess.getDamageSource() != null) {
             rayCalcDone = false;
             firstRay = true;
-            getAffectedPositionsOnPlaneY(e,  0,  0, 15,  0, 15); // bottom
-            getAffectedPositionsOnPlaneY(e, 15,  0, 15,  0, 15); // top
-            getAffectedPositionsOnPlaneX(e,  0,  1, 14,  0, 15); // west
-            getAffectedPositionsOnPlaneX(e, 15,  1, 14,  0, 15); // east
-            getAffectedPositionsOnPlaneZ(e,  0,  1, 14,  1, 14); // north
-            getAffectedPositionsOnPlaneZ(e, 15,  1, 14,  1, 14); // south
+            getAffectedPositionsOnPlaneY(e,  0,  0, 15,  0, 15);
+            getAffectedPositionsOnPlaneY(e, 15,  0, 15,  0, 15);
+            getAffectedPositionsOnPlaneX(e,  0,  1, 14,  0, 15);
+            getAffectedPositionsOnPlaneX(e, 15,  1, 14,  0, 15);
+            getAffectedPositionsOnPlaneZ(e,  0,  1, 14,  1, 14);
+            getAffectedPositionsOnPlaneZ(e, 15,  1, 14,  1, 14);
             stateCache.clear();
             fluidCache.clear();
 
@@ -145,7 +144,6 @@ public class OptimizedExplosion
         {
             posMutable.set(posX, posY, posZ);
 
-            // Don't query already cached positions again from the world
             BlockState state = stateCache.get(posMutable);
             FluidState fluid = fluidCache.get(posMutable);
             BlockPos posImmutable = null;

@@ -80,7 +80,6 @@ public class Carpet
         return () -> CarpetProfiler.end_current_section(token);
     }
 
-    // not needed in vanilla
     public static void MinecraftServer_addScriptServer(MinecraftServer server, CarpetScriptServer scriptServer)
     {
         MixinCompat.server_addScriptServer(server, scriptServer);
@@ -198,7 +197,6 @@ public class Carpet
         }
     }
 
-    // to be ran once during CarpetEventServer.Event static init
     public static void initCarpetEvents() {
         CarpetEventServer.Event carpetRuleChanges = new CarpetEventServer.Event("carpet_rule_changes", 2, true)
         {

@@ -98,7 +98,6 @@ import java.util.stream.Stream;
 
 import static carpet.script.value.NBTSerializableValue.nameFromRegistryId;
 
-// TODO: decide whether copy(entity) should duplicate entity in the world.
 public class EntityValue extends Value
 {
     private Entity entity;
@@ -266,13 +265,12 @@ public class EntityValue extends Value
             }
         }
         return eDesc;
-        //TODO add more here like search by tags, or type
-        //if (who.startsWith('tag:'))
+
     }
 
     public static class EntityClassDescriptor
     {
-        public final EntityTypeTest<Entity, ? extends Entity> directType; // interface of EntityType
+        public final EntityTypeTest<Entity, ? extends Entity> directType;
         public final Predicate<? super Entity> filteringPredicate;
         public final List<EntityType<? extends Entity>> types;
 
@@ -297,7 +295,7 @@ public class EntityValue extends Value
         public static final Map<String, EntityClassDescriptor> byName = new HashMap<>()
         {{
             List<EntityType<?>> allTypes = BuiltInRegistries.ENTITY_TYPE.stream().toList();
-            // nonliving types
+
             Set<EntityType<?>> projectiles = Set.of(
                     EntityType.ARROW, EntityType.DRAGON_FIREBALL, EntityType.FIREWORK_ROCKET,
                     EntityType.FIREBALL, EntityType.LLAMA_SPIT, EntityType.SMALL_FIREBALL,
@@ -318,7 +316,7 @@ public class EntityValue extends Value
                     EntityType.FURNACE_MINECART, EntityType.HOPPER_MINECART,
                     EntityType.SPAWNER_MINECART, EntityType.TNT_MINECART
             );
-            // living mob groups - non-defeault
+
             Set<EntityType<?>> undeads = Set.of(
                     EntityType.STRAY, EntityType.SKELETON, EntityType.WITHER_SKELETON,
                     EntityType.ZOMBIE, EntityType.DROWNED, EntityType.ZOMBIE_VILLAGER,
@@ -347,7 +345,6 @@ public class EntityValue extends Value
                     living.contains(et) && !undeads.contains(et) && !arthropods.contains(et) && !aquatique.contains(et) && !illagers.contains(et)
             ).collect(Collectors.toSet());
 
-
             put("*", new EntityClassDescriptor(ANY, e -> true, allTypes));
             put("valid", new EntityClassDescriptor(ANY, net.minecraft.world.entity.EntitySelector.ENTITY_STILL_ALIVE, allTypes));
             put("!valid", new EntityClassDescriptor(ANY, e -> !e.isAlive(), allTypes));
@@ -360,9 +357,6 @@ public class EntityValue extends Value
 
             put("minecarts", new EntityClassDescriptor(EntityTypeTest.forClass(AbstractMinecart.class), net.minecraft.world.entity.EntitySelector.ENTITY_STILL_ALIVE, allTypes.stream().filter(minecarts::contains)));
             put("!minecarts", new EntityClassDescriptor(ANY, (e) -> (!(e instanceof AbstractMinecart) && e.isAlive()), allTypes.stream().filter(et -> !minecarts.contains(et) && !living.contains(et))));
-
-
-            // combat groups
 
             put("arthropod", new EntityClassDescriptor(EntityTypeTest.forClass(LivingEntity.class), e -> (e.getType().is(EntityTypeTags.ARTHROPOD) && e.isAlive()), allTypes.stream().filter(arthropods::contains)));
             put("!arthropod", new EntityClassDescriptor(EntityTypeTest.forClass(LivingEntity.class), e -> (!e.getType().is(EntityTypeTags.ARTHROPOD) && e.isAlive()), allTypes.stream().filter(et -> !arthropods.contains(et) && living.contains(et))));
@@ -428,7 +422,7 @@ public class EntityValue extends Value
 
     private static final Map<String, BiFunction<Entity, Value, Value>> featureAccessors = new HashMap<String, BiFunction<Entity, Value, Value>>()
     {{
-        //put("test", (e, a) -> a == null ? Value.NULL : new StringValue(a.getString()));
+
         put("removed", (entity, arg) -> BooleanValue.of(entity.isRemoved()));
         put("uuid", (e, a) -> new StringValue(e.getStringUUID()));
         put("id", (e, a) -> new NumericValue(e.getId()));
@@ -456,7 +450,7 @@ public class EntityValue extends Value
         put("passengers", (e, a) -> ListValue.wrap(e.getPassengers().stream().map(EntityValue::new)));
         put("mount", (e, a) -> (e.getVehicle() != null) ? new EntityValue(e.getVehicle()) : Value.NULL);
         put("unmountable", (e, a) -> BooleanValue.of(Vanilla.Entity_isPermanentVehicle(e)));
-        // deprecated
+
         put("tags", (e, a) -> ListValue.wrap(e.getTags().stream().map(StringValue::new)));
 
         put("scoreboard_tags", (e, a) -> ListValue.wrap(e.getTags().stream().map(StringValue::new)));
@@ -464,7 +458,7 @@ public class EntityValue extends Value
             EntityType<?> type = e.getType();
             return ListValue.wrap(e.level().getServer().registryAccess().lookupOrThrow(Registries.ENTITY_TYPE).getTags().filter(entry -> entry.stream().anyMatch(h -> h.value() == type)).map(entry -> ValueConversions.of(entry)));
         });
-        // deprecated
+
         put("has_tag", (e, a) -> BooleanValue.of(e.getTags().contains(a.getString())));
 
         put("has_scoreboard_tag", (e, a) -> BooleanValue.of(e.getTags().contains(a.getString())));
@@ -474,9 +468,7 @@ public class EntityValue extends Value
             {
                 return Value.NULL;
             }
-            //Tag<EntityType<?>> tag = e.getServer().getTags().getOrEmpty(Registry.ENTITY_TYPE_REGISTRY).getTag(InputValidator.identifierOf(a.getString()));
-            //if (tag == null) return Value.NULL;
-            //return BooleanValue.of(e.getType().is(tag));
+
             EntityType<?> type = e.getType();
             return BooleanValue.of(tag.get().stream().anyMatch(h -> h.value() == type));
         });
@@ -500,7 +492,7 @@ public class EntityValue extends Value
         put("immune_to_frost", (e, a) -> BooleanValue.of(!e.canFreeze()));
 
         put("invulnerable", (e, a) -> BooleanValue.of(e instanceof Player player ? player.getAbilities().invulnerable : e.isInvulnerable()));
-        put("dimension", (e, a) -> nameFromRegistryId(e.level().dimension().identifier())); // getDimId
+        put("dimension", (e, a) -> nameFromRegistryId(e.level().dimension().identifier()));
         put("height", (e, a) -> new NumericValue(e.getDimensions(Pose.STANDING).height()));
         put("width", (e, a) -> new NumericValue(e.getDimensions(Pose.STANDING).width()));
         put("eye_height", (e, a) -> new NumericValue(e.getEyeHeight()));
@@ -514,12 +506,12 @@ public class EntityValue extends Value
         put("pickup_delay", (e, a) -> (e instanceof ItemEntity ie) ? new NumericValue(Vanilla.ItemEntity_getPickupDelay(ie)) : Value.NULL);
         put("portal_cooldown", (e, a) -> new NumericValue(Vanilla.Entity_getPublicNetherPortalCooldown(e)));
         put("portal_timer", (e, a) -> new NumericValue(Vanilla.Entity_getPortalTimer(e)));
-        // ItemEntity -> despawn timer via ssGetAge
+
         put("is_baby", (e, a) -> (e instanceof LivingEntity le) ? BooleanValue.of(le.isBaby()) : Value.NULL);
         put("target", (e, a) -> {
             if (e instanceof Mob mob)
             {
-                LivingEntity target = mob.getTarget(); // there is also getAttacking in living....
+                LivingEntity target = mob.getTarget();
                 if (target != null)
                 {
                     return new EntityValue(target);
@@ -646,7 +638,7 @@ public class EntityValue extends Value
                     return new StringValue("lan_host");
                 }
                 return new StringValue("lan player");
-                // realms?
+
             }
             return Value.NULL;
         });
@@ -655,8 +647,6 @@ public class EntityValue extends Value
         put("team", (e, a) -> e.getTeam() == null ? Value.NULL : new StringValue(e.getTeam().getName()));
         put("ping", (e, a) -> e instanceof ServerPlayer sp ? new NumericValue(sp.connection.latency()) : Value.NULL);
 
-        //spectating_entity
-        // isGlowing
         put("effect", (e, a) ->
         {
             if (!(e instanceof LivingEntity le))
@@ -733,7 +723,6 @@ public class EntityValue extends Value
             }
             return Value.NULL;
         });
-
 
         put("facing", (e, a) -> {
             int index = 0;
@@ -921,15 +910,12 @@ public class EntityValue extends Value
         else
         {
             e.snapTo(x, y, z, yaw, pitch);
-            // we were sending to players for not-living entites, that were untracked. Living entities should be tracked.
-            //((ServerWorld) e.getEntityWorld()).getChunkManager().sendToNearbyPlayers(e, new EntityS2CPacket.(e));
+
             if (e instanceof LivingEntity le)
             {
                 le.yBodyRotO = le.yRotO = yaw;
                 le.yHeadRotO = le.yHeadRot = yaw;
-                // seems universal for:
-                //e.setHeadYaw(yaw);
-                //e.setYaw(yaw);
+
             }
             else
             {
@@ -949,7 +935,7 @@ public class EntityValue extends Value
 
     private static final Map<String, BiConsumer<Entity, Value>> featureModifiers = new HashMap<String, BiConsumer<Entity, Value>>()
     {{
-        put("remove", (entity, value) -> entity.discard()); // using discard here - will see other options if valid
+        put("remove", (entity, value) -> entity.discard());
         put("age", (e, v) -> e.tickCount = Math.abs((int) NumericValue.asNumber(v).getLong()));
         put("health", (e, v) -> {
             float health = (float) NumericValue.asNumber(v).getDouble();
@@ -957,9 +943,7 @@ public class EntityValue extends Value
             {
                 if (player.containerMenu != null)
                 {
-                    // if player dies with open container, then that causes NPE on the client side
-                    // its a client side bug that may never surface unless vanilla gets into scripting at some point
-                    // bug: #228
+
                     player.closeContainer();
                 }
                 ((LivingEntity) e).setHealth(health);
@@ -1037,21 +1021,6 @@ public class EntityValue extends Value
             }
         });
 
-        // todo add handling of the source for extra effects
-        /*put("damage", (e, v) -> {
-            float dmgPoints;
-            DamageSource source;
-            if (v instanceof final ListValue lv && lv.getItems().size() > 1)
-            {
-                   List<Value> vals = lv.getItems();
-                   dmgPoints = (float) NumericValue.asNumber(v).getDouble();
-                   source = DamageSource ... yeah...
-            }
-            else
-            {
-
-            }
-        });*/
         put("kill", (e, v) -> e.kill((ServerLevel) e.level()));
         put("location", (e, v) ->
         {
@@ -1125,9 +1094,6 @@ public class EntityValue extends Value
             float yaw = (float) (x == 0 && z == 0 ? e.getYRot() : Mth.atan2(-x, z) / 0.017453292F);
             updatePosition(e, e.getX(), e.getY(), e.getZ(), yaw, pitch);
         });
-
-        //"turn"
-        //"nod"
 
         put("move", (e, v) ->
         {
@@ -1292,14 +1258,7 @@ public class EntityValue extends Value
                 e.removeTag(v.getString());
             }
         });
-        //put("target", (e, v) -> {
-        //    // attacks indefinitely - might need to do it through tasks
-        //    if (e instanceof MobEntity)
-        //    {
-        //        LivingEntity elb = assertEntityArgType(LivingEntity.class, v);
-        //        ((MobEntity) e).setTarget(elb);
-        //    }
-        //});
+
         put("breeding_age", (e, v) ->
         {
             if (e instanceof AgeableMob am)
@@ -1308,7 +1267,7 @@ public class EntityValue extends Value
             }
         });
         put("talk", (e, v) -> {
-            // attacks indefinitely
+
             if (e instanceof Mob mob)
             {
                 mob.playAmbientSound();
@@ -1366,7 +1325,7 @@ public class EntityValue extends Value
                 tasks.put("home", task);
                 Vanilla.Mob_getAI(ec, false).addGoal(10, task);
             }
-        }); //requires mixing
+        });
 
         put("spawn_point", (e, a) -> {
             if (!(e instanceof ServerPlayer spe))
@@ -1406,7 +1365,7 @@ public class EntityValue extends Value
                 {
                     throw new InternalExpressionException("block for spawn modification should be localised in the world");
                 }
-                spe.setRespawnPosition(new ServerPlayer.RespawnConfig(new LevelData.RespawnData(new GlobalPos(bv.getWorld().dimension(), bv.getPos()), e.getYRot(), 0), true), false); // yaw
+                spe.setRespawnPosition(new ServerPlayer.RespawnConfig(new LevelData.RespawnData(new GlobalPos(bv.getWorld().dimension(), bv.getPos()), e.getYRot(), 0), true), false);
             }
             else if (a.isNull())
             {
@@ -1745,9 +1704,7 @@ public class EntityValue extends Value
                 itemframe.setItem(item);
             }
         });
-        // "dimension"      []
-        // "count",         []
-        // "effect_"name    []
+
     }};
 
     public void setEvent(CarpetContext cc, String eventName, FunctionValue fun, List<Value> args)

@@ -120,7 +120,6 @@ public class SpawnCommand
         return MOB_CATEGORY_MAP.get(string.toLowerCase(Locale.ROOT));
     }
 
-
     private static int listSpawns(CommandSourceStack source, BlockPos pos)
     {
         Messenger.send(source, SpawnReporter.report(pos, source.getLevel()));
@@ -162,9 +161,9 @@ public class SpawnCommand
 
     private static int runTest(CommandSourceStack source, int ticks, String counter)
     {
-        // Start tracking
+
         SpawnReporter.startTracking(source.getServer(), null);
-        // Reset counter
+
         if (counter == null)
         {
             HopperCounter.resetAll(source.getServer(), false);
@@ -176,12 +175,8 @@ public class SpawnCommand
                     hCounter.reset(source.getServer());
         }
 
-
-        // tick warp 0
         ServerTickRateManager trm = source.getServer().tickRateManager();
-        // stop warp
-        // unnecessary
-        // start warp
+
         trm.requestGameToSprint(ticks);
         Messenger.m(source, String.format("gi Started spawn test for %d ticks", ticks));
         return 1;

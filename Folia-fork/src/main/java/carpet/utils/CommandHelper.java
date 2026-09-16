@@ -7,17 +7,9 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.TickTask;
 import net.minecraft.server.level.ServerPlayer;
 
-/**
- * A few helpful methods to work with settings and commands.
- * 
- * This is not any kind of API, but it's unlikely to change
- *
- */
 public final class CommandHelper {
     private CommandHelper() {}
-    /**
-     * Notifies all players that the commands changed by resending the command tree.
-     */
+
     public static void notifyPlayersCommandsChanged(MinecraftServer server)
     {
         if (server == null || server.getPlayerList() == null)
@@ -30,7 +22,7 @@ public final class CommandHelper {
             scheduledTick = server.getTickCount();
         }
         catch (UnsupportedOperationException e)
-        { // Folia does not support direct tick counting
+        {
             scheduledTick = 0;
         }
         try
@@ -49,7 +41,7 @@ public final class CommandHelper {
             }));
         }
         catch (UnsupportedOperationException syncFallback)
-        { // Folia does not allow scheduling through MinecraftServer
+        {
             try
             {
                 for (ServerPlayer player : server.getPlayerList().getPlayers()) {
@@ -62,10 +54,7 @@ public final class CommandHelper {
             }
         }
     }
-    
-    /**
-     * Whether the given source has enough permission level to run a command that requires the given commandLevel
-     */
+
     public static boolean canUseCommand(CommandSourceStack source, Object commandLevel)
     {
         if (commandLevel instanceof Boolean) return (Boolean) commandLevel;
@@ -74,7 +63,7 @@ public final class CommandHelper {
         {
             case "true"  -> true;
             case "false" -> false;
-            case "ops"   -> Commands.LEVEL_GAMEMASTERS.check(source.permissions()); // typical for other cheaty commands
+            case "ops"   -> Commands.LEVEL_GAMEMASTERS.check(source.permissions());
             case "0" ->  Commands.LEVEL_ALL.check(source.permissions());
             case "1" -> Commands.LEVEL_MODERATORS.check(source.permissions());
             case "2" -> Commands.LEVEL_GAMEMASTERS.check(source.permissions());

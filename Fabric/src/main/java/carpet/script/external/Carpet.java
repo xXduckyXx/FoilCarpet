@@ -85,7 +85,6 @@ public class Carpet
         return () -> CarpetProfiler.end_current_section(token);
     }
 
-    // not needed in vanilla
     public static void MinecraftServer_addScriptServer(MinecraftServer server, CarpetScriptServer scriptServer)
     {
         ((MinecraftServerInterface) server).addScriptServer(scriptServer);
@@ -207,14 +206,13 @@ public class Carpet
         {
             Version presentVersion = mod.getMetadata().getVersion();
             if (predicate.test(presentVersion) || (FabricLoader.getInstance().isDevelopmentEnvironment() && !(presentVersion instanceof SemanticVersion)))
-            { // in a dev env, mod version is usually replaced with ${version}, and that isn't semantic
+            {
                 return;
             }
         }
         throw new LoadException(String.format("%s requires a version of mod '%s' matching '%s', which is missing!", host.getVisualName(), requiredModId, stringPredicate));
     }
 
-    // to be ran once during CarpetEventServer.Event static init
     public static void initCarpetEvents() {
         CarpetEventServer.Event carpetRuleChanges = new CarpetEventServer.Event("carpet_rule_changes", 2, true)
         {

@@ -16,7 +16,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(Entity.class)
 public abstract class Entity_scarpetEventsMixin implements EntityInterface
 {
-    //@Shadow public boolean removed;
 
     @Shadow private int portalCooldown;
 
@@ -79,13 +78,11 @@ public abstract class Entity_scarpetEventsMixin implements EntityInterface
         events.onEvent(EntityEventsGroup.Event.ON_TICK);
     }
 
-
     @Inject(method = "remove", at = @At("HEAD"))
     private void onRemove(CallbackInfo ci)
     {
-        if (!isRemoved()) events.onEvent(EntityEventsGroup.Event.ON_REMOVED);  // ! isRemoved()
+        if (!isRemoved()) events.onEvent(EntityEventsGroup.Event.ON_REMOVED);
     }
-
 
     @Inject(method = "setPosRaw", at = @At("HEAD"))
     private void firstPos(CallbackInfo ci)

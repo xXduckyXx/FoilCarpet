@@ -29,7 +29,7 @@ public class ServerboundSetStructureBlockPacketMixin {
     )
     private void structureBlockLimitsRead(FriendlyByteBuf buf, CallbackInfo ci) {
         if (buf.readableBytes() == 6*4) {
-            // This will throw an exception if carpet is not installed on client
+
             offset = new BlockPos(Mth.clamp(buf.readInt(), -CarpetSettings.structureBlockLimit, CarpetSettings.structureBlockLimit), Mth.clamp(buf.readInt(), -CarpetSettings.structureBlockLimit, CarpetSettings.structureBlockLimit), Mth.clamp(buf.readInt(), -CarpetSettings.structureBlockLimit, CarpetSettings.structureBlockLimit));
             size = new Vec3i(Mth.clamp(buf.readInt(), 0, CarpetSettings.structureBlockLimit), Mth.clamp(buf.readInt(), 0, CarpetSettings.structureBlockLimit), Mth.clamp(buf.readInt(), 0, CarpetSettings.structureBlockLimit));
         }
@@ -40,7 +40,7 @@ public class ServerboundSetStructureBlockPacketMixin {
             at = @At("TAIL")
     )
     private void structureBlockLimitsWrite(FriendlyByteBuf buf, CallbackInfo ci) {
-        //client method, only applicable if with carpet is on the server, or running locally
+
         if (CarpetSettings.structureBlockLimit != StructureBlockEntity.MAX_SIZE_PER_AXIS)
         {
             buf.writeInt(this.offset.getX());

@@ -19,13 +19,11 @@ public abstract class ClientPacketListener_explosionMixin extends ClientCommonPa
 
     private static Vec3 vec3dmem;
     private static long tickmem;
-    // For disabling the explosion particles and sounds if explosions are stacking up
 
     protected ClientPacketListener_explosionMixin(final Minecraft minecraft, final Connection connection, final CommonListenerCookie commonListenerCookie)
     {
         super(minecraft, connection, commonListenerCookie);
     }
-
 
     @Inject(method = "handleExplosion", at = @At(
             value = "INVOKE",

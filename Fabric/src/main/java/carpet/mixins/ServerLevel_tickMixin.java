@@ -105,11 +105,9 @@ public abstract class ServerLevel_tickMixin extends Level implements LevelInterf
         currentSection = null;
     }
 
-    // Chunk
-
     @Inject(method = "tickChunk", at = @At("HEAD"))
     private void startThunderSpawningSection(CallbackInfo ci) {
-        // Counting it in spawning because it's spawning skeleton horses
+
         currentSection = CarpetProfiler.start_section((Level) (Object) this, "Spawning", CarpetProfiler.TYPE.GENERAL);
     }
 

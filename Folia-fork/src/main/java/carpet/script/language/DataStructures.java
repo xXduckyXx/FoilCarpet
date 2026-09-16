@@ -105,8 +105,7 @@ public class DataStructures
             return ListValue.wrap(toSort);
         });
 
-        // needs lazy cause sort function is reused
-        expression.addLazyFunction("sort_key", (c, t, lv) ->  //get working with iterators
+        expression.addLazyFunction("sort_key", (c, t, lv) ->
         {
             if (lv.isEmpty())
             {
@@ -125,7 +124,7 @@ public class DataStructures
                 return (ct, tt) -> ret;
             }
             LazyValue sortKey = lv.get(1);
-            //scoping
+
             LazyValue defaultVal = c.getVariable("_");
             toSort.sort((v1, v2) -> {
                 c.setVariable("_", (cc, tt) -> v1);
@@ -134,7 +133,7 @@ public class DataStructures
                 Value ev2 = sortKey.evalValue(c);
                 return ev1.compareTo(ev2);
             });
-            //revering scope
+
             c.setVariable("_", defaultVal);
             Value ret = ListValue.wrap(toSort);
             return (cc, tt) -> ret;
@@ -208,7 +207,6 @@ public class DataStructures
             return t != Context.LVALUE ? cvi.get(address) : new LContainerValue(cvi, address);
         });
 
-        // lazy cause conditional typing - questionable
         expression.addLazyFunction("get", (c, t, lv) ->
         {
             if (lv.isEmpty())
@@ -247,7 +245,6 @@ public class DataStructures
             return (cc, tt) -> finalContainer;
         });
 
-        // same as `get`
         expression.addLazyFunction("has", (c, t, lv) ->
         {
             if (lv.isEmpty())
@@ -286,7 +283,6 @@ public class DataStructures
             return (cc, tt) -> ret;
         });
 
-        // same as `get`
         expression.addLazyFunction("put", (c, t, lv) ->
         {
             if (lv.size() < 2)
@@ -325,7 +321,6 @@ public class DataStructures
             return (cc, tt) -> retVal;
         });
 
-        // same as `get`
         expression.addLazyFunction("delete", (c, t, lv) ->
         {
             if (lv.isEmpty())

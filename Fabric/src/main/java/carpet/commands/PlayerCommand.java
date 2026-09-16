@@ -48,7 +48,7 @@ import static net.minecraft.commands.SharedSuggestionProvider.suggest;
 
 public class PlayerCommand
 {
-    // TODO: allow any order like execute
+
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext commandBuildContext)
     {
         LiteralArgumentBuilder<CommandSourceStack> command = literal("player")
@@ -213,7 +213,7 @@ public class PlayerCommand
                 uuid = UUIDUtil.createOfflinePlayerUUID(playerName);
             }
         }
-        //GameProfile profile = new GameProfile(uuid, playerName);
+
         NameAndId profile = server.services().nameToIdCache().get(uuid).orElse(null);
         if (profile == null)
         {
@@ -295,11 +295,11 @@ public class PlayerCommand
 
         if (mode == GameType.SPECTATOR)
         {
-            // Force override flying to true for spectator players, or they will fell out of the world.
+
             flying = true;
         } else if (mode.isSurvival())
         {
-            // Force override flying to false for survival-like players, or they will fly too
+
             flying = false;
         }
         String playerName = StringArgumentType.getString(context, "player");

@@ -41,8 +41,8 @@ public class BlockInfo
         lst.add(Messenger.s(String.format(" - Map colour: %s", Colors.mapColourName.get(state.getMapColor(world, pos)))));
         lst.add(Messenger.s(String.format(" - Sound type: %s", Colors.soundName.get(state.getSoundType()))));
         lst.add(Messenger.s(""));
-        lst.add(Messenger.s(String.format(" - Full block: %s", state.isCollisionShapeFullBlock(world, pos)))); //  isFullCube() )));
-        lst.add(Messenger.s(String.format(" - Normal cube: %s", state.isRedstoneConductor(world, pos)))); //isNormalCube()))); isSimpleFullBlock
+        lst.add(Messenger.s(String.format(" - Full block: %s", state.isCollisionShapeFullBlock(world, pos))));
+        lst.add(Messenger.s(String.format(" - Normal cube: %s", state.isRedstoneConductor(world, pos))));
         lst.add(Messenger.s(String.format(" - Is liquid: %s", state.is(Blocks.WATER) || state.is(Blocks.LAVA))));
         lst.add(Messenger.s(""));
         lst.add(Messenger.s(String.format(" - Light in: %d, above: %d",
@@ -50,11 +50,9 @@ public class BlockInfo
                 Math.max(world.getBrightness(LightLayer.BLOCK, pos.above()),world.getBrightness(LightLayer.SKY, pos.above())))));
         lst.add(Messenger.s(String.format(" - Brightness in: %.2f, above: %.2f", world.getLightLevelDependentMagicValue(pos), world.getLightLevelDependentMagicValue(pos.above()))));
         lst.add(Messenger.s(String.format(" - Is opaque: %s", state.isSolid() )));
-        //lst.add(Messenger.s(String.format(" - Light opacity: %d", state.getOpacity(world,pos))));
-        //lst.add(Messenger.s(String.format(" - Emitted light: %d", state.getLightValue())));
-        //lst.add(Messenger.s(String.format(" - Picks neighbour light value: %s", state.useNeighborBrightness(world, pos))));
+
         lst.add(Messenger.s(""));
-        lst.add(Messenger.s(String.format(" - Causes suffocation: %s", state.isSuffocating(world, pos)))); //canSuffocate
+        lst.add(Messenger.s(String.format(" - Causes suffocation: %s", state.isSuffocating(world, pos))));
         lst.add(Messenger.s(String.format(" - Blocks movement on land: %s", !state.isPathfindable(PathComputationType.LAND))));
         lst.add(Messenger.s(String.format(" - Blocks movement in air: %s", !state.isPathfindable(PathComputationType.AIR))));
         lst.add(Messenger.s(String.format(" - Blocks movement in liquids: %s", !state.isPathfindable(PathComputationType.WATER))));
@@ -82,7 +80,7 @@ public class BlockInfo
         for (int i=0; i<1000; i++)
         {
 
-            Vec3 vec = DefaultRandomPos.getPos(creature, 10, 7); // TargetFinder.findTarget(creature, 10, 7);
+            Vec3 vec = DefaultRandomPos.getPos(creature, 10, 7);
             if (vec == null)
             {
                 continue;
@@ -93,7 +91,7 @@ public class BlockInfo
         for (int trie=0; trie<1000; trie++)
         {
             int i;
-            for (i=1;i<30*20*60; i++) //*60 used to be 5 hours, limited to 30 mins
+            for (i=1;i<30*20*60; i++)
             {
                 if (wander.canUse())
                 {
@@ -102,7 +100,7 @@ public class BlockInfo
             }
             total_ticks += 3*i;
         }
-        creature.discard(); // discarded // remove(Entity.RemovalReason.field_26999); // 2nd option - DISCARDED
+        creature.discard();
         long total_time = (total_ticks)/1000/20;
         return Messenger.s(String.format(" - Wander chance above: %.1f%%\n - Average standby above: %s",
                 (100.0F*success)/1000,

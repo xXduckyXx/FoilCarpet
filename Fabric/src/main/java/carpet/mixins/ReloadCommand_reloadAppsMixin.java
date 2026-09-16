@@ -11,12 +11,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(ReloadCommand.class)
 public class ReloadCommand_reloadAppsMixin {
-    //method_13530(Lcom/mojang/brigadier/context/CommandContext;)I
-    // internal of register.
+
     @Inject(method = "method_13530", at = @At("TAIL"), remap = false)
     private static void onReload(CommandContext<CommandSourceStack> context, CallbackInfoReturnable<Integer> cir)
     {
-        // can't fetch here the reference to the server
+
         CarpetServer.onReload(context.getSource().getServer());
     }
 }

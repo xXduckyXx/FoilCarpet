@@ -15,8 +15,7 @@ import java.util.function.BooleanSupplier;
 @Mixin(MinecraftServer.class)
 public abstract class MinecraftServer_coreMixin
 {
-    //to inject right before
-    // this.tickWorlds(booleanSupplier_1);
+
     @Inject(
             method = "tickServer",
             at = @At(

@@ -20,7 +20,7 @@ public class CommandNode_scarpetCommandsMixin<S> implements CommandNodeInterface
     private Map<String, LiteralCommandNode<S>> literals;
     @Shadow @Final
     private Map<String, ArgumentCommandNode<S, ?>> arguments;
-    
+
     @Override
     public void carpet$removeChild(String name) {
         this.children.remove(name);

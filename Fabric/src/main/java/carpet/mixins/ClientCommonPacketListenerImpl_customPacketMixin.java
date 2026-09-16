@@ -23,7 +23,7 @@ public class ClientCommonPacketListenerImpl_customPacketMixin
     at = @At("HEAD"))
     private void onOnCustomPayload(ClientboundCustomPayloadPacket packet, CallbackInfo ci)
     {
-        //System.out.println("CustomPayload of : " + packet.payload());
+
     }
 
 }

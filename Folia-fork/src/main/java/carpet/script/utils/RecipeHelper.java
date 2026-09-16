@@ -20,7 +20,6 @@ public class RecipeHelper
     {
         List<Recipe<?>> results = new ArrayList<>();
 
-
         ContextMap context = SlotDisplayContext.fromLevel(level);
         recipeManager.getRecipes().forEach(r -> {
             if (r.value().getType() == type)

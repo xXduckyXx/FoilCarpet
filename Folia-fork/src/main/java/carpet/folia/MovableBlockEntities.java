@@ -28,21 +28,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.plugin.Plugin;
 
-/**
- * Replicates Carpet's {@code movableBlockEntities} on stock Folia, where the MOVE_BLOCK_ENTITY
- * subsystem cannot be mixin-ed in. Vanilla refuses to push any block with a block entity, so on
- * the vanilla/Folia builds a "stuck" piston is a powered, retracted piston whose push line
- * contains (at least) one block entity. Since no vanilla path or Bukkit event can ever move such
- * a line, this class periodically scans loaded chunks (on their own region threads), detects
- * stuck pistons and instantly moves the whole push line far-to-near, copying each block entity
- * through its serialized NBT (same data the chunk format uses). The piston itself is left in the
- * extended state and a piston head is placed in the freed space so that any queued vanilla extend
- * event becomes a no-op.
- *
- * <p>This is deliberately tolerant to edge cases: redstone-clock driven pistons work, they just
- * animate instantly instead of smoothly. Chains that cross into a foreign region abort and
- * retry on the next sweep.
- */
 public final class MovableBlockEntities
 {
     private static final int SCAN_INTERVAL = 2;
@@ -97,13 +82,13 @@ public final class MovableBlockEntities
                     }
                     catch (Throwable ignored)
                     {
-                        // chunk may have been unloaded / outside the region scheduler
+
                     }
                 }
             }
             catch (Throwable ignored)
             {
-                // getLoadedChunks may race with world shutdown
+
             }
         }
     }
@@ -133,15 +118,10 @@ public final class MovableBlockEntities
         }
         catch (Throwable ignored)
         {
-            // cross-region reads / unloaded chunks: retried on the next sweep
+
         }
     }
 
-    /**
-     * For a given block entity position, look for any retracted powered piston whose push line
-     * (up to the push limit, in any of the six directions) contains the block entity, and which
-     * vanilla would refuse to extend because of it.
-     */
     private static void attemptMoveFromBlock(BlockPos bePos, ServerLevel level)
     {
         for (Direction dir : Direction.values())
@@ -187,7 +167,7 @@ public final class MovableBlockEntities
                 }
                 if (!hasMovableBlockEntity)
                 {
-                    // vanilla can extend this piston by itself; do not interfere
+
                     continue;
                 }
                 moveLine(level, pistonPos, dir, chain, pistonBlock == Blocks.STICKY_PISTON);
@@ -219,12 +199,6 @@ public final class MovableBlockEntities
         return false;
     }
 
-    /**
-     * Walks the straight push line in front of the piston using Carpet's movable-block-entity
-     * semantics. Returns the ordered list of blocks to push (closest to the piston first), or
-     * {@code null} if the line contains an immovable block or exceeds the push limit, or an
-     * empty list if the piston faces air.
-     */
     private static List<BlockPos> pushLine(ServerLevel level, BlockPos pistonPos, Direction dir)
     {
         List<BlockPos> chain = new ArrayList<>();
@@ -349,8 +323,6 @@ public final class MovableBlockEntities
                 savedNbt.add(tag);
             }
 
-            // Move far to near, exactly like vanilla moveBlocks: the destination of block i is
-            // block i+1, which has already been cleared when i is processed.
             for (int i = count - 1; i >= 0; i--)
             {
                 BlockPos src = chain.get(i);
@@ -373,7 +345,7 @@ public final class MovableBlockEntities
                     }
                     catch (Throwable t)
                     {
-                        // leave the freshly-created empty block entity; round-trip failed
+
                     }
                 }
             }
@@ -399,8 +371,7 @@ public final class MovableBlockEntities
         }
         catch (Throwable t)
         {
-            // cross-region write or other transient failure: the move is partially applied,
-            // the next sweep will re-resolve from the actual world state
+
         }
         finally
         {

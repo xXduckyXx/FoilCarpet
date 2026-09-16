@@ -19,7 +19,7 @@ public class ParticleDisplay
         double lineLengthSq = from.distanceToSqr(to);
         if (lineLengthSq == 0) return;
 
-        Vec3 incvec = to.subtract(from).normalize();//    multiply(50/sqrt(lineLengthSq));
+        Vec3 incvec = to.subtract(from).normalize();
         for (Vec3 delta = new Vec3(0.0,0.0,0.0);
              delta.lengthSqr() < lineLengthSq;
              delta = delta.add(incvec.scale(player.level().random.nextFloat())))

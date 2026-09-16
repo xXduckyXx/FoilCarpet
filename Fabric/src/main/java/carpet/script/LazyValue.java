@@ -2,9 +2,6 @@ package carpet.script;
 
 import carpet.script.value.Value;
 
-/**
- * LazyNumber interface created for lazily evaluated functions
- */
 @FunctionalInterface
 public interface LazyValue
 {
@@ -37,7 +34,6 @@ public interface LazyValue
             return evalType(type);
         }
     }
-
 
     class Constant implements ContextFreeLazyValue
     {

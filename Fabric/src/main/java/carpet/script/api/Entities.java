@@ -88,7 +88,7 @@ public class Entities
                             yield ListValue.wrap(ret);
                         }
                         case "*" -> getPlayersFromWorldMatching(c, p -> true);
-                        case "survival" -> getPlayersFromWorldMatching(c, p -> p.gameMode.isSurvival()); // includes adventure
+                        case "survival" -> getPlayersFromWorldMatching(c, p -> p.gameMode.isSurvival());
                         case "creative" -> getPlayersFromWorldMatching(c, ServerPlayer::isCreative);
                         case "spectating" -> getPlayersFromWorldMatching(c, ServerPlayer::isSpectator);
                         case "!spectating" -> getPlayersFromWorldMatching(c, p -> !p.isSpectator());
@@ -252,7 +252,6 @@ public class Entities
                     };
         });
 
-        // or update
         expression.addContextFunction("modify", -1, (c, t, lv) ->
         {
             if (lv.size() < 2)
@@ -305,7 +304,7 @@ public class Entities
             }
             else
             {
-                ///compat
+
                 int numberOfArguments = funArg.function.getArguments().size() - funArg.args.size();
                 if (numberOfArguments == 1)
                 {
@@ -320,7 +319,6 @@ public class Entities
             return new NumericValue(types.size());
         });
 
-        // or update
         expression.addContextFunction("entity_event", -1, (c, t, lv) ->
         {
             if (lv.size() < 3)

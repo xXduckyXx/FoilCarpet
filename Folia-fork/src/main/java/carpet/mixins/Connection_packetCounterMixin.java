@@ -20,14 +20,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(Connection.class)
 public abstract class Connection_packetCounterMixin implements ClientConnectionInterface
 {
-    // Add to the packet counter whenever a packet is received.
+
     @Inject(method = "channelRead0", at = @At("HEAD"))
     private void packetInCount(ChannelHandlerContext channelHandlerContext_1, Packet<?> packet_1, CallbackInfo ci)
     {
         PacketCounter.totalIn++;
     }
-    
-    // Add to the packet counter whenever a packet is sent.
+
     @Inject(method = "sendPacket", at = @At("HEAD"))
     private void packetOutCount(Packet<?> packet, ChannelFutureListener channelFutureListener, boolean bl, CallbackInfo ci)
     {
@@ -35,6 +34,6 @@ public abstract class Connection_packetCounterMixin implements ClientConnectionI
     }
 
     @Override
-    @Accessor //Compat with adventure-platform-fabric
+    @Accessor
     public abstract void setChannel(Channel channel);
 }

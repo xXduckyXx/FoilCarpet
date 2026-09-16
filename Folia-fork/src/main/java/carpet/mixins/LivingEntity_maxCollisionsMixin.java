@@ -89,5 +89,4 @@ public abstract class LivingEntity_maxCollisionsMixin extends Entity
         ci.cancel();
     }
 
-
 }

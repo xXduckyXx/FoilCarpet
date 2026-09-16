@@ -41,7 +41,6 @@ public class PistonStructureResolver_customStickyMixin {
         }
     }
 
-    // fields that are needed because @Redirects cannot capture locals
     @Unique private BlockPos pos_addBlockLine;
     @Unique private BlockPos behindPos_addBlockLine;
 
@@ -74,7 +73,6 @@ public class PistonStructureResolver_customStickyMixin {
         return canStickToEachOther(state, behindState);
     }
 
-    // fields that are needed because @Redirects cannot capture locals
     @Unique private Direction dir_addBranchingBlocks;
     @Unique private BlockPos neighborPos_addBranchingBlocks;
 

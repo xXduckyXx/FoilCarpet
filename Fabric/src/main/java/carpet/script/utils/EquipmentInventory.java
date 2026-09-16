@@ -52,7 +52,7 @@ public class EquipmentInventory implements Container
         }
         catch (IndexOutOfBoundsException ignored)
         {
-            //going out of the index should be really exceptional
+
             return ItemStack.EMPTY;
         }
         return mob.getItemBySlot(slotSlot);
@@ -68,7 +68,7 @@ public class EquipmentInventory implements Container
         }
         catch (IndexOutOfBoundsException ignored)
         {
-            //going out of the index should be really exceptional
+
             return ItemStack.EMPTY;
         }
         return mob.getItemBySlot(slotSlot).split(amount);
@@ -84,7 +84,7 @@ public class EquipmentInventory implements Container
         }
         catch (IndexOutOfBoundsException ignored)
         {
-            //going out of the index should be really exceptional
+
             return ItemStack.EMPTY;
         }
         ItemStack previous = mob.getItemBySlot(slotSlot);
@@ -102,7 +102,7 @@ public class EquipmentInventory implements Container
         }
         catch (IndexOutOfBoundsException ignored)
         {
-            //going out of the index should be really exceptional
+
             return;
         }
         mob.setItemSlot(slotSlot, stack);

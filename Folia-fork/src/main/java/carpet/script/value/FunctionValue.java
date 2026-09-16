@@ -195,7 +195,7 @@ public class FunctionValue extends Value implements Fluff.ILazyFunction
 
     public static List<Value> unpackArgs(List<LazyValue> lazyParams, Context c)
     {
-        // TODO we shoudn't need that if all fuctions are not lazy really
+
         List<Value> params = new ArrayList<>();
         for (LazyValue lv : lazyParams)
         {
@@ -223,14 +223,13 @@ public class FunctionValue extends Value implements Fluff.ILazyFunction
     public LazyValue execute(Context c, Context.Type type, Expression e, Token t, List<Value> params, @Nullable ThreadValue freshNewCallingThread)
     {
         assertArgsOk(params, fixedArgs -> {
-            if (fixedArgs)  // wrong number of args for fixed args
+            if (fixedArgs)
             {
                 throw new ExpressionException(c, e, t,
                         "Incorrect number of arguments for function " + name +
                                 ". Should be " + args.size() + ", not " + params.size() + " like " + args
                 );
             }
-            // too few args for varargs
 
             List<String> argList = new ArrayList<>(args);
             argList.add("... " + varArgs);
@@ -252,7 +251,7 @@ public class FunctionValue extends Value implements Fluff.ILazyFunction
         for (int i = 0; i < args.size(); i++)
         {
             String arg = args.get(i);
-            Value val = params.get(i).reboundedTo(arg); // todo check if we need to copy that
+            Value val = params.get(i).reboundedTo(arg);
             newFrame.setVariable(arg, (cc, tt) -> val);
         }
         if (varArgs != null)
@@ -260,16 +259,16 @@ public class FunctionValue extends Value implements Fluff.ILazyFunction
             List<Value> extraParams = new ArrayList<>();
             for (int i = args.size(), mx = params.size(); i < mx; i++)
             {
-                extraParams.add(params.get(i).reboundedTo(null)); // copy by value I guess
+                extraParams.add(params.get(i).reboundedTo(null));
             }
-            Value rest = ListValue.wrap(extraParams).bindTo(varArgs); // didn't we just copied that?
+            Value rest = ListValue.wrap(extraParams).bindTo(varArgs);
             newFrame.setVariable(varArgs, (cc, tt) -> rest);
 
         }
         Value retVal;
         try
         {
-            retVal = body.evalValue(newFrame, type); // todo not sure if we need to propagete type / consider boolean context in defined functions - answer seems ye
+            retVal = body.evalValue(newFrame, type);
         }
         catch (BreakStatement | ContinueStatement exc)
         {
@@ -316,11 +315,11 @@ public class FunctionValue extends Value implements Fluff.ILazyFunction
     public void assertArgsOk(List<?> list, Consumer<Boolean> feedback)
     {
         int size = list.size();
-        if (varArgs == null && args.size() != size) // wrong number of args for fixed args
+        if (varArgs == null && args.size() != size)
         {
             feedback.accept(true);
         }
-        else if (varArgs != null && args.size() > size) // too few args for varargs
+        else if (varArgs != null && args.size() > size)
         {
             feedback.accept(false);
         }

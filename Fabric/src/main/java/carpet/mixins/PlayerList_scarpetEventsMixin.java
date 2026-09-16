@@ -34,7 +34,7 @@ public class PlayerList_scarpetEventsMixin
             at = @At("HEAD"),
             cancellable = true)
     private void cancellableChatMessageEvent(PlayerChatMessage message, ServerPlayer player, ChatType.Bound params, CallbackInfo ci) {
-        // having this earlier breaks signatures
+
         if (PLAYER_MESSAGE.isNeeded())
         {
             if (PLAYER_MESSAGE.onPlayerMessage(player, message.signedContent())) ci.cancel();

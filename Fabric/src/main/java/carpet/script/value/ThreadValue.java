@@ -43,7 +43,7 @@ public class ThreadValue extends LazyListValue
         ThreadValue callingThread = isCoroutine ? this : null;
         if (executor == null)
         {
-            // app is shutting down - no more threads can be spawned.
+
             return CompletableFuture.completedFuture(Value.NULL);
         }
         else
@@ -55,7 +55,7 @@ public class ThreadValue extends LazyListValue
                 }
                 catch (ExitStatement exit)
                 {
-                    // app stopped
+
                     return exit.retval;
                 }
                 catch (ExpressionException exc)
@@ -147,16 +147,14 @@ public class ThreadValue extends LazyListValue
     @Override
     public void fatality()
     {
-        // we signal that won't be interested in the co-thread anymore
-        // but threads run client code, so we can't just kill them
+
     }
 
     @Override
     public void reset()
     {
-        //throw new InternalExpressionException("Illegal operation on a task");
-    }
 
+    }
 
     @Override
     public Iterator<Value> iterator()
@@ -249,8 +247,6 @@ public class ThreadValue extends LazyListValue
                 coState.notifyAll();
             }
         }
-
-        // locked mode
 
         synchronized (coLock)
         {

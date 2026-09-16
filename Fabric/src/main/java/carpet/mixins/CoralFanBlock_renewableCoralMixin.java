@@ -12,5 +12,5 @@ public class CoralFanBlock_renewableCoralMixin implements FertilizableCoral
     public boolean isEnabled() {
         return CarpetSettings.renewableCoral == CarpetSettings.RenewableCoralMode.EXPANDED;
     }
-    // Logic in FertilizableCoral
+
 }

@@ -12,14 +12,9 @@ import net.minecraft.world.item.DyeColor;
 
 import static net.minecraft.commands.Commands.literal;
 
-/**
- * Class for the /counter command which allows to use hoppers pointing into wool
- */
 public class CounterCommand
 {
-    /**
-     * The method used to register the command and make it available for the players to use.
-     */
+
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext commandBuildContext)
     {
         LiteralArgumentBuilder<CommandSourceStack> commandBuilder = literal("counter")
@@ -42,13 +37,6 @@ public class CounterCommand
         dispatcher.register(commandBuilder);
     }
 
-    /**
-     * A method to prettily display the contents of a counter to the player
-     * @param color The counter colour whose contents we are querying.
-     * @param realtime Whether or not to display it as in-game time or IRL time, which accounts for less than 20TPS which
-     *                would make it slower than IRL
-     */
-
     private static int displayCounter(CommandSourceStack source, DyeColor color, boolean realtime)
     {
         HopperCounter counter = HopperCounter.getCounter(color);
@@ -67,11 +55,6 @@ public class CounterCommand
         return 1;
     }
 
-    /**
-     * A method to reset the counter's timer to 0 and empty its items
-     * 
-     * @param color The counter whose contents we want to reset
-     */
     private static int resetCounter(CommandSourceStack source, DyeColor color)
     {
         HopperCounter.getCounter(color).reset(source.getServer());
@@ -79,11 +62,6 @@ public class CounterCommand
         return 1;
     }
 
-    /**
-     * A method to prettily display all the counters to the player
-     * @param realtime Whether or not to display it as in-game time or IRL time, which accounts for less than 20TPS which
-     *                would make it slower than IRL
-     */
     private static int listAllCounters(CommandSourceStack source, boolean realtime)
     {
         for (Component message: HopperCounter.formatAll(source.getServer(), realtime))

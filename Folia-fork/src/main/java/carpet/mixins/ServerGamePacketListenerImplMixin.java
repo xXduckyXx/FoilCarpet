@@ -19,5 +19,4 @@ public class ServerGamePacketListenerImplMixin
 {
     @Shadow public ServerPlayer player;
 
-
 }

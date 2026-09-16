@@ -145,9 +145,8 @@ public class Operators
             return new NumericValue(accumulator);
         });
 
-        // lazy cause RHS is only conditional
         expression.addLazyBinaryOperator("&&", "and", precedence.get("and&&"), false, true, t -> Context.Type.BOOLEAN, (c, t, lv1, lv2) ->
-        { // todo check how is optimizations going
+        {
             Value v1 = lv1.evalValue(c, Context.BOOLEAN);
             return v1.getBoolean() ? lv2 : ((cc, tt) -> v1);
         }, (c, t, lv) -> {
@@ -180,7 +179,6 @@ public class Operators
             return lv.get(last);
         });
 
-        // lazy cause RHS is only conditional
         expression.addLazyBinaryOperator("||", "or", precedence.get("or||"), false, true, t -> Context.Type.BOOLEAN, (c, t, lv1, lv2) ->
         {
             Value v1 = lv1.evalValue(c, Context.BOOLEAN);
@@ -326,7 +324,7 @@ public class Operators
             {
                 return Value.TRUE;
             }
-            // need to order them so same obejects will be next to each other.
+
             lv.sort(Comparator.comparingInt(Value::hashCode));
             Value prev = lv.get(0);
             for (Value next : lv.subList(1, size))
@@ -340,7 +338,6 @@ public class Operators
             return Value.TRUE;
         });
 
-        // lazy cause of assignment which is non-trivial
         expression.addLazyBinaryOperator("=", "assign", precedence.get("assign=<>"), false, false, t -> Context.Type.LVALUE, (c, t, lv1, lv2) ->
         {
             Value v1 = lv1.evalValue(c, Context.LVALUE);
@@ -393,7 +390,6 @@ public class Operators
             return boundedLHS;
         });
 
-        // lazy due to assignment
         expression.addLazyBinaryOperator("+=", "append", precedence.get("assign=<>"), false, false, t -> Context.Type.LVALUE, (c, t, lv1, lv2) ->
         {
             Value v1 = lv1.evalValue(c, Context.LVALUE);
@@ -515,12 +511,10 @@ public class Operators
 
         expression.addUnaryOperator("+", "identity", false, NumericValue::asNumber);
 
-        // could be non-lazy, but who cares - its a small one.
         expression.addLazyUnaryOperator("!", "not", precedence.get("unary+-!..."), false, true, x -> Context.Type.BOOLEAN, (c, t, lv) ->
                 lv.evalValue(c, Context.BOOLEAN).getBoolean() ? (cc, tt) -> Value.FALSE : (cc, tt) -> Value.TRUE
-        ); // might need context boolean
+        );
 
-        // lazy because of typed evaluation of the argument
         expression.addLazyUnaryOperator("...", "unpack", Operators.precedence.get("unary+-!..."), false, true, t -> t == Context.Type.LOCALIZATION ? Context.NONE : t, (c, t, lv) ->
         {
             if (t == Context.LOCALIZATION)

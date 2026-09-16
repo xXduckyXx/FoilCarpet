@@ -34,12 +34,12 @@ public class SnoopyCommandSource extends CommandSourceStack
     private final String simpleName;
     private final Component name;
     private final MinecraftServer server;
-    // skipping silent since snooper is never silent
+
     private final Entity entity;
     private final CommandResultCallback resultConsumer;
     private final EntityAnchorArgument.Anchor entityAnchor;
     private final Vec2 rotation;
-    // good stuff
+
     private final Component[] error;
     private final List<Component> chatOutput;
     private final CommandSigningContext signingContext;
@@ -50,7 +50,7 @@ public class SnoopyCommandSource extends CommandSourceStack
     {
         super(CommandSource.NULL, original.getPosition(), original.getRotation(), original.getLevel(), Vanilla.MinecraftServer_getRunPermissionLevel(original.getServer()),
                 original.getTextName(), original.getDisplayName(), original.getServer(), original.getEntity()
-                //,false ,(b, i) -> returnValue[0] = OptionalLong.of(i), EntityAnchorArgument.Anchor.FEET, CommandSigningContext.ANONYMOUS, TaskChainer.immediate(original.getServer())
+
         );
         this.output = CommandSource.NULL;
         this.position = original.getPosition();
@@ -86,7 +86,7 @@ public class SnoopyCommandSource extends CommandSourceStack
         this.entity = player;
         this.resultConsumer = (b, i) -> result[0] = i;
         this.entityAnchor = EntityAnchorArgument.Anchor.FEET;
-        this.rotation = player.getRotationVector(); // not a client call really
+        this.rotation = player.getRotationVector();
         this.error = error;
         this.chatOutput = output;
         this.signingContext = CommandSigningContext.ANONYMOUS;
@@ -100,7 +100,7 @@ public class SnoopyCommandSource extends CommandSourceStack
     {
         super(output, pos, rot, world, level,
                 simpleName, name, server, entity
-               // , false, consumer, entityAnchor, context, chainer
+
         );
         this.output = output;
         this.position = pos;
@@ -150,10 +150,6 @@ public class SnoopyCommandSource extends CommandSourceStack
         CommandResultCallback resultConsumer = binaryOperator.apply(this.resultConsumer, consumer);
         return this.withCallback(resultConsumer);
     }
-
-    //@Override // only used in fuctions and we really don't care to track these actually, besides the basic output
-    // also other overrides target ONLY execute command, which withSilent doesn't care bout.
-    //public ServerCommandSource withSilent() { return this; }
 
     @Override
     public CommandSourceStack withPermission(PermissionSet level)

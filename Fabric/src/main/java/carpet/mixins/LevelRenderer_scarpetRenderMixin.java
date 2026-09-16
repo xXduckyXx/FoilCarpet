@@ -50,9 +50,7 @@ public class LevelRenderer_scarpetRenderMixin
     ))
     private void renderStarpetThingsLate(GraphicsResourceAllocator graphicsResourceAllocator, DeltaTracker deltaTracker, boolean bl, Camera camera, Matrix4f matrix4f, Matrix4f arg5, Matrix4f matrix4f3, GpuBufferSlice gpuBufferSlice, Vector4f vector4f, boolean bl2, CallbackInfo ci, @Local FrameGraphBuilder frameGraphBuilder)
     {
-        // in normal circumstances we want to render shapes at the very end so it appears correctly behind stuff.
-        // we might actually not need to play with render hooks here.
-        //if (!FabricAPIHooks.WORLD_RENDER_EVENTS && CarpetClient.shapes != null )
+
         if (CarpetClient.shapes != null)
         {
             final float deltaPartialTick = deltaTracker.getGameTimeDeltaPartialTick(false);

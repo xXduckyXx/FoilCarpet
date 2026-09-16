@@ -71,7 +71,7 @@ public abstract class ThreadedLevelLightEngine_scarpetChunkCreationMixin extends
                     for (int z = -1; z < 17; ++z)
                     {
                         if (x > 0 && x < 16 && z > 0 && z < 16)
-                        {// not really efficient way to do it, but hey, we have bigger problems with this
+                        {
                             continue;
                         }
                         for (int y = minY; y < maxY; ++y)
@@ -88,7 +88,7 @@ public abstract class ThreadedLevelLightEngine_scarpetChunkCreationMixin extends
         return CompletableFuture.runAsync(
             Util.name(() -> {
                     chunk.setLightCorrect(true);
-                    //((ThreadedAnvilChunkStorageInterface) this.chunkMap).releaseRelightTicket(pos);
+
                 },
                 () -> "Release relight ticket " + pos
             ),

@@ -12,7 +12,7 @@ import java.util.Map;
 
 public class ParticleParser
 {
-    private static final Map<String, ParticleOptions> particleCache = new HashMap<>(); // we reset this on reloads, but probably need something better
+    private static final Map<String, ParticleOptions> particleCache = new HashMap<>();
 
     private static ParticleOptions parseParticle(String name, RegistryAccess lookup)
     {

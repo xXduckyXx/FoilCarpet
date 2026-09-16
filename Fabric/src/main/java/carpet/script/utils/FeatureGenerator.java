@@ -177,7 +177,7 @@ public class FeatureGenerator
 
     private static Thing simpleTree(TreeConfiguration config)
     {
-        //config.ignoreFluidCheck();
+
         return simplePlop(new ConfiguredFeature<>(Feature.TREE, config));
     }
 
@@ -193,8 +193,7 @@ public class FeatureGenerator
 
     private static Structure getDefaultFeature(StructureType<?> structure, ServerLevel world, BlockPos pos)
     {
-        // would be nice to have a way to grab structures of this type for position
-        // TODO allow old types, like vaillage, or bastion
+
         Holder<Biome> existingBiome = world.getBiome(pos);
         Structure result = null;
         for (Structure confstr : world.registryAccess().lookupOrThrow(Registries.STRUCTURE).entrySet().stream().
@@ -231,7 +230,6 @@ public class FeatureGenerator
                 findFirst().map(Map.Entry::getValue).orElse(null);
     }
 
-
     public static <T extends FeatureConfiguration> StructureStart shouldStructureStartAt(ServerLevel world, BlockPos pos, Structure structure, boolean computeBox)
     {
         ServerChunkCache chunkSource = world.getChunkSource();
@@ -250,7 +248,7 @@ public class FeatureGenerator
 
         if (!computeBox)
         {
-            //Holder<Biome> genBiome = generator.getBiomeSource().getNoiseBiome(QuartPos.fromBlock(pos.getX()), QuartPos.fromBlock(pos.getY()), QuartPos.fromBlock(pos.getZ()), seed.sampler());
+
             if (structure.findValidGenerationPoint(new Structure.GenerationContext(
                     world.registryAccess(), generator, generator.getBiomeSource(),
                     seed, world.getStructureManager(), world.getSeed(), chunkPos, world, structureBiomes::contains
@@ -301,7 +299,6 @@ public class FeatureGenerator
 
             HolderGetter<StructureTemplatePool> pools = regs.lookupOrThrow(Registries.TEMPLATE_POOL);
             Holder<StructureTemplatePool> empty = pools.getOrThrow(Pools.EMPTY);
-
 
             return spawnCustomStructure(
                     new JigsawStructure(new Structure.StructureSettings(l.registryAccess().lookup(Registries.BIOME).orElseThrow().getOrThrow(BiomeTags.HAS_BASTION_REMNANT),
@@ -411,7 +408,6 @@ public class FeatureGenerator
         });
     }};
 
-
     public static boolean plopAnywhere(Structure structure, ServerLevel world, BlockPos pos, ChunkGenerator generator, boolean wireOnly)
     {
         ThreadLocal<Boolean> checks = Vanilla.skipGenerationChecks(world);
@@ -441,10 +437,9 @@ public class FeatureGenerator
                 });
                 start.placeInChunk(world, world.structureManager(), generator, rand, box, new ChunkPos(j, k));
             }
-            //structurestart.notifyPostProcessAt(new ChunkPos(j, k));
+
             int i = Math.max(box.getXSpan(), box.getZSpan()) / 16 + 1;
 
-            //int i = getRadius();
             for (int k1 = j - i; k1 <= j + i; ++k1)
             {
                 for (int l1 = k - i; l1 <= k + i; ++l1)

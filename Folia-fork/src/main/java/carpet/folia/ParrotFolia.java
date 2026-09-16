@@ -23,19 +23,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import carpet.CarpetSettings;
 
-/**
- * Folia-native implementation of Carpet's {@code persistentParrots} rule.
- *
- * <p>Carpet achieves this with mixins on {@code Player.hurtServer} (disables the damage-driven
- * shoulder removal), {@code ServerPlayer.hurtServer} (per-parrot drop roll of chance damage/15)
- * and {@code ServerPlayer.handleShoulderEntities} (only removes parrots on certain movement
- * conditions). None of those hooks can run on stock Folia, so we observe the parrot respawns that
- * vanilla performs whenever it removes a shoulder parrot and undo the ones Carpet would have kept.
- *
- * <p>Vanilla always spawns the parrot(s) before clearing the shoulder data, and we snapshot every
- * online player's shoulder data at the end of each tick, so a spawned parrot can be matched back
- * to the slot it came from by UUID.
- */
 public final class ParrotFolia implements Listener
 {
     private static final int PRUNE_TICKS = 20;
@@ -65,11 +52,6 @@ public final class ParrotFolia implements Listener
         plugin = owner;
     }
 
-    /**
-     * Called from the plugin's per-tick loop (global scheduler, after region ticking): captures
-     * each player's current shoulder data so the next removal can be matched, and prunes stale
-     * damage records.
-     */
     public static void tick(MinecraftServer server)
     {
         if (server == null || !CarpetSettings.persistentParrots)
@@ -144,7 +126,7 @@ public final class ParrotFolia implements Listener
             }
             if (ownerId == null || plugin == null)
             {
-                return; // natural parrot spawn, not a shoulder respawn
+                return;
             }
             Player bukkitPlayer = Bukkit.getPlayer(ownerId);
             if (bukkitPlayer == null || !bukkitPlayer.isOnline())
@@ -159,14 +141,12 @@ public final class ParrotFolia implements Listener
             boolean keep;
             if (damagePath)
             {
-                // carpet only drops the parrot on damage if not sneaking, then with chance damage/15
+
                 keep = player.isShiftKeyDown() || !(player.getRandom().nextFloat() < dmg.damage / 15.0F);
             }
             else
             {
-                // movement-path removal: carpet keeps the parrots on the shoulders unless the
-                // player is invulnerable and falling hard, in water, flying, sleeping or in
-                // powder snow - in all of which it drops them, just like vanilla
+
                 boolean carpetRemoves = (player.getAbilities().invulnerable && player.fallDistance > 0.5F)
                         || player.isInWater() || player.getAbilities().flying
                         || player.isSleeping() || player.isInPowderSnow;
@@ -174,7 +154,7 @@ public final class ParrotFolia implements Listener
             }
             if (!keep)
             {
-                return; // carpet drops this parrot too: leave vanilla's spawn alone
+                return;
             }
 
             event.setCancelled(true);
@@ -204,7 +184,7 @@ public final class ParrotFolia implements Listener
         {
             try
             {
-                // only restore into an empty slot so we never clobber a freshly re-sat parrot
+
                 if (left)
                 {
                     if (owner.getShoulderEntityLeft().isEmpty())

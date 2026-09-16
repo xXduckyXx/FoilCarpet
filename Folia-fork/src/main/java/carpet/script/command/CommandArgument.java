@@ -120,16 +120,16 @@ public abstract class CommandArgument
     }
 
     private static final List<? extends CommandArgument> baseTypes = Lists.newArrayList(
-            // default
+
             new StringArgument(),
-            // vanilla arguments as per https://minecraft.wiki/w/Argument_types
+
             new VanillaUnconfigurableArgument("bool", BoolArgumentType::bool,
                     (c, p) -> BooleanValue.of(BoolArgumentType.getBool(c, p)), false
             ),
             new FloatArgument(),
             new IntArgument(),
             new WordArgument(), new GreedyStringArgument(),
-            new VanillaUnconfigurableArgument("yaw", AngleArgument::angle,  // angle
+            new VanillaUnconfigurableArgument("yaw", AngleArgument::angle,
                     (c, p) -> new NumericValue(AngleArgument.getAngle(c, p)), true
             ),
             new BlockPosArgument(),
@@ -154,7 +154,7 @@ public abstract class CommandArgument
             new VanillaUnconfigurableArgument("columnpos", ColumnPosArgument::columnPos,
                     (c, p) -> ValueConversions.of(ColumnPosArgument.getColumnPos(c, p)), false
             ),
-            // component  // raw json
+
             new VanillaUnconfigurableArgument("dimension", DimensionArgument::dimension,
                     (c, p) -> ValueConversions.of(DimensionArgument.getDimension(c, p)), false
             ),
@@ -168,7 +168,6 @@ public abstract class CommandArgument
             new VanillaUnconfigurableArgument("floatrange", RangeArgument::floatRange,
                     (c, p) -> ValueConversions.of(c.getArgument(p, MinMaxBounds.Doubles.class)), true
             ),
-            // function??
 
             new PlayerProfileArgument(),
             new VanillaUnconfigurableArgument("intrange", RangeArgument::intRange,
@@ -176,7 +175,6 @@ public abstract class CommandArgument
             ),
             new VanillaUnconfigurableArgument("enchantment", Registries.ENCHANTMENT),
 
-            // item_predicate  ?? //same as item but accepts tags, not sure right now
             new SlotArgument(),
             new VanillaUnconfigurableArgument("item", ItemArgument::item,
                     (c, p) -> ValueConversions.of(ItemArgument.getItem(c, p).createItemStack(1, false), c.getSource().registryAccess()),
@@ -187,7 +185,7 @@ public abstract class CommandArgument
             ),
             new VanillaUnconfigurableArgument("effect", Registries.MOB_EFFECT),
 
-            new TagArgument(), // for nbt_compound_tag and nbt_tag
+            new TagArgument(),
             new VanillaUnconfigurableArgument("path", NbtPathArgument::nbtPath,
                     (c, p) -> StringValue.of(NbtPathArgument.getPath(c, p).toString()), true
             ),
@@ -197,12 +195,10 @@ public abstract class CommandArgument
             new VanillaUnconfigurableArgument("criterion", ObjectiveCriteriaArgument::criteria,
                     (c, p) -> StringValue.of(ObjectiveCriteriaArgument.getCriteria(c, p).getName()), false
             ),
-            // operation // not sure if we need it, you have scarpet for that
+
             new VanillaUnconfigurableArgument("particle", ParticleArgument::particle,
                     (c, p) -> ValueConversions.of(ParticleArgument.getParticle(c, p), c.getSource().registryAccess()), (c, b) -> SharedSuggestionProvider.suggestResource(c.getSource().getServer().registryAccess().lookupOrThrow(Registries.PARTICLE_TYPE).keySet(), b)
             ),
-
-            // resource / identifier section
 
             new VanillaUnconfigurableArgument("recipe", Registries.RECIPE),
             new VanillaUnconfigurableArgument("advancement", Registries.ADVANCEMENT),
@@ -236,10 +232,7 @@ public abstract class CommandArgument
                     (c, p) -> ValueConversions.of(IdentifierArgument.getId(c, p)), (ctx, builder) -> SharedSuggestionProvider.suggestResource(ctx.getSource().getServer().getCommandStorage().keys(), builder)
             ),
 
-            // default
             new CustomIdentifierArgument(),
-
-            // end resource / identifier // I would be great if you guys have suggestions for that.
 
             new VanillaUnconfigurableArgument("rotation",
                     RotationArgument::rotation,
@@ -327,7 +320,6 @@ public abstract class CommandArgument
     protected Function<String, SuggestionProvider<CommandSourceStack>> suggestionProvider;
     protected FunctionArgument customSuggester;
 
-
     protected CommandArgument(
             String suffix,
             @Nullable Collection<String> examples,
@@ -339,7 +331,6 @@ public abstract class CommandArgument
     }
 
     protected abstract ArgumentType<?> getArgumentType(CarpetScriptHost host) throws CommandSyntaxException;
-
 
     public static Value getValue(CommandContext<CommandSourceStack> context, String param, CarpetScriptHost host) throws CommandSyntaxException
     {

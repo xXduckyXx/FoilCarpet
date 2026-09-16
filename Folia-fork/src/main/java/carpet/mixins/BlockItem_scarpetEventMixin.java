@@ -27,7 +27,7 @@ public class BlockItem_scarpetEventMixin
         if (context.getPlayer() instanceof ServerPlayer && PLAYER_PLACES_BLOCK.isNeeded())
             PLAYER_PLACES_BLOCK.onBlockPlaced((ServerPlayer) context.getPlayer(), context.getClickedPos(), context.getHand(), context.getItemInHand());
     }
-    
+
     @Inject(method = "placeBlock", at = @At("HEAD"), cancellable = true)
     private void beforePlacement(BlockPlaceContext context, BlockState placementState, CallbackInfoReturnable<Boolean> cir) {
         if (context.getPlayer() instanceof ServerPlayer && PLAYER_PLACING_BLOCK.isNeeded()) {

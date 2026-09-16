@@ -21,7 +21,7 @@ public abstract class EntityMixin implements EntityInterface
 {
     @Shadow
     public float yRot;
-    
+
     @Shadow
     public float yRotO;
 

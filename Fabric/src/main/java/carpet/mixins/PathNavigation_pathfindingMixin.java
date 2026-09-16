@@ -22,7 +22,6 @@ public abstract class PathNavigation_pathfindingMixin
 
     @Shadow @Final protected Mob mob;
 
-
     @Shadow protected @Nullable abstract Path createPath(Set<BlockPos> set, int i, boolean bl, int j);
 
     @Redirect(method =  "createPath(Lnet/minecraft/core/BlockPos;I)Lnet/minecraft/world/level/pathfinder/Path;", at = @At(
@@ -37,7 +36,7 @@ public abstract class PathNavigation_pathfindingMixin
         Path path = createPath(set_1, int_1, boolean_1, int_2);
         long finish = System.nanoTime();
         float duration = (1.0F*((finish - start)/1000))/1000;
-        set_1.forEach(b -> PathfindingVisualizer.slowPath(mob, Vec3.atBottomCenterOf(b), duration, path != null)); // ground centered position
+        set_1.forEach(b -> PathfindingVisualizer.slowPath(mob, Vec3.atBottomCenterOf(b), duration, path != null));
         return path;
     }
 

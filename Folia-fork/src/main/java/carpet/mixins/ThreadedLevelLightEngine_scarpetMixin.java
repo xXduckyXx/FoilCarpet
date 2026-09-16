@@ -16,11 +16,6 @@ import org.spongepowered.asm.mixin.Shadow;
 @Mixin(ThreadedLevelLightEngine.class)
 public abstract class ThreadedLevelLightEngine_scarpetMixin extends LevelLightEngine implements ServerLightingProviderInterface
 {
-    //@Shadow public abstract void checkBlock(BlockPos pos);
-
-    //@Shadow public abstract void setLightEnabled(final ChunkPos chunkPos, final boolean bl);
-
-    //@Shadow public abstract void propagateLightSources(final ChunkPos chunkPos);
 
     public ThreadedLevelLightEngine_scarpetMixin(LightChunkGetter chunkProvider, boolean hasBlockLight, boolean hasSkyLight)
     {
@@ -30,14 +25,11 @@ public abstract class ThreadedLevelLightEngine_scarpetMixin extends LevelLightEn
     @Override
     public void resetLight(ChunkAccess chunk, ChunkPos pos)
     {
-        //super.setRetainData(pos, false);
-        //super.setLightEnabled(pos, false);
-        //for (int x = chpos.x-1; x <= chpos.x+1; x++ )
-        //    for (int z = chpos.z-1; z <= chpos.z+1; z++ )
+
             {
-                //ChunkPos pos = new ChunkPos(x, z);
+
                 int j;
-                for(j = -1; j < 17; ++j) {                                                                 // skip some recomp
+                for(j = -1; j < 17; ++j) {
                     super.queueSectionData(LightLayer.BLOCK, SectionPos.of(pos, j), new DataLayer());
                     super.queueSectionData(LightLayer.SKY, SectionPos.of(pos, j), new DataLayer());
                 }
@@ -48,14 +40,8 @@ public abstract class ThreadedLevelLightEngine_scarpetMixin extends LevelLightEn
                 setLightEnabled(pos, true);
 
                 propagateLightSources(pos);
-                //    chunk.getLights().forEach((blockPos) -> {
-                //        super.onBlockEmissionIncrease(blockPos, chunk.getLightEmission(blockPos));
-                //    });
 
             }
-
-
-
 
     }
 }

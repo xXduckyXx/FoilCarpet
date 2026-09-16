@@ -55,38 +55,27 @@ public class EntityPlayerMPFake extends ServerPlayer
     public Runnable fixStartingPosition = () -> {};
     public boolean isAShadow;
 
-    // Returns true if it was successful, false if couldn't spawn due to the player not existing in Mojang servers
     public static boolean createFake(String username, MinecraftServer server, Vec3 pos, double yaw, double pitch, ResourceKey<Level> dimensionId, GameType gamemode, boolean flying)
     {
-        //prolly half of that crap is not necessary, but it works
+
         ServerLevel worldIn = server.getLevel(dimensionId);
         server.services().nameToIdCache().resolveOfflineUsers(false);
         GameProfile gameprofile;
 
             UUID uuid = OldUsersConverter.convertMobOwnerIfNecessary(server, username);
-            //NameAndId res = server.services().nameToIdCache().get(username).orElseThrow(); //findByName  .orElse(null)
+
             if (uuid == null && CarpetSettings.allowSpawningOfflinePlayers) {
                 server.services().nameToIdCache().resolveOfflineUsers(server.isDedicatedServer() && server.usesAuthentication());
                 uuid = UUIDUtil.createOfflinePlayerUUID(username);
             }
             if (uuid == null) {
-                return false; // no uuid, no player
+                return false;
             }
             gameprofile = new GameProfile(uuid, username);
 
-
-        //GameProfile finalGP = gameprofile;
-
-        // We need to mark this player as spawning so that we do not
-        // try to spawn another player with the name while the profile
-        // is being fetched - preventing multiple players spawning
         String name = gameprofile.name();
         spawning.add(name);
 
-        // Fetch profile by NAME (not offline UUID) so that Mojang returns the real
-        // UUID and textures (skin) even in offline mode. If the name belongs to a real
-        // account the profile will contain a "textures" property; if not, we fall back
-        // to the local offline profile (no skin).
         GameProfile fetchedProfile = null;
         try
         {
@@ -99,9 +88,7 @@ public class EntityPlayerMPFake extends ServerPlayer
         if (fetchedProfile != null && !fetchedProfile.name().isEmpty()
                 && fetchedProfile.properties().containsKey("textures"))
         {
-            // Successfully resolved a real profile with textures. Use it as-is so the
-            // fake player has the correct UUID and skin (identical to upstream behaviour
-            // on an online-mode server).
+
             finalProfile = fetchedProfile;
         }
         else
@@ -110,7 +97,6 @@ public class EntityPlayerMPFake extends ServerPlayer
         }
         spawning.remove(name);
 
-        // Run the actual spawn on the correct region thread via Folia's region scheduler
         try
         {
             net.minecraft.world.level.ChunkPos cpos = new net.minecraft.world.level.ChunkPos(
@@ -134,33 +120,29 @@ public class EntityPlayerMPFake extends ServerPlayer
     {
         EntityPlayerMPFake instance = new EntityPlayerMPFake(server, worldIn, current, ClientInformation.createDefault(), false);
         instance.fixStartingPosition = () -> instance.snapTo(pos.x, pos.y, pos.z, (float) yaw, (float) pitch);
-        // The PlayerList_fakePlayersMixin.fixStartingPos injection does not apply on Folia
-        // (no mixin host), so position the fake explicitly BEFORE placeNewPlayer adds it to
-        // the level - otherwise it is added at world spawn (0,0,0) and suffocates.
+
         instance.fixStartingPosition.run();
         FakeClientConnection fakeConnection = new FakeClientConnection(PacketFlow.SERVERBOUND);
         CommonListenerCookie cookie = new CommonListenerCookie(current, 0, instance.clientInformation(), false, null, Set.of(), new KeepAlive());
         server.getPlayerList().placeNewPlayer(fakeConnection, instance, cookie);
         ensureFakeHandler(instance, fakeConnection, cookie);
         loadPlayerData(instance);
-        instance.stopRiding(); // otherwise the created fake player will be on the vehicle
+        instance.stopRiding();
         instance.fixStartingPosition.run();
         instance.setHealth(20.0F);
         instance.unsetRemoved();
         instance.getAttribute(Attributes.STEP_HEIGHT).setBaseValue(0.6F);
         instance.gameMode.changeGameModeForPlayer(gamemode);
-        server.getPlayerList().broadcastAll(new ClientboundRotateHeadPacket(instance, (byte) (instance.yHeadRot * 256 / 360)), dimensionId);//instance.dimension);
-        server.getPlayerList().broadcastAll(ClientboundEntityPositionSyncPacket.of(instance), dimensionId);//instance.dimension);
-        //instance.world.getChunkManager(). updatePosition(instance);
-        instance.entityData.set(DATA_PLAYER_MODE_CUSTOMISATION, (byte) 0x7f); // show all model layers (incl. capes)
+        server.getPlayerList().broadcastAll(new ClientboundRotateHeadPacket(instance, (byte) (instance.yHeadRot * 256 / 360)), dimensionId);
+        server.getPlayerList().broadcastAll(ClientboundEntityPositionSyncPacket.of(instance), dimensionId);
+
+        instance.entityData.set(DATA_PLAYER_MODE_CUSTOMISATION, (byte) 0x7f);
         instance.getAbilities().flying = flying;
     }
 
     private static void ensureFakeHandler(EntityPlayerMPFake instance, FakeClientConnection fakeConnection, CommonListenerCookie cookie)
     {
-        // Vanilla's placeNewPlayer always creates a plain ServerGamePacketListenerImpl.
-        // Without the mixin redirect that swaps in NetHandlerPlayServerFake, the idle-kick
-        // timer fires ~15s and the fake is disconnected. Post-swap the handler.
+
         if (!(instance.connection instanceof NetHandlerPlayServerFake))
         {
             instance.connection = new NetHandlerPlayServerFake(instance.level().getServer(), fakeConnection, instance, cookie);
@@ -168,10 +150,7 @@ public class EntityPlayerMPFake extends ServerPlayer
     }
 
     private static CompletableFuture<GameProfile> fetchGameProfileByName(MinecraftServer server, final String name) {
-        // On a server that runs in offline mode the UserNameToIdResolver maps names to
-        // offline UUIDs, so resolving by name never reaches Mojang and never yields a
-        // "textures" property (skin). Query Mojang directly by name to get the real
-        // UUID, then fetch the full profile (with textures) for that UUID.
+
         return CompletableFuture.supplyAsync(() -> {
             try
             {
@@ -211,7 +190,7 @@ public class EntityPlayerMPFake extends ServerPlayer
     public static EntityPlayerMPFake createShadow(MinecraftServer server, ServerPlayer player)
     {
         player.connection.disconnect(Component.translatable("multiplayer.disconnect.duplicate_login"));
-        ServerLevel worldIn = player.level();//.getWorld(player.dimension);
+        ServerLevel worldIn = player.level();
         GameProfile gameprofile = player.getGameProfile();
         EntityPlayerMPFake playerShadow = new EntityPlayerMPFake(server, worldIn, gameprofile, player.clientInformation(), true);
         playerShadow.setChatSession(player.getChatSession());
@@ -225,14 +204,13 @@ public class EntityPlayerMPFake extends ServerPlayer
         playerShadow.connection.teleport(player.getX(), player.getY(), player.getZ(), player.getYRot(), player.getXRot());
         playerShadow.gameMode.changeGameModeForPlayer(player.gameMode.getGameModeForPlayer());
         MixinCompat.player_getActionPack(playerShadow).copyFrom(MixinCompat.player_getActionPack(player));
-        // this might create problems if a player logs back in...
+
         playerShadow.getAttribute(Attributes.STEP_HEIGHT).setBaseValue(0.6F);
         playerShadow.entityData.set(DATA_PLAYER_MODE_CUSTOMISATION, player.getEntityData().get(DATA_PLAYER_MODE_CUSTOMISATION));
 
-
         server.getPlayerList().broadcastAll(new ClientboundRotateHeadPacket(playerShadow, (byte) (player.yHeadRot * 256 / 360)), playerShadow.level().dimension());
         server.getPlayerList().broadcastAll(new ClientboundPlayerInfoUpdatePacket(ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER, playerShadow));
-        //player.world.getChunkManager().updatePosition(playerShadow);
+
         playerShadow.getAbilities().flying = player.getAbilities().flying;
         return playerShadow;
     }
@@ -262,12 +240,7 @@ public class EntityPlayerMPFake extends ServerPlayer
     @Override
     protected void markHurt()
     {
-        // Vanilla Player.causeExtraKnockback -> if (target.hurtMarked) { ...; target.setDeltaMovement(preHurtVec); }
-        // Real players get their knockback from the client rendering the motion packet, so the server-side
-        // velocity reset is harmless. Fake players are clientless - their deltaMovement IS the knockback, so
-        // that reset would erase it. Carpet's Player_fakePlayersMixin makes hurtMarked read false for fakes
-        // to skip the block; mixins don't apply here, so never set the flag on fakes instead.
-        // (hurtMarked has no other consumers.)
+
     }
 
     @Override
@@ -280,9 +253,6 @@ public class EntityPlayerMPFake extends ServerPlayer
     {
         shakeOff();
 
-        // PlayerList.remove ticks the player while removing it, which on Folia must happen on the
-        // player's own region thread. Commands are dispatched from the command/global thread, so
-        // route the disconnect onto the region scheduler unless we are already on the right thread.
         if (ca.spottedleaf.moonrise.common.util.TickThread.isTickThreadFor(this.level(), this.blockPosition()))
         {
             this.connection.onDisconnect(new DisconnectionDetails(reason));
@@ -312,17 +282,14 @@ public class EntityPlayerMPFake extends ServerPlayer
         }
         catch (Throwable ignored)
         {
-            // Paper/Folia porting can cause various exceptions during fake player
-            // tick (NPE, ConcurrentModificationException in InsideBlockEffectApplier,
-            // etc.) that do not indicate a fatal problem. Swallow them so the
-            // server does not crash while ticking a bot.
+
         }
     }
 
     @Override
     public boolean startRiding(Entity entityToRide, boolean force, boolean sendEventAndTriggers) {
         if (super.startRiding(entityToRide, force, sendEventAndTriggers)) {
-            // from ClientPacketListener.handleSetEntityPassengersPacket
+
             if (entityToRide instanceof AbstractBoat) {
                 this.yRotO = entityToRide.getYRot();
                 this.setYRot(entityToRide.getYRot());
@@ -378,8 +345,6 @@ public class EntityPlayerMPFake extends ServerPlayer
             connection.handleClientCommand(p);
         }
 
-        // If above branch was taken, *this* has been removed and replaced, the new instance has been set
-        // on 'our' connection (which is now theirs, but we still have a ref).
         if (connection.player.isChangingDimension()) {
             connection.player.hasChangedDimension();
         }

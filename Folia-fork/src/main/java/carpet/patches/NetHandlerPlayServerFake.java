@@ -21,8 +21,7 @@ public class NetHandlerPlayServerFake extends ServerGamePacketListenerImpl
     @Override
     public void tick()
     {
-        // Skip the keep-alive / idling timeout entirely — FakeClientConnection.send() is a no-op
-        // so the client can never respond, and we do not want the fake player auto-killed.
+
     }
 
     @Override

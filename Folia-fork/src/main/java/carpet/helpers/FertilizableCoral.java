@@ -23,13 +23,8 @@ import net.minecraft.world.level.levelgen.feature.CoralTreeFeature;
 import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
 import net.minecraft.world.level.material.MapColor;
 
-/**
- * Deduplicates logic for the different behaviors of the {@code renewableCoral} rule
- */
 public interface FertilizableCoral extends BonemealableBlock {
-    /**
-     * @return Whether the rule for this behavior is enabled
-     */
+
     boolean isEnabled();
 
     @Override

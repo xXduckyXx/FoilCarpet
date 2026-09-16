@@ -132,7 +132,7 @@ public class FileArgument
         }
         String origtype = lv.get(1).getString().toLowerCase(Locale.ROOT);
         boolean shared = origtype.startsWith("shared_");
-        String typeString = shared ? origtype.substring(7) : origtype; //len(shared_)
+        String typeString = shared ? origtype.substring(7) : origtype;
         Type type = Type.of.get(typeString);
         if (type == null)
         {
@@ -170,7 +170,7 @@ public class FileArgument
             {
                 token = token.substring(0, token.length() - 4);
             }
-            token = (type == Type.ANY && i == pathElements.length - 1) ? // sloppy really, but should work
+            token = (type == Type.ANY && i == pathElements.length - 1) ?
                     token.replaceAll("[^A-Za-z0-9\\-+_.]", "") :
                     token.replaceAll("[^A-Za-z0-9\\-+_]", "");
             if (token.isEmpty())
@@ -225,7 +225,7 @@ public class FileArgument
                 zipPath = resolve(getDescriptor(module, zipContainer));
                 if (!Files.exists(zipPath) && reason != Reason.CREATE)
                 {
-                    return null; // no zip file
+                    return null;
                 }
                 try
                 {
@@ -264,13 +264,12 @@ public class FileArgument
         {
             return res.isEmpty() ? "shared" : "shared/" + res;
         }
-        if (module != null) // appdata
+        if (module != null)
         {
             return module.name() + ".data" + (res == null || res.isEmpty() ? "" : "/" + res);
         }
         throw new InternalExpressionException("Invalid file descriptor: " + res);
     }
-
 
     public boolean findPathAndApply(Module module, Consumer<Path> action)
     {
@@ -278,7 +277,7 @@ public class FileArgument
         {
             synchronized (writeIOSync)
             {
-                Path dataFile = toPath(module);//, resourceName, supportedTypes.get(type), isShared);
+                Path dataFile = toPath(module);
                 if (dataFile == null)
                 {
                     return false;
@@ -334,7 +333,7 @@ public class FileArgument
                     return null;
                 }
                 String zipComponent = (zipContainer != null) ? rootPath.relativize(zipPath).toString() : null;
-                // need to evaluate the stream before exiting try-with-resources else there'll be no data to stream
+
                 strings = (zipContainer == null)
                         ? result.map(p -> rootPath.relativize(p).toString().replaceAll("[\\\\/]+", "/")).toList().stream()
                         : result.map(p -> (zipComponent + '/' + p.toString()).replaceAll("[\\\\/]+", "/")).toList().stream();
@@ -344,7 +343,7 @@ public class FileArgument
         {
             close();
         }
-        // java 8 paths are inconsistent. in java 16 they all should not have trailing slashes
+
         return type == Type.FOLDER
                 ? strings.map(s -> s.endsWith("/") ? s.substring(0, s.length() - 1) : s)
                 : strings.map(FilenameUtils::removeExtension);
@@ -408,7 +407,7 @@ public class FileArgument
     }
 
     @Nullable
-    public Tag getNbtData(Module module) // aka getData
+    public Tag getNbtData(Module module)
     {
         try
         {
@@ -428,8 +427,6 @@ public class FileArgument
         }
     }
 
-    //copied private method from net.minecraft.nbt.NbtIo.read()
-    // to read non-compound tags - these won't be compressed
     @Nullable
     public static Tag readTag(Path path)
     {
@@ -439,7 +436,7 @@ public class FileArgument
         }
         catch (IOException e)
         {
-            // Copy of NbtIo.read(File) because that's now client-side only
+
             if (!Files.exists(path))
             {
                 return null;
@@ -450,7 +447,7 @@ public class FileArgument
             }
             catch (IOException ioException)
             {
-                // not compressed compound tag neither uncompressed compound tag - trying any type of a tag
+
                 try (DataInputStream dataInputStream = new DataInputStream(new BufferedInputStream(Files.newInputStream(path))))
                 {
                     byte b = dataInputStream.readByte();
@@ -479,7 +476,7 @@ public class FileArgument
         }
     }
 
-    public boolean saveNbtData(Module module, Tag tag) // aka saveData
+    public boolean saveNbtData(Module module, Tag tag)
     {
         try
         {
@@ -500,7 +497,6 @@ public class FileArgument
         }
     }
 
-    //copied private method from net.minecraft.nbt.NbtIo.write() and client method safe_write
     public static boolean writeTagDisk(Tag tag, Path path, boolean zipped)
     {
         Path original = path;

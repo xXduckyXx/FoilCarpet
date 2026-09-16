@@ -125,7 +125,7 @@ public class Colors
             entry(MapColor.LAPIS      , "lapis"     ),
             entry(MapColor.EMERALD    , "emerald"   ),
             entry(MapColor.PODZOL     , "obsidian"  ),
-            entry(MapColor.NETHER     , "netherrack"), //TODO fix these
+            entry(MapColor.NETHER     , "netherrack"),
             entry(MapColor.TERRACOTTA_WHITE      , "white_terracotta"      ),
             entry(MapColor.TERRACOTTA_ORANGE    , "orange_terracotta"     ),
             entry(MapColor.TERRACOTTA_MAGENTA   , "magenta_terracotta"    ),

@@ -61,7 +61,6 @@ public class NumericValue extends Value
         return new NumericValue(value.doubleValue());
     }
 
-
     @Override
     public String getString()
     {
@@ -81,9 +80,9 @@ public class NumericValue extends Value
             }
             if (abs(value) < epsilon)
             {
-                return (signum(value) < 0) ? "-0" : "0"; //zero rounding fails with big decimals
+                return (signum(value) < 0) ? "-0" : "0";
             }
-            // dobules have 16 point precision, 12 is plenty to display
+
             return BigDecimal.valueOf(value).round(displayRounding).stripTrailingZeros().toPlainString();
         }
         catch (NumberFormatException exc)
@@ -129,7 +128,7 @@ public class NumericValue extends Value
 
     @Override
     public Value add(Value v)
-    {  // TODO test if definintn add(NumericVlaue) woud solve the casting
+    {
         if (v instanceof NumericValue nv)
         {
             return longValue != null && nv.longValue != null ? new NumericValue(longValue + nv.longValue) : new NumericValue(value + nv.value);
@@ -139,7 +138,7 @@ public class NumericValue extends Value
 
     @Override
     public Value subtract(Value v)
-    {  // TODO test if definintn add(NumericVlaue) woud solve the casting
+    {
         if (v instanceof NumericValue nv)
         {
             return longValue != null && nv.longValue != null ? new NumericValue(longValue - nv.longValue) : new NumericValue(value - nv.value);
@@ -269,10 +268,9 @@ public class NumericValue extends Value
     @Override
     public int hashCode()
     {
-        // is sufficiently close to the integer value
+
         return longValue != null || Math.abs(Math.floor(value + 0.5D) - value) < epsilon ? Long.hashCode(getLong()) : Double.hashCode(value);
     }
-
 
     public int getInt()
     {

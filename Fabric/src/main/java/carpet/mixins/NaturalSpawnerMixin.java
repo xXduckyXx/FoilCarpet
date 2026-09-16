@@ -53,10 +53,7 @@ public class NaturalSpawnerMixin
     ))
     private static boolean doesNotCollide(ServerLevel world, AABB bb)
     {
-        //.doesNotCollide is VERY expensive. On the other side - most worlds are not made of trapdoors in
-        // various configurations, but solid and 'passable' blocks, like air, water grass, etc.
-        // checking if in the BB of the entity are only passable blocks is very cheap and covers most cases
-        // in case something more complex happens - we default to full block collision check
+
         if (!CarpetSettings.lagFreeSpawning)
         {
             return world.noCollision(bb);
@@ -66,7 +63,7 @@ public class NaturalSpawnerMixin
         int minZ = Mth.floor(bb.minZ);
         int maxY = Mth.ceil(bb.maxY)-1;
         BlockPos.MutableBlockPos blockpos = new BlockPos.MutableBlockPos();
-        if (bb.getXsize() <= 1) // small mobs
+        if (bb.getXsize() <= 1)
         {
             for (int y=minY; y <= maxY; y++)
             {
@@ -86,7 +83,7 @@ public class NaturalSpawnerMixin
             }
             return true;
         }
-        // this code is only applied for mobs larger than 1 block in footprint
+
         int maxX = Mth.ceil(bb.maxX)-1;
         int maxZ = Mth.ceil(bb.maxZ)-1;
         for (int y = minY; y <= maxY; y++)
@@ -108,8 +105,7 @@ public class NaturalSpawnerMixin
                     }
                 }
         int min_below = minY - 1;
-        // we need to check blocks below for extended hitbox and in that case call
-        // only applies to 'large mobs', slimes, spiders, magmacubes, ghasts, etc.
+
         for (int x = minX; x <= maxX; x++)
         {
             for (int z = minZ; z <= maxZ; z++)
@@ -141,7 +137,7 @@ public class NaturalSpawnerMixin
         {
             Map<EntityType<?>, Entity> precookedMobs = ((LevelInterface)world_1).getPrecookedMobs();
             if (precookedMobs.containsKey(entityType))
-                //this mob has been <init>'s but not used yet
+
                 return precookedMobs.get(entityType);
             Entity e = entityType.create(world_1, entitySpawnReason);
             precookedMobs.put(entityType, e);
@@ -158,20 +154,20 @@ public class NaturalSpawnerMixin
                                     MobCategory group, ServerLevel world2, ChunkAccess chunk, BlockPos pos, NaturalSpawner.SpawnPredicate checker, NaturalSpawner.AfterSpawnCallback runner)
     {
         if (CarpetSettings.lagFreeSpawning)
-            // we used the mob - next time we will create a new one when needed
+
             ((LevelInterface) world).getPrecookedMobs().remove(entity_1.getType());
 
         if (SpawnReporter.trackingSpawns() && SpawnReporter.local_spawns != null)
         {
             SpawnReporter.registerSpawn(
-                    //world.method_27983(), // getDimensionType //dimension.getType(), // getDimensionType
+
                     (Mob) entity_1,
-                    group, //entity_1.getType().getSpawnGroup(),
+                    group,
                     entity_1.blockPosition());
         }
         if (!SpawnReporter.mockSpawns)
             world.addFreshEntityWithPassengers(entity_1);
-            //world.spawnEntity(entity_1);
+
     }
 
     @Redirect(method = "spawnCategoryForPosition(Lnet/minecraft/world/entity/MobCategory;Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/level/chunk/ChunkAccess;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/NaturalSpawner$SpawnPredicate;Lnet/minecraft/world/level/NaturalSpawner$AfterSpawnCallback;)V", at = @At(
@@ -180,7 +176,7 @@ public class NaturalSpawnerMixin
     ))
     private static SpawnGroupData spawnEntity(Mob mobEntity, ServerLevelAccessor serverWorldAccess, DifficultyInstance difficulty, EntitySpawnReason spawnReason, SpawnGroupData entityData)
     {
-        if (!SpawnReporter.mockSpawns) // WorldAccess
+        if (!SpawnReporter.mockSpawns)
             return mobEntity.finalizeSpawn(serverWorldAccess, difficulty, spawnReason, entityData);
         return null;
     }
@@ -198,15 +194,11 @@ public class NaturalSpawnerMixin
         return distanceTo;
     }
 
-
-
-    ////
-
     @Redirect(method = "spawnForChunk", at = @At(
             value = "INVOKE",
             target = "Lnet/minecraft/world/level/NaturalSpawner;spawnCategoryForChunk(Lnet/minecraft/world/entity/MobCategory;Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/level/chunk/LevelChunk;Lnet/minecraft/world/level/NaturalSpawner$SpawnPredicate;Lnet/minecraft/world/level/NaturalSpawner$AfterSpawnCallback;)V"
     ))
-    // inject our repeat of spawns if more spawn ticks per tick are chosen.
+
     private static void spawnMultipleTimes(MobCategory category, ServerLevel world, LevelChunk chunk, NaturalSpawner.SpawnPredicate checker, NaturalSpawner.AfterSpawnCallback runner)
     {
         for (int i = 0; i < SpawnReporter.spawn_tries.get(category); i++)
@@ -215,61 +207,8 @@ public class NaturalSpawnerMixin
         }
     }
 
-    // shrug - why no inject, no idea. need to inject twice more. Will check with the names next week
-/*
-    @Redirect(method = "spawn", at = @At(
-            value = "INVOKE",
-            target = "Lnet/minecraft/world/SpawnHelper$Info;isBelowCap(Lnet/minecraft/entity/SpawnGroup;)Z"
-    ))
-    // allows to change mobcaps and captures each category try per dimension before it fails due to full mobcaps.
-    private static boolean changeMobcaps(
-            SpawnHelper.Info info, SpawnGroup entityCategory,
-            ServerWorld serverWorld, WorldChunk chunk, SpawnHelper.Info info_outer, boolean spawnAnimals, boolean spawnMonsters, boolean shouldSpawnAnimals
-    )
-    {
-        DimensionType dim = serverWorld.dimension.getType();
-        int newCap = (int) ((double)entityCategory.getSpawnCap()*(Math.pow(2.0,(SpawnReporter.mobcap_exponent/4))));
-        if (SpawnReporter.track_spawns > 0L)
-        {
-            int int_2 = SpawnReporter.chunkCounts.get(dim); // eligible chunks for spawning
-            int int_3 = newCap * int_2 / CHUNK_AREA; //current spawning limits
-            int mobCount = info.getCategoryToCount().getInt(entityCategory);
-
-            if (SpawnReporter.track_spawns > 0L && !SpawnReporter.first_chunk_marker.contains(entityCategory))
-            {
-                SpawnReporter.first_chunk_marker.add(entityCategory);
-                //first chunk with spawn eligibility for that category
-                Pair key = Pair.of(dim, entityCategory);
-
-
-                int spawnTries = SpawnReporter.spawn_tries.get(entityCategory);
-
-                SpawnReporter.spawn_attempts.put(key,
-                        SpawnReporter.spawn_attempts.get(key) + spawnTries);
-
-                SpawnReporter.spawn_cap_count.put(key,
-                        SpawnReporter.spawn_cap_count.get(key) + mobCount);
-            }
-
-            if (mobCount <= int_3 || SpawnReporter.mock_spawns)
-            {
-                //place 0 to indicate there were spawn attempts for a category
-                //if (entityCategory != EntityCategory.CREATURE || world.getServer().getTicks() % 400 == 0)
-                // this will only be called once every 400 ticks anyways
-                SpawnReporter.local_spawns.putIfAbsent(entityCategory, 0L);
-
-                //else
-                //full mobcaps - and key in local_spawns will be missing
-            }
-        }
-        return SpawnReporter.mock_spawns || info.getCategoryToCount().getInt(entityCategory) < newCap;
-    }
-
-*/
-    //temporary mixin until naming gets fixed
-
     @Inject(method = "spawnForChunk", at = @At("HEAD"))
-    // allows to change mobcaps and captures each category try per dimension before it fails due to full mobcaps.
+
     private static void checkSpawns(ServerLevel world, LevelChunk chunk, NaturalSpawner.SpawnState info,
                                     List<MobCategory> list, CallbackInfo ci)
     {
@@ -278,16 +217,16 @@ public class NaturalSpawnerMixin
             for (MobCategory entityCategory: list)
             {
 
-                    ResourceKey<Level> dim = world.dimension(); // getDimensionType;
-                    int newCap = entityCategory.getMaxInstancesPerChunk();  //(int) ((double)entityCategory.getCapacity()*(Math.pow(2.0,(SpawnReporter.mobcap_exponent/4))));
-                    int int_2 = SpawnReporter.chunkCounts.get(dim); // eligible chunks for spawning
-                    int int_3 = newCap * int_2 / MAGIC_NUMBER; //current spawning limits
+                    ResourceKey<Level> dim = world.dimension();
+                    int newCap = entityCategory.getMaxInstancesPerChunk();
+                    int int_2 = SpawnReporter.chunkCounts.get(dim);
+                    int int_3 = newCap * int_2 / MAGIC_NUMBER;
                     int mobCount = info.getMobCategoryCounts().getInt(entityCategory);
 
                     if (SpawnReporter.trackingSpawns() && !SpawnReporter.first_chunk_marker.contains(entityCategory))
                     {
                         SpawnReporter.first_chunk_marker.add(entityCategory);
-                        //first chunk with spawn eligibility for that category
+
                         Pair<ResourceKey<Level>, MobCategory> key = Pair.of(dim, entityCategory);
 
                         int spawnTries = SpawnReporter.spawn_tries.get(entityCategory);
@@ -297,15 +236,11 @@ public class NaturalSpawnerMixin
                         SpawnReporter.spawn_cap_count.addTo(key, mobCount);
                     }
 
-                    if (mobCount <= int_3 || SpawnReporter.mockSpawns) //TODO this will not float with player based mobcaps
+                    if (mobCount <= int_3 || SpawnReporter.mockSpawns)
                     {
-                        //place 0 to indicate there were spawn attempts for a category
-                        //if (entityCategory != EntityCategory.CREATURE || world.getServer().getTicks() % 400 == 0)
-                        // this will only be called once every 400 ticks anyways
+
                         SpawnReporter.local_spawns.putIfAbsent(entityCategory, 0L);
 
-                        //else
-                        //full mobcaps - and key in local_spawns will be missing
                     }
             }
         }

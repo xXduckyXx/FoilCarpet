@@ -2,14 +2,10 @@ package carpet.settings;
 
 import carpet.CarpetSettings;
 
-/**
- * @deprecated Use {@link carpet.api.settings.Rule.Condition} instead
- *
- */
 @Deprecated(forRemoval = true)
 public interface Condition extends carpet.api.settings.Rule.Condition {
     boolean isTrue();
-    
+
     @Override
     default boolean shouldRegister() {
         CarpetSettings.LOG.warn("""

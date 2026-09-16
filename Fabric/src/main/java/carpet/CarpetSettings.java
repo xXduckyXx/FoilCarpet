@@ -49,7 +49,7 @@ import static carpet.api.settings.RuleCategory.DISPENSER;
 import static carpet.api.settings.RuleCategory.SCARPET;
 import static carpet.api.settings.RuleCategory.CLIENT;
 
-@SuppressWarnings({"CanBeFinal", "removal"}) // removal should be removed after migrating rules to the new system
+@SuppressWarnings({"CanBeFinal", "removal"})
 public class CarpetSettings
 {
     public static final String carpetVersion = FabricLoader.getInstance().getModContainer("carpet").orElseThrow().getMetadata().getVersion().toString();
@@ -78,58 +78,10 @@ public class CarpetSettings
             desc = "Sets the language for Carpet",
             category = FEATURE,
             options = {"en_us", "fr_fr", "es_ar","pt_br", "zh_cn", "zh_tw"},
-            strict = true, // the current system doesn't handle fallbacks and other, not defined languages would make unreadable mess. Change later
+            strict = true,
             validate = LanguageValidator.class
     )
     public static String language = "en_us";
-
-    /*
-    These will be turned when events can be added / removed in code
-    Then also gotta remember to remove relevant rules
-
-    @Rule(
-            desc = "Turns on internal camera path tracing app",
-            extra = "Controlled via 'camera' command",
-            category = {COMMAND, SCARPET},
-            appSource = "camera"
-    )
-    public static boolean commandCamera = true;
-
-    @Rule(
-            desc = "Allows to add extra graphical debug information",
-            extra = "Controlled via 'overlay' command",
-            category = {COMMAND, SCARPET},
-            appSource = "overlay"
-    )
-    public static boolean commandOverlay = true;
-
-    @Rule(
-            desc = "Turns on extra information about mobs above and around them",
-            extra = "Controlled via 'ai_tracker' command",
-            category = {COMMAND, SCARPET},
-            appSource = "ai_tracker"
-    )
-    public static boolean commandAITracker = true;
-
-    @Rule(
-        desc = "Enables /draw commands",
-        extra = {
-            "... allows for drawing simple shapes or",
-            "other shapes which are sorta difficult to do normally"
-        },
-        appSource = "draw",
-        category = {FEATURE, SCARPET, COMMAND}
-    )
-    public static String commandDraw = "true";
-
-    @Rule(
-        desc = "Enables /distance command to measure in game distance between points",
-        extra = "Also enables brown carpet placement action if 'carpets' rule is turned on as well",
-        appSource = "distance",
-        category = {FEATURE, SCARPET, COMMAND}
-    )
-    public static String commandDistance = "true";
-    */
 
     private static class CarpetPermissionLevel extends Validator<String> {
         @Override public String validate(CommandSourceStack source, CarpetRule<String> currentRule, String newValue, String string) {
@@ -152,33 +104,16 @@ public class CarpetSettings
     )
     public static String carpetCommandPermissionLevel = "ops";
 
-
     @Rule(desc = "Gbhs sgnf sadsgras fhskdpri!!!", category = EXPERIMENTAL)
     public static boolean superSecretSetting = false;
 
     @Rule(desc = "Parrots don't get of your shoulders until you receive proper damage", category = {SURVIVAL, FEATURE})
     public static boolean persistentParrots = false;
 
-    /*@Rule(
-            desc = "Mobs growing up won't glitch into walls or go through fences",
-            category = BUGFIX,
-            validate = Validator.WIP.class
-    )
-    public static boolean growingUpWallJump = false;
-
-    @Rule(
-            desc = "Won't let mobs glitch into blocks when reloaded.",
-            extra = "Can cause slight differences in mobs behaviour",
-            category = {BUGFIX, EXPERIMENTAL},
-            validate = Validator.WIP.class
-    )
-    public static boolean reloadSuffocationFix = false;
-    */
-
     @Rule( desc = "Players absorb XP instantly, without delay", category = CREATIVE )
     public static boolean xpNoCooldown = false;
 
-    public static class StackableShulkerBoxValidator extends Validator<String> 
+    public static class StackableShulkerBoxValidator extends Validator<String>
     {
         @Override
         public String validate(CommandSourceStack source, CarpetRule<String> currentRule, String newValue, String string)
@@ -217,7 +152,7 @@ public class CarpetSettings
             category = {SURVIVAL, FEATURE}
     )
     public static String stackableShulkerBoxes = "false";
-    public static int shulkerBoxStackSize = 1; // Referenced from Carpet extra
+    public static int shulkerBoxStackSize = 1;
 
     @Rule( desc = "Explosions won't destroy blocks", category = {CREATIVE, TNT} )
     public static boolean explosionNoBlockDamage = false;
@@ -449,7 +384,6 @@ public class CarpetSettings
     }
     public static PermissionCheck perfPermissionCheck = Commands.LEVEL_OWNERS;
 
-
     @Rule(desc = "Enables /log command to monitor events via chat and overlays", category = COMMAND)
     public static String commandLog = "true";
 
@@ -489,7 +423,6 @@ public class CarpetSettings
     @Rule(desc = "Enables /draw commands", extra = {"... allows for drawing simple shapes or","other shapes which are sorta difficult to do normally"}, category = COMMAND)
     public static String commandDraw = "ops";
 
-
     @Rule(
             desc = "Enables /script command",
             extra = "An in-game scripting API for Scarpet programming language",
@@ -505,7 +438,7 @@ public class CarpetSettings
                     case "2", "true", "ops" -> Commands.LEVEL_GAMEMASTERS;
                     case "3" -> Commands.LEVEL_ADMINS;
                     case "4" -> Commands.LEVEL_OWNERS;
-                    default -> throw new IllegalArgumentException(); // already checked by previous validator
+                    default -> throw new IllegalArgumentException();
             	};
             if (source != null && !permissionLevel.check(source.permissions()))
                 return null;
@@ -556,8 +489,7 @@ public class CarpetSettings
         @Override
         public String validate(CommandSourceStack source, CarpetRule<String> currentRule, String newValue, String stringInput) {
             if (newValue.equals(currentRule.value())) {
-                // Don't refresh the local repo if it's the same (world change), helps preventing hitting rate limits from github when
-                // getting suggestions. Pending is a way to invalidate the cache when it gets old, and investigating api usage further
+
                 return newValue;
             }
             if (newValue.equals("none")) {
@@ -591,7 +523,6 @@ public class CarpetSettings
     )
     public static String scriptsAppStore = "gnembon/scarpet/contents/programs";
 
-
     @Rule(desc = "Enables /player command to control/spawn players", category = COMMAND)
     public static String commandPlayer = "ops";
 
@@ -621,7 +552,6 @@ public class CarpetSettings
 
     @Rule(desc = "Disables breaking of blocks caused by flowing liquids", category = CREATIVE)
     public static boolean liquidDamageDisabled = false;
-
 
     @Rule(
             desc = "smooth client animations with low tps settings",
@@ -692,15 +622,6 @@ public class CarpetSettings
             validate = Validators.NonNegativeNumber.class
     )
     public static int pingPlayerListLimit = 12;
-    /*
-
-    @Rule(
-            desc = "fixes water performance issues",
-            category = OPTIMIZATION,
-            validate = Validator.WIP.class
-    )
-    public static boolean waterFlow = true;
-    */
 
     @Rule(
             desc = "Sets a different motd message on client trying to connect to the server",
@@ -860,10 +781,9 @@ public class CarpetSettings
     public static boolean creativeNoClip = false;
     public static boolean isCreativeFlying(Entity entity)
     {
-        // #todo replace after merger to 1.17
+
         return CarpetSettings.creativeNoClip && entity instanceof Player && (((Player) entity).isCreative()) && ((Player) entity).getAbilities().flying;
     }
-
 
     @Rule(
             desc = "Creative flying speed multiplier",
@@ -934,7 +854,7 @@ public class CarpetSettings
 
         @Override
         public String validate(CommandSourceStack source, CarpetRule<String> currentRule, String newValue, String string) {
-            if (source == null) return newValue; // closing or sync
+            if (source == null) return newValue;
             Optional<Block> ignoredBlock = source.registryAccess().lookupOrThrow(Registries.BLOCK).getOptional(Identifier.tryParse(newValue));
             if (!ignoredBlock.isPresent()) {
                 Messenger.m(source, "r Unknown block '" + newValue + "'.");
@@ -1012,7 +932,6 @@ public class CarpetSettings
         FALSE, RANDOM, ALL;
     }
 
-    // refers to "[MC-215169](https://bugs.mojang.com/browse/MC-215169)." - unconfirmed yet that its a java bug
     @Rule(
             desc = "Allows to grow nether fungi with 3x3 base with bonemeal",
             extra = {"Setting to 'all' will make all nether fungi grow into 3x3 trees", "Setting to 'random' will make 6% of all nether fungi grow into 3x3 trees", "(this being consistent with worldgen)"},

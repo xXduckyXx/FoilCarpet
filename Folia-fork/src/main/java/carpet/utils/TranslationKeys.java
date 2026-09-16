@@ -1,17 +1,13 @@
 package carpet.utils;
 
-/**
- * This is not public API!
- */
 public final class TranslationKeys {
     public static final String BASE_RULE_NAMESPACE = "%s.rule.";
-    public static final String BASE_RULE_PATTERN   = BASE_RULE_NAMESPACE + "%s."; // [settingsManager].rule.[name]
+    public static final String BASE_RULE_PATTERN   = BASE_RULE_NAMESPACE + "%s.";
     public static final String RULE_NAME_PATTERN   = BASE_RULE_PATTERN + "name";
     public static final String RULE_DESC_PATTERN   = BASE_RULE_PATTERN + "desc";
     public static final String RULE_EXTRA_PREFIX_PATTERN = BASE_RULE_PATTERN + "extra.";
-    public static final String CATEGORY_PATTERN    = "%s.category.%s"; //[settingsManager].category.[name]
-    
-    // Settings command
+    public static final String CATEGORY_PATTERN    = "%s.category.%s";
+
     private static final String SETTINGS_BASE           = "carpet.settings.command.";
     public static final String BROWSE_CATEGORIES        = SETTINGS_BASE + "browse_categories";
     public static final String VERSION                  = SETTINGS_BASE + "version";

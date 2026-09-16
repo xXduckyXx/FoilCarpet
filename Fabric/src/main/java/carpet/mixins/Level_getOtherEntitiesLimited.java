@@ -24,7 +24,7 @@ public abstract class Level_getOtherEntitiesLimited implements LevelInterface {
 
     @Override
     public List<Entity> getOtherEntitiesLimited(@Nullable Entity except, AABB box, Predicate<? super Entity> predicate, int limit) {
-        Profiler.get().incrementCounter("getEntities"); // visit
+        Profiler.get().incrementCounter("getEntities");
         AtomicInteger checkedEntities = new AtomicInteger();
         List<Entity> list = Lists.newArrayList();
         try {
@@ -49,7 +49,7 @@ public abstract class Level_getOtherEntitiesLimited implements LevelInterface {
             });
         } catch (RuntimeException e) {
             if (e != CONTROL_FLOW_EXCEPTION)
-                // If it wasn't the exception we were watching, rethrow it
+
                 throw e;
         }
         return list;

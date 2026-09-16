@@ -69,12 +69,12 @@ public class InfoCommand
     private static int infoBlock(CommandSourceStack source, BlockPos pos, String grep)
     {
         if (!Commands.LEVEL_GAMEMASTERS.check(source.permissions())) {
-            //check id pos is loaded
+
             if (!source.getLevel().hasChunkAt(pos)) {
                 Messenger.m(source, "r Chunk is not loaded");
                 return 0;
             }
-            // verify it is in world bounds
+
             if (!source.getLevel().isInWorldBounds(pos)) {
                 Messenger.m(source, "r Position is outside of world bounds");
                 return 0;

@@ -18,9 +18,7 @@ public interface CustomPacketPayload_networkStuffMixin
     @Inject(method = "codec(Lnet/minecraft/network/protocol/common/custom/CustomPacketPayload$FallbackProvider;Ljava/util/List;)Lnet/minecraft/network/codec/StreamCodec;", at = @At("HEAD"), cancellable = true)
     private static <B extends FriendlyByteBuf> void onCodec(final CustomPacketPayload.FallbackProvider<B> fallbackProvider, final List<CustomPacketPayload.TypeAndCodec<? super B, ?>> list, final CallbackInfoReturnable<StreamCodec<B, CustomPacketPayload>> cir)
     {
-        // this is stupid hack to make sure carpet payloads are always registered
-        // that might collide with other mods that do the same thing
-        // so we may need to adjust this in the future
+
         if (!(list instanceof CarpetTaintedList))
         {
             List<CustomPacketPayload.TypeAndCodec<? super B, ?>> extendedList = new CarpetTaintedList<>(list);

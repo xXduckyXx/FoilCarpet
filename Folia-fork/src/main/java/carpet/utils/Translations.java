@@ -22,7 +22,7 @@ public class Translations
     {
         return translationMap.getOrDefault(key, key);
     }
-    
+
     public static String trOrNull(String key)
     {
         return translationMap.get(key);
@@ -47,7 +47,7 @@ public class Translations
     {
         InputStream langFile = Translations.class.getClassLoader().getResourceAsStream(path);
         if (langFile == null) {
-            // we don't have that language
+
             return Collections.emptyMap();
         }
         Gson gson = new GsonBuilder().setLenient().create();
@@ -63,14 +63,14 @@ public class Translations
         for (CarpetExtension ext : CarpetServer.extensions)
         {
             Map<String, String> extMappings = ext.canHasTranslations(CarpetSettings.language);
-            if (extMappings == null) continue; // would be nice to get rid of this, but too many extensions return null where they don't know they do
+            if (extMappings == null) continue;
             boolean warned = false;
             for (var entry : extMappings.entrySet()) {
                 var key = entry.getKey();
-                // Migrate the old format
+
                 if (!key.startsWith("carpet.")) {
                     if (key.startsWith("rule.")) {
-                        // default to carpet's settings manager. Custom managers are really uncommon and the known ones don't provide translations anyway
+
                         key = TranslationKeys.BASE_RULE_NAMESPACE.formatted("carpet") + key.substring(5);
                     } else if (key.startsWith("category.")) {
                         key = TranslationKeys.CATEGORY_PATTERN.formatted("carpet", key.substring(9));
@@ -97,29 +97,24 @@ public class Translations
             } else
                 return false;
         });
-        // Remove after deprecated settings api is removed
+
         addFallbacksTo(translations);
         translationMap = translations;
     }
 
     public static boolean isValidLanguage(String newValue)
     {
-        // will put some validations for availble languages at some point
+
         return true;
     }
-    
-    // fallbacks for old rules that don't define rule descriptions or stuff in language files yet
-    // to be removed when old settings system is removed and translation refactor is finished
-    
+
     private static final Map<String, String> FALLBACKS = new HashMap<>();
-    /**
-     * @deprecated if you compile against this method I'll steal your kneecaps
-     */
+
     @Deprecated(forRemoval = true)
     public static void registerFallbackTranslation(String key, String description) {
         FALLBACKS.put(key, description);
     }
-    
+
     private static void addFallbacksTo(Map<String, String> translationMap) {
         FALLBACKS.forEach(translationMap::putIfAbsent);
     }

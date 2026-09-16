@@ -20,9 +20,6 @@ import net.minecraft.world.level.block.entity.HopperBlockEntity;
 import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
-/**
- * The {@link Mixin} which removes items in a hopper if it points into a wool counter, and calls {@link HopperCounter#add}
- */
 @Mixin(HopperBlockEntity.class)
 public abstract class HopperBlockEntity_counterMixin extends RandomizableContainerBlockEntity
 {
@@ -30,15 +27,8 @@ public abstract class HopperBlockEntity_counterMixin extends RandomizableContain
         super(blockEntityType, blockPos, blockState);
     }
 
-    //@Shadow public abstract int getContainerSize();
-
-    //@Shadow public abstract void setItem(int slot, ItemStack stack);
-
     @Shadow private Direction facing;
 
-    /**
-     * A method to remove items from hoppers pointing into wool and count them via {@link HopperCounter#add} method
-     */
     @Inject(method = "ejectItems", at = @At("HEAD"), cancellable = true)
     private static void onInsert(Level world, BlockPos blockPos, HopperBlockEntity hopperBlockEntity, CallbackInfoReturnable<Boolean> cir)
     {
@@ -54,7 +44,7 @@ public abstract class HopperBlockEntity_counterMixin extends RandomizableContain
                 {
                     if (!inventory.getItem(i).isEmpty())
                     {
-                        ItemStack itemstack = inventory.getItem(i);//.copy();
+                        ItemStack itemstack = inventory.getItem(i);
                         HopperCounter.getCounter(woolColor).add(world.getServer(), itemstack);
                         inventory.setItem(i, ItemStack.EMPTY);
                     }

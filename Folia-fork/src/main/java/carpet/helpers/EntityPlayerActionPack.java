@@ -78,7 +78,7 @@ public class EntityPlayerActionPack
         if (action != null)
         {
             actions.put(type, action);
-            type.start(player, action); // noop
+            type.start(player, action);
         }
         return this;
     }
@@ -129,9 +129,9 @@ public class EntityPlayerActionPack
 
     public EntityPlayerActionPack look(float yaw, float pitch)
     {
-        player.setYRot(yaw % 360); //setYaw
-        player.setXRot(Mth.clamp(pitch, -90, 90)); // setPitch
-        // maybe player.moveTo(player.getX(), player.getY(), player.getZ(), yaw, Mth.clamp(pitch,-90.0F, 90.0F));
+        player.setYRot(yaw % 360);
+        player.setXRot(Mth.clamp(pitch, -90, 90));
+
         return this;
     }
 
@@ -160,7 +160,6 @@ public class EntityPlayerActionPack
         return this;
     }
 
-
     public EntityPlayerActionPack stopAll()
     {
         for (ActionType type : actions.keySet()) type.stop(player, actions.get(type));
@@ -170,7 +169,7 @@ public class EntityPlayerActionPack
 
     public EntityPlayerActionPack mount(boolean onlyRideables)
     {
-        //test what happens
+
         List<Entity> entities;
         if (onlyRideables)
         {
@@ -218,28 +217,28 @@ public class EntityPlayerActionPack
         {
             ActionType type = e.getKey();
             Action action = e.getValue();
-            // skipping attack if use was successful
+
             if (!(actionAttempts.getOrDefault(ActionType.USE, false) && type == ActionType.ATTACK))
             {
                 Boolean actionStatus = action.tick(this, type);
                 if (actionStatus != null)
                     actionAttempts.put(type, actionStatus);
             }
-            // optionally retrying use after successful attack and unsuccessful use
+
             if (type == ActionType.ATTACK
                     && actionAttempts.getOrDefault(ActionType.ATTACK, false)
                     && !actionAttempts.getOrDefault(ActionType.USE, true) )
             {
-                // according to MinecraftClient.handleInputEvents
+
                 Action using = actions.get(ActionType.USE);
-                if (using != null) // this is always true - we know use worked, but just in case
+                if (using != null)
                 {
                     using.retry(this, ActionType.USE);
                 }
             }
         }
         float vel = sneaking?0.3F:1.0F;
-        // The != 0.0F checks are needed given else real players can't control minecarts, however it works with fakes and else they don't stop immediately
+
         if (forward != 0.0F || player instanceof EntityPlayerMPFake) {
             player.zza = forward * vel;
         }
@@ -256,22 +255,22 @@ public class EntityPlayerActionPack
 
     private void dropItemFromSlot(int slot, boolean dropAll)
     {
-        Inventory inv = player.getInventory(); // getInventory;
+        Inventory inv = player.getInventory();
         if (!inv.getItem(slot).isEmpty())
             player.drop(inv.removeItem(slot,
                     dropAll ? inv.getItem(slot).getCount() : 1
-            ), false, true); // scatter, keep owner
+            ), false, true);
     }
 
     public void drop(int selectedSlot, boolean dropAll)
     {
-        Inventory inv = player.getInventory(); // getInventory;
-        if (selectedSlot == -2) // all
+        Inventory inv = player.getInventory();
+        if (selectedSlot == -2)
         {
             for (int i = inv.getContainerSize(); i >= 0; i--)
                 dropItemFromSlot(i, dropAll);
         }
-        else // one slot
+        else
         {
             if (selectedSlot == -1)
                 selectedSlot = inv.getSelectedSlot();
@@ -339,7 +338,7 @@ public class EntityPlayerActionPack
                                 ap.itemUseCooldown = 3;
                                 return true;
                             }
-                            // fix for SS itemframe always returns CONSUME even if no action is performed
+
                             if (player.interactOn(entity, hand).consumesAction() && !(handWasEmpty && itemFrameEmpty))
                             {
                                 ap.itemUseCooldown = 3;
@@ -421,7 +420,7 @@ public class EntityPlayerActionPack
                             if (notAir && state.getDestroyProgress(player, player.level(), pos) >= 1)
                             {
                                 ap.currentBlock = null;
-                                //instamine??
+
                                 blockBroken = true;
                             }
                             else
@@ -468,7 +467,7 @@ public class EntityPlayerActionPack
             {
                 if (action.limit == 1)
                 {
-                    if (player.onGround()) player.jumpFromGround(); // onGround
+                    if (player.onGround()) player.jumpFromGround();
                 }
                 else
                 {
@@ -489,7 +488,7 @@ public class EntityPlayerActionPack
             boolean execute(ServerPlayer player, Action action)
             {
                 player.resetLastActionTime();
-                player.drop(false); // dropSelectedItem
+                player.drop(false);
                 return false;
             }
         },
@@ -499,7 +498,7 @@ public class EntityPlayerActionPack
             boolean execute(ServerPlayer player, Action action)
             {
                 player.resetLastActionTime();
-                player.drop(true); // dropSelectedItem
+                player.drop(true);
                 return false;
             }
         },
@@ -579,8 +578,7 @@ public class EntityPlayerActionPack
             {
                 if (interval == 1 && !isContinuous)
                 {
-                    // need to allow entity to tick, otherwise won't have effect (bow)
-                    // actions are 20 tps, so need to clear status mid tick, allowing entities process it till next time
+
                     if (!type.preventSpectator || !actionPack.player.isSpectator())
                     {
                         type.inactiveTick(actionPack.player, this);
@@ -612,7 +610,7 @@ public class EntityPlayerActionPack
 
         void retry(EntityPlayerActionPack actionPack, ActionType type)
         {
-            //assuming action run but was unsuccesful that tick, but opportunity emerged to retry it, lets retry it.
+
             if (!type.preventSpectator || !actionPack.player.isSpectator())
             {
                 type.execute(actionPack.player, this);

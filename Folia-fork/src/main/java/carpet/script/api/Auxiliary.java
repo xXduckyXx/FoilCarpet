@@ -196,7 +196,7 @@ public class Auxiliary
                     if (lv.size() > 2 + locator.offset)
                     {
                         speed = NumericValue.asNumber(lv.get(2 + locator.offset)).getDouble();
-                        if (lv.size() > 3 + locator.offset) // should accept entity as well as long as it is player
+                        if (lv.size() > 3 + locator.offset)
                         {
                             player = ms.getPlayerList().getPlayerByName(lv.get(3 + locator.offset).getString());
                         }
@@ -313,9 +313,8 @@ public class Auxiliary
             );
             return new NumericValue(particleCount);
         });
-        // deprecated
-        expression.alias("particle_rect", "particle_box");
 
+        expression.alias("particle_rect", "particle_box");
 
         expression.addContextFunction("draw_shape", -1, (c, t, lv) ->
         {
@@ -324,7 +323,7 @@ public class Auxiliary
             MinecraftServer server = world.getServer();
             Set<ServerPlayer> playerTargets = new HashSet<>();
             List<ShapeDispatcher.ShapeWithConfig> shapes = new ArrayList<>();
-            if (lv.size() == 1) // bulk
+            if (lv.size() == 1)
             {
                 Value specLoad = lv.get(0);
                 if (!(specLoad instanceof final ListValue spec))
@@ -404,7 +403,7 @@ public class Auxiliary
             }
             armorstand.snapTo(
                     pointLocator.vec.x,
-                    //pointLocator.vec.y - ((!interactable && targetBlock == null)?0.41f:((targetBlock==null)?(armorstand.getHeight()+0.41):(armorstand.getHeight()-0.3))),
+
                     pointLocator.vec.y + yoffset,
                     pointLocator.vec.z,
                     (float) pointLocator.yaw,
@@ -494,7 +493,6 @@ public class Auxiliary
             return new NBTSerializableValue(tag);
         });
 
-        //"overridden" native call that prints to stderr
         expression.addContextFunction("print", -1, (c, t, lv) ->
         {
             if (lv.isEmpty() || lv.size() > 2)
@@ -525,7 +523,7 @@ public class Auxiliary
                 if (player != null) {
                     targets = Collections.singletonList(player.createCommandSourceStack());
                 }
-            } // optionally retrieve from CC.host.responsibleSource to print?
+            }
             Component message = FormattedTextValue.getTextByValue(res);
             if (targets == null)
             {
@@ -535,7 +533,7 @@ public class Auxiliary
             {
                 targets.forEach(p -> p.sendSuccess(() -> message, false));
             }
-            return res; // pass through for variables
+            return res;
         });
 
         expression.addContextFunction("display_title", -1, (c, t, lv) -> {
@@ -587,7 +585,7 @@ public class Auxiliary
 
                     break;
                 case "clear":
-                    packetGetter = x -> new ClientboundClearTitlesPacket(true); // resetting default fade
+                    packetGetter = x -> new ClientboundClearTitlesPacket(true);
                     break;
                 case "player_list_header", "player_list_footer":
                     break;
@@ -604,7 +602,7 @@ public class Auxiliary
             }
             else
             {
-                title = null; // Will never happen, just to make lambda happy
+                title = null;
             }
             if (packetGetter == null)
             {
@@ -620,7 +618,7 @@ public class Auxiliary
 
                 AtomicInteger total = new AtomicInteger(0);
                 List<ServerPlayer> targetList = targets.collect(Collectors.toList());
-                if (!soundsTrue) // null or empty string
+                if (!soundsTrue)
                 {
                     targetList.forEach(target -> {
                         map.remove(target.getScoreboardName());
@@ -637,7 +635,7 @@ public class Auxiliary
                 Carpet.updateScarpetHUDs(((CarpetContext) c).server(), targetList);
                 return NumericValue.of(total.get());
             }
-            ClientboundSetTitlesAnimationPacket timesPacket; // TimesPacket
+            ClientboundSetTitlesAnimationPacket timesPacket;
             if (lv.size() > 3)
             {
                 if (lv.size() != 6)
@@ -748,7 +746,6 @@ public class Auxiliary
             return SystemInfo.get("server_last_tick_times", (CarpetContext) c);
         });
 
-
         expression.addContextFunction("game_tick", -1, (c, t, lv) -> {
             CarpetContext cc = (CarpetContext) c;
             MinecraftServer server = cc.server();
@@ -785,7 +782,7 @@ public class Auxiliary
                         }
                     }
                 }
-                scriptServer.tickStart = System.nanoTime(); // for the next tick
+                scriptServer.tickStart = System.nanoTime();
                 Thread.yield();
             }
             finally
@@ -811,19 +808,9 @@ public class Auxiliary
         expression.addContextFunction("relight", -1, (c, t, lv) ->
         {
             return Value.NULL;
-            /*
-            CarpetContext cc = (CarpetContext) c;
-            BlockArgument locator = BlockArgument.findIn(cc, lv, 0);
-            BlockPos pos = locator.block.getPos();
-            ServerLevel world = cc.level();
-            Vanilla.ChunkMap_relightChunk(world.getChunkSource().chunkMap, new ChunkPos(pos));
-            WorldTools.forceChunkUpdate(pos, world);
-            return Value.TRUE;
 
-             */
         });
 
-        // Should this be deprecated for system_info('source_dimension')?
         expression.addContextFunction("current_dimension", 0, (c, t, lv) ->
                 ValueConversions.of(((CarpetContext) c).level()));
 
@@ -832,7 +819,6 @@ public class Auxiliary
             return new NumericValue(((CarpetContext) c).server().getPlayerList().getViewDistance());
         });
 
-        // lazy due to passthrough and context changing ability
         expression.addLazyFunction("in_dimension", 2, (c, t, lv) -> {
             CommandSourceStack outerSource = ((CarpetContext) c).source();
             Value dimensionValue = lv.get(0).evalValue(c);
@@ -926,7 +912,7 @@ public class Auxiliary
                     case "debug" -> CarpetScriptServer.LOG.debug(res.getString());
                     case "warn" -> CarpetScriptServer.LOG.warn(res.getString());
                     case "info" -> CarpetScriptServer.LOG.info(res.getString());
-                    // Somehow issue deprecation
+
                     case "fatal", "error" -> CarpetScriptServer.LOG.error(res.getString());
                     default -> throw new InternalExpressionException("Unknown log level for 'logger': " + level);
                 }
@@ -936,7 +922,7 @@ public class Auxiliary
                 throw new InternalExpressionException("logger takes 1 or 2 arguments");
             }
 
-            return res; // pass through for variables
+            return res;
         });
 
         expression.addContextFunction("list_files", 2, (c, t, lv) ->
@@ -1081,7 +1067,6 @@ public class Auxiliary
             return new NumericValue(player.getStats().getValue(stat));
         });
 
-        //handle_event('event', function...)
         expression.addContextFunction("handle_event", -1, (c, t, lv) ->
         {
             if (lv.size() < 2)
@@ -1095,10 +1080,10 @@ public class Auxiliary
             {
                 return BooleanValue.of(host.scriptServer().events.removeBuiltInEvent(event, host));
             }
-            // args don't need to be checked will be checked at the event
+
             return BooleanValue.of(host.scriptServer().events.handleCustomEvent(event, host, callback.function, callback.args));
         });
-        //signal_event('event', player or null, args.... ) -> number of apps notified
+
         expression.addContextFunction("signal_event", -1, (c, t, lv) ->
         {
             if (lv.isEmpty())
@@ -1108,7 +1093,7 @@ public class Auxiliary
             CarpetContext cc = (CarpetContext) c;
             CarpetScriptServer server = ((CarpetScriptHost) c.host).scriptServer();
             String eventName = lv.get(0).getString();
-            // no such event yet
+
             if (CarpetEventServer.Event.getEvent(eventName, server) == null)
             {
                 return Value.NULL;
@@ -1131,9 +1116,6 @@ public class Auxiliary
             return new NumericValue(counts);
         });
 
-        // nbt_storage()
-        // nbt_storage(key)
-        // nbt_storage(key, nbt)
         expression.addContextFunction("nbt_storage", -1, (c, t, lv) -> {
             if (lv.size() > 2)
             {
@@ -1158,7 +1140,6 @@ public class Auxiliary
             return NBTSerializableValue.of(oldNbt);
         });
 
-        // script run create_datapack('foo', {'foo' -> {'bar.json' -> {'c' -> true,'d' -> false,'e' -> {'foo' -> [1,2,3]},'a' -> 'foobar','b' -> 5}}})
         expression.addContextFunction("create_datapack", 2, (c, t, lv) -> {
             CarpetContext cc = (CarpetContext) c;
             String origName = lv.get(0).getString();
@@ -1211,7 +1192,6 @@ public class Auxiliary
                     }
                     List<Pack> list = Lists.newArrayList(packManager.getSelectedPacks());
                     resourcePackProfile.getDefaultPosition().insert(list, resourcePackProfile, Pack::selectionConfig, false);
-
 
                     server.reloadResources(list.stream().map(Pack::getId).collect(Collectors.toList())).
                             exceptionally(exc -> {
@@ -1292,7 +1272,7 @@ public class Auxiliary
         List<Value> toJoin;
         String string;
         String delimiter = System.lineSeparator();
-        // i dont know it shoule be \n or System.lineSeparator
+
         if (output instanceof LazyListValue lazyListValue)
         {
             toJoin = lazyListValue.unroll();
@@ -1307,7 +1287,6 @@ public class Auxiliary
         {
             string = output.getString();
         }
-
 
         Files.createDirectories(path.getParent());
         BufferedWriter bufferedWriter = Files.newBufferedWriter(path);

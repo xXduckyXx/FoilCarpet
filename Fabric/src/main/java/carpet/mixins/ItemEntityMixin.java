@@ -24,7 +24,7 @@ public abstract class ItemEntityMixin extends Entity implements ItemEntityInterf
     @Override
     public void thunderHit(ServerLevel world, LightningBolt lightning) {
         if (CarpetSettings.lightningKillsDropsFix) {
-            if (this.age > 8) { //Only kill item if it's older than 8 ticks
+            if (this.age > 8) {
                 super.thunderHit(world, lightning);
             }
         } else {

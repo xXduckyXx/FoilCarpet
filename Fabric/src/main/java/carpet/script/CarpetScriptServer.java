@@ -55,7 +55,7 @@ import static carpet.script.CarpetEventServer.Event.PLAYER_DISCONNECTS;
 
 public class CarpetScriptServer extends ScriptServer
 {
-    //make static for now, but will change that later:
+
     public static final Logger LOG = LoggerFactory.getLogger("Scarpet");
     public final MinecraftServer server;
     public CarpetScriptHost globalHost;
@@ -70,24 +70,11 @@ public class CarpetScriptServer extends ScriptServer
     private static final List<Module> bundledModuleData = new ArrayList<>();
     private static final List<Module> ruleModuleData = new ArrayList<>();
 
-    /**
-     * Registers a Scarpet App to be always available under the {@code /script load} list.
-     *
-     * @param app The {@link Module} of the app
-     * @see Module#fromJarPath(String, String, boolean)
-     */
     public static void registerBuiltInApp(Module app)
     {
         bundledModuleData.add(app);
     }
 
-    /**
-     * Registers a Scarpet App to be used as a Rule App (to be controlled with the value of a Carpet rule).
-     * Libraries should be registered with {@link #registerBuiltInScript(BundledModule)} instead
-     *
-     * @param app The {@link Module} of the app.
-     * @see Module#fromJarPath(String, String, boolean)
-     */
     public static void registerSettingsApp(Module app)
     {
         ruleModuleData.add(app);
@@ -104,7 +91,7 @@ public class CarpetScriptServer extends ScriptServer
         registerBuiltInApp(Module.carpetNative("ai_tracker", false));
         registerBuiltInApp(Module.carpetNative("draw_beta", false));
         registerBuiltInApp(Module.carpetNative("shapes", true));
-        //registerBuiltInApp(Module.carpetNative("sctest", false));
+
         registerBuiltInApp(Module.carpetNative("distance_beta", false));
     }
 
@@ -290,7 +277,7 @@ public class CarpetScriptServer extends ScriptServer
                 Carpet.Messenger_message(source, "r Failed to add app '" + finalName + "': ", s);
             }
         });
-        if (isCommandAdded == null) // error should be dispatched
+        if (isCommandAdded == null)
         {
             removeScriptHost(source, name, false, isRuleApp);
             return 0;
@@ -313,7 +300,7 @@ public class CarpetScriptServer extends ScriptServer
 
         if (newHost.isPerUser())
         {
-            // that will provide player hosts right at the startup
+
             for (ServerPlayer player : source.getServer().getPlayerList().getPlayers())
             {
                 newHost.retrieveForExecution(player.createCommandSourceStack(), player);
@@ -321,7 +308,7 @@ public class CarpetScriptServer extends ScriptServer
         }
         else
         {
-            // global app - calling start now.
+
             FunctionValue onStart = newHost.getFunction("__on_start");
             if (onStart != null)
             {
@@ -339,7 +326,6 @@ public class CarpetScriptServer extends ScriptServer
         return holyMoly.contains(appName);
     }
 
-
     public boolean removeScriptHost(CommandSourceStack source, String name, boolean notifySource, boolean isRuleApp)
     {
         name = name.toLowerCase(Locale.ROOT);
@@ -351,7 +337,7 @@ public class CarpetScriptServer extends ScriptServer
             }
             return false;
         }
-        // stop all events associated with name
+
         CarpetScriptHost host = modules.remove(name);
         events.removeAllHostEvents(host);
         host.onClose();
@@ -488,8 +474,8 @@ public class CarpetScriptServer extends ScriptServer
     {
         if (bootstrapDone) return;
         bootstrapDone = true;
-        ExpressionException.prepareForDoom(); // see fc-#1172
-        // Language
+        ExpressionException.prepareForDoom();
+
         AnnotationParser.parseFunctionClass(Arithmetic.class);
         AnnotationParser.parseFunctionClass(ControlFlow.class);
         AnnotationParser.parseFunctionClass(DataStructures.class);
@@ -498,7 +484,6 @@ public class CarpetScriptServer extends ScriptServer
         AnnotationParser.parseFunctionClass(Sys.class);
         AnnotationParser.parseFunctionClass(Threading.class);
 
-        // API
         AnnotationParser.parseFunctionClass(Auxiliary.class);
         AnnotationParser.parseFunctionClass(BlockIterators.class);
         AnnotationParser.parseFunctionClass(Entities.class);

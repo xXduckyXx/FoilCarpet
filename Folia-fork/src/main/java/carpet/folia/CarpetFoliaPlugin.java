@@ -66,11 +66,8 @@ public final class CarpetFoliaPlugin extends JavaPlugin implements Listener {
             Bukkit.getPluginManager().registerEvents(shulkerFolia, this);
             Bukkit.getPluginManager().registerEvents(railFolia, this);
 
-            // worlds are ready at this point: initialize scarpet and remaining state (also covers reloads)
             Bukkit.getGlobalRegionScheduler().run(this, task -> CarpetServer.onServerLoadedWorlds(server));
 
-            // per-tick updates (script server + HUD). One failing app/feature must never
-            // kill the per-tick loop, so isolate each tick and keep the scheduler alive.
             Bukkit.getGlobalRegionScheduler().runAtFixedRate(this, task -> {
                 tickCounter++;
                 try
@@ -209,12 +206,7 @@ public final class CarpetFoliaPlugin extends JavaPlugin implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerFailMove(PlayerFailMoveEvent event) {
-        // When "creative fly speed" custom speed is applied to a player (e.g. via scarpet
-        // `fly_speed`), moving faster than the vanilla server expects trips the anti-cheat
-        // and rubber-bands the player back: "moved too quickly" when the server can't keep
-        // up with the movement rate, and "moved into unloaded chunk" when the player
-        // outruns chunk generation. If a player is flying faster than the vanilla maximum,
-        // allow the movement so it doesn't teleport the player back every tick.
+
         Player player = event.getPlayer();
         try {
             if (player.isFlying()

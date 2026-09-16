@@ -37,9 +37,7 @@ public class ServerNetworkHandler
 
     public static void onPlayerJoin(ServerPlayer playerEntity)
     {
-        // On stock Folia the clientbound carpet:hello payload cannot be registered in the
-        // vanilla known-payload registry (that is propped open by the Fabric networking API),
-        // so encoding it crashes and disconnects the player. Skip the server-side handshake.
+
         if (!playerEntity.connection.connection.isMemoryConnection())
         {
             return;
@@ -59,7 +57,7 @@ public class ServerNetworkHandler
         {
             CarpetSettings.LOG.warn("Player " + playerEntity.getName().getString() + " joined with another carpet version: " + version);
         }
-        DataBuilder data = DataBuilder.create(playerEntity.level().getServer()); // tickrate related settings are sent on world change
+        DataBuilder data = DataBuilder.create(playerEntity.level().getServer());
         CarpetServer.forEachManager(sm -> sm.getCarpetRules().forEach(data::withRule));
         playerEntity.connection.send(data.build());
     }
@@ -68,11 +66,9 @@ public class ServerNetworkHandler
     {
         if (CarpetSettings.superSecretSetting || !validCarpetPlayers.contains(player))
         {
-            //return;
+
         }
-        // noop, used to send ticking information
-        //DataBuilder data = DataBuilder.create(player.server);//.withTickRate().withFrozenState().withTickPlayerActiveTimeout(); // .withSuperHotState()
-        //player.connection.send(data.build());
+
     }
 
     private static void handleClientCommand(ServerPlayer player, CompoundTag commandData)
@@ -109,7 +105,7 @@ public class ServerNetworkHandler
             result.put("output", outputResult);
         }
         player.connection.send(DataBuilder.create(player.level().getServer()).withCustomNbt("clientCommand", result).build());
-        // run command plug to command output,
+
     }
 
     public static void onClientData(ServerPlayer player, CompoundTag compound)
@@ -200,7 +196,7 @@ public class ServerNetworkHandler
     private static class DataBuilder
     {
         private CompoundTag tag;
-        // unused now, but hey
+
         private MinecraftServer server;
 
         private static DataBuilder create(final MinecraftServer server)

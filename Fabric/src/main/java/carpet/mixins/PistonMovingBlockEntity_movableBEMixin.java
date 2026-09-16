@@ -33,7 +33,7 @@ public abstract class PistonMovingBlockEntity_movableBEMixin extends BlockEntity
     private boolean isSourcePiston;
     @Shadow
     private BlockState movedState;
-    
+
     private BlockEntity carriedBlockEntity;
     private boolean renderCarriedBlockEntity = false;
     private boolean renderSet = false;
@@ -42,10 +42,6 @@ public abstract class PistonMovingBlockEntity_movableBEMixin extends BlockEntity
         super(blockEntityType, blockPos, blockState);
     }
 
-
-    /**
-     * @author 2No2Name
-     */
     @Override
     public BlockEntity getCarriedBlockEntity()
     {
@@ -65,10 +61,10 @@ public abstract class PistonMovingBlockEntity_movableBEMixin extends BlockEntity
         if (this.carriedBlockEntity != null)
         {
             ((BlockEntityInterface)carriedBlockEntity).setCMPos(worldPosition);
-            // this might be little dangerous since pos is final for a hashing reason?
+
             if (level != null) carriedBlockEntity.setLevel(level);
         }
-        //    this.carriedBlockEntity.setPos(this.pos);
+
     }
 
     @Override
@@ -89,10 +85,7 @@ public abstract class PistonMovingBlockEntity_movableBEMixin extends BlockEntity
         renderCarriedBlockEntity = b;
         renderSet = true;
     }
-    
-    /**
-     * @author 2No2Name
-     */
+
     @Redirect(method = "tick", at = @At(value = "INVOKE",
               target = "Lnet/minecraft/world/level/Level;setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;I)Z"))
     private static boolean movableTEsetBlockState0(
@@ -104,7 +97,7 @@ public abstract class PistonMovingBlockEntity_movableBEMixin extends BlockEntity
         else
             return ((LevelInterface) (world)).setBlockStateWithBlockEntity(blockPos_1, blockAState_2, ((PistonBlockEntityInterface)pistonBlockEntity).getCarriedBlockEntity(), int_1);
     }
-    
+
     @Redirect(method = "finalTick", at = @At(value = "INVOKE",
               target = "Lnet/minecraft/world/level/Level;setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;I)Z"))
     private boolean movableTEsetBlockState1(Level world, BlockPos blockPos_1, BlockState blockState_2, int int_1)
@@ -114,17 +107,15 @@ public abstract class PistonMovingBlockEntity_movableBEMixin extends BlockEntity
         else
         {
             boolean ret = ((LevelInterface) (world)).setBlockStateWithBlockEntity(blockPos_1, blockState_2, this.carriedBlockEntity, int_1);
-            this.carriedBlockEntity = null; //this will cancel the finishHandleBroken
+            this.carriedBlockEntity = null;
             return ret;
         }
     }
-    
+
     @Inject(method = "finalTick", at = @At(value = "RETURN"))
     private void finishHandleBroken(CallbackInfo cir)
     {
-        //Handle TNT Explosions or other ways the moving Block is broken
-        //Also /setblock will cause this to be called, and drop e.g. a moving chest's contents.
-        // This is MC-40380 (BlockEntities that aren't Inventories drop stuff when setblock is called )
+
         if (CarpetSettings.movableBlockEntities && this.carriedBlockEntity != null && !this.level.isClientSide() && this.level.getBlockState(this.worldPosition).getBlock() == Blocks.AIR)
         {
             BlockState blockState_2;
@@ -136,26 +127,26 @@ public abstract class PistonMovingBlockEntity_movableBEMixin extends BlockEntity
             this.level.destroyBlock(this.worldPosition, false, null);
         }
     }
-    
+
     @Inject(method = "loadAdditional", at = @At(value = "TAIL"))
     private void onFromTag(ValueInput valueInput, CallbackInfo ci)
     {
         if (CarpetSettings.movableBlockEntities)
             valueInput.child("carriedTileEntityCM").ifPresent(tag -> {
                 if (this.movedState.getBlock() instanceof EntityBlock)
-                    this.carriedBlockEntity = ((EntityBlock) (this.movedState.getBlock())).newBlockEntity(worldPosition, movedState);//   this.world);
-                if (carriedBlockEntity != null) //Can actually be null, as BlockPistonMoving.createNewTileEntity(...) returns null
+                    this.carriedBlockEntity = ((EntityBlock) (this.movedState.getBlock())).newBlockEntity(worldPosition, movedState);
+                if (carriedBlockEntity != null)
                     this.carriedBlockEntity.loadWithComponents(tag);
                 setCarriedBlockEntity(carriedBlockEntity);
             });
     }
-    
+
     @Inject(method = "saveAdditional", at = @At(value = "RETURN", shift = At.Shift.BEFORE))
     private void onToTag(ValueOutput valueOutput, CallbackInfo ci)
     {
         if (CarpetSettings.movableBlockEntities && this.carriedBlockEntity != null && valueOutput instanceof TagValueOutput output)
         {
-            //Leave name "carriedTileEntityCM" instead of "carriedBlockEntityCM" for upgrade compatibility with 1.13.2 movable TE
+
             this.carriedBlockEntity.saveWithoutMetadata(output.child("carriedTileEntityCM"));
         }
     }

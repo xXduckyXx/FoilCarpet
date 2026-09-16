@@ -27,17 +27,6 @@ public class FunctionArgument extends Argument
         this.args = args;
     }
 
-    /**
-     * @param c         context
-     * @param module    module
-     * @param params    list of params
-     * @param offset    offset where to start looking for functional argument
-     * @param allowNone none indicates no function present, otherwise it will croak
-     * @param checkArgs whether the caller expects trailing parameters to fully resolve function argument list
-     *                  if not - argument count check will not be performed and its up to the caller to verify
-     *                  if the number of supplied arguments is right
-     * @return argument data
-     */
     public static FunctionArgument findIn(
             Context c,
             Module module,

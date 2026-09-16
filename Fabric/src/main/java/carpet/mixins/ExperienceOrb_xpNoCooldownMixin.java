@@ -33,7 +33,7 @@ public abstract class ExperienceOrb_xpNoCooldownMixin extends Entity
     private void addXP(Player player, CallbackInfo ci) {
         if (CarpetSettings.xpNoCooldown && !level().isClientSide()) {
             player.takeXpDelay = 0;
-            // reducing the count to 1 and leaving vanilla to deal with it
+
             while (this.count > 1) {
                 int remainder = this.repairPlayerItems((ServerPlayer) player, this.getValue());
                 if (remainder > 0) {

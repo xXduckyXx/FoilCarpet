@@ -21,22 +21,5 @@ import net.minecraft.world.level.chunk.UpgradeData;
 @Mixin(ChunkHolder.class)
 public abstract class ChunkHolder_scarpetChunkCreationMixin implements ChunkHolderInterface
 {
-    //@Shadow protected abstract void updateChunkToSave(CompletableFuture<? extends ChunkResult<? extends ChunkAccess>> newChunkFuture, String type);
 
-    //@Shadow @Final private AtomicReferenceArray<CompletableFuture<ChunkResult<ChunkAccess>>> futures;
-
-    /*
-    @Override
-    public CompletableFuture<ChunkResult<ChunkAccess>> setDefaultProtoChunk(ChunkPos chpos, BlockableEventLoop<Runnable> executor, ServerLevel world)
-    {
-        int i = ChunkStatus.EMPTY.getIndex();
-        CompletableFuture<ChunkResult<ChunkAccess>> completableFuture2 = CompletableFuture.supplyAsync(
-                () -> ChunkResult.of(new ProtoChunk(chpos, UpgradeData.EMPTY, world,  world.registryAccess().registryOrThrow(Registries.BIOME), null)), // todo figure out what that does - maybe add an option to reset with blending enabled..?
-                executor
-        );
-        updateChunkToSave(completableFuture2, "unfull"); // possible debug data
-        futures.set(i, completableFuture2);
-        return completableFuture2;
-    }
-     */
 }

@@ -1,0 +1,15 @@
+# Gradle / build
+.gradle/
+build/
+out/
+
+# Logs
+*.log
+
+# Test-server leftovers (should not be committed)
+eula.txt
+session.lock
+
+# OS junk
+.DS_Store
+Thumbs.db

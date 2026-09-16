@@ -1,0 +1,87 @@
+plugins {
+    id 'java'
+    id 'com.gradleup.shadow' version '9.0.0'
+}
+
+group = 'carpet.folia'
+version = '1.4.194+folia1.21.11'
+
+base {
+    archivesName = 'carpet-folia'
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+    withSourcesJar()
+}
+
+tasks.withType(JavaCompile).configureEach {
+    it.options.encoding = 'UTF-8'
+}
+
+repositories {
+    mavenCentral()
+    maven { url 'https://repo.papermc.io/repository/maven-public/' }
+    maven { url 'https://repo.spongepowered.org/repository/maven-public/' }
+}
+
+configurations {
+    shade
+}
+
+dependencies {
+    compileOnly 'dev.folia:folia-api:1.21.11-R0.1-SNAPSHOT'
+    compileOnly files('libs/folia-server-1.21.11.jar')
+
+    compileOnly 'org.jetbrains:annotations:26.0.1'
+    compileOnly 'com.google.code.findbugs:jsr305:3.0.2'
+    compileOnly 'net.sf.jopt-simple:jopt-simple:6.0-alpha-3'
+    compileOnly 'commons-io:commons-io:2.20.0'
+    compileOnly 'com.mojang:authlib:7.0.61'
+    compileOnly 'com.mojang:datafixerupper:9.0.19'
+    compileOnly 'io.netty:netty-transport:4.2.7.Final'
+    compileOnly 'io.netty:netty-codec:4.2.7.Final'
+
+    implementation('org.spongepowered:mixin:0.8.7') {
+        exclude group: 'org.spongepowered', module: 'mixin-ap'
+        transitive = true
+    }
+    shade('org.spongepowered:mixin:0.8.7') {
+        exclude group: 'org.spongepowered', module: 'mixin-ap'
+        transitive = true
+    }
+    implementation 'io.github.llamalad7:mixinextras-common:0.4.1'
+    shade 'io.github.llamalad7:mixinextras-common:0.4.1'
+}
+
+processResources {
+    from('LICENSE') {
+        rename { 'LICENSE' }
+    }
+}
+
+jar {
+    manifest {
+        attributes(
+            'Implementation-Title': project.name,
+            'Implementation-Version': project.version,
+            'MixinConfigs': 'carpet.mixins.json',
+        )
+    }
+}
+
+shadowJar {
+    archiveClassifier.set('')
+    archiveBaseName.set('carpet-folia')
+    archiveVersion.set(project.version.toString())
+    configurations = [project.configurations.shade]
+    exclude 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA'
+}
+
+build.dependsOn shadowJar
+
+artifacts {
+    archives shadowJar
+}

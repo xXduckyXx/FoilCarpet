@@ -101,7 +101,7 @@ public class EntityPlayerMPFake extends ServerPlayer
         {
             net.minecraft.world.level.ChunkPos cpos = new net.minecraft.world.level.ChunkPos(
                     net.minecraft.core.BlockPos.containing(pos));
-            org.bukkit.plugin.Plugin plugin = org.bukkit.Bukkit.getPluginManager().getPlugin("Carpet-Folia");
+            org.bukkit.plugin.Plugin plugin = carpet.folia.CarpetFoliaPlugin.get();
             org.bukkit.Bukkit.getRegionScheduler().execute(
                     plugin,
                     worldIn.getWorld(),
@@ -111,7 +111,7 @@ public class EntityPlayerMPFake extends ServerPlayer
         }
         catch (Throwable e)
         {
-            CarpetSettings.LOG.error("[Carpet-Folia] Failed to schedule fake player " + name, e);
+            CarpetSettings.LOG.error("[FoilCarpet] Failed to schedule fake player " + name, e);
         }
         return true;
     }
@@ -260,7 +260,7 @@ public class EntityPlayerMPFake extends ServerPlayer
         else
         {
             net.minecraft.world.level.ChunkPos cpos = new net.minecraft.world.level.ChunkPos(this.blockPosition());
-            org.bukkit.plugin.Plugin plugin = org.bukkit.Bukkit.getPluginManager().getPlugin("Carpet-Folia");
+            org.bukkit.plugin.Plugin plugin = carpet.folia.CarpetFoliaPlugin.get();
             final Component r = reason;
             org.bukkit.Bukkit.getRegionScheduler().execute(plugin, this.level().getWorld(), cpos.x, cpos.z,
                     () -> this.connection.onDisconnect(new DisconnectionDetails(r)));

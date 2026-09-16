@@ -146,7 +146,7 @@ public final class CarpetFoliaPlugin extends JavaPlugin implements Listener {
 
             getLogger().info("Carpet Folia enabled");
         } catch (Throwable t) {
-            getLogger().severe("Failed to enable Carpet-Folia: " + t);
+            getLogger().severe("Failed to enable FoilCarpet: " + t);
             t.printStackTrace();
             Bukkit.getPluginManager().disablePlugin(this);
         }
@@ -166,7 +166,7 @@ public final class CarpetFoliaPlugin extends JavaPlugin implements Listener {
             }
             CarpetServer.onServerDoneClosing(server);
         } catch (Throwable t) {
-            getLogger().severe("Error during Carpet-Folia disable: " + t);
+            getLogger().severe("Error during FoilCarpet disable: " + t);
         }
         getLogger().info("Carpet Folia disabled");
     }

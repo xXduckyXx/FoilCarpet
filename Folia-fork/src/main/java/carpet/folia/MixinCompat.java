@@ -164,7 +164,7 @@ public final class MixinCompat
         {
             return;
         }
-        org.bukkit.plugin.Plugin plugin = org.bukkit.Bukkit.getPluginManager().getPlugin("Carpet-Folia");
+        org.bukkit.plugin.Plugin plugin = carpet.folia.CarpetFoliaPlugin.get();
         for (ServerPlayer player : server.getPlayerList().getPlayers())
         {
             EntityPlayerActionPack actionPack = PLAYER_ACTION_PACKS.get(player);

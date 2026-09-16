@@ -1,8 +1,8 @@
-name: Carpet-Folia
+name: FoilCarpet
 version: '1.4.194'
 main: carpet.folia.CarpetFoliaPlugin
 api-version: '1.21.11'
 folia-supported: true
-description: Carpet mod functionality for Folia servers
+description: Carpet mod for Folia servers (carpet wrapped in foil)
 authors: [gnembon, Carpet contributors]
 website: https://github.com/gnembon/fabric-carpet

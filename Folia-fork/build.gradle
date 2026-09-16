@@ -7,7 +7,7 @@ group = 'carpet.folia'
 version = '1.4.194+folia1.21.11'
 
 base {
-    archivesName = 'carpet-folia'
+    archivesName = 'foilcarpet'
 }
 
 java {
@@ -74,7 +74,7 @@ jar {
 
 shadowJar {
     archiveClassifier.set('')
-    archiveBaseName.set('carpet-folia')
+    archiveBaseName.set('foilcarpet')
     archiveVersion.set(project.version.toString())
     configurations = [project.configurations.shade]
     exclude 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA'

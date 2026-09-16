@@ -1,4 +1,4 @@
-# Carpet-Folia
+# FoilCarpet
 
 Folia bukkit plugin for 1.21.11 that ports some of the carpet mod rules to a stock folia server
 

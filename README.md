@@ -1,100 +1,107 @@
 # Carpet-Folia
 
-heyo, welcome to my silly little project :3
+Folia bukkit plugin for 1.21.11 that ports some of the carpet mod rules to a stock folia server
 
-this is a hobby port of [gnembon's Fabric Carpet](https://github.com/gnembon/fabric-carpet) into a **Bukkit plugin that runs on [Folia](https://github.com/PaperMC/Folia)** servers (`1.21.11`). instead of using the Fabric mod loader, it re-implements a bunch of carpet's rules using Bukkit/Folia APIs. made by a duck who really likes minecraft machines, quack :3
+-----------------------------
 
-> ### ⚠️ experimental, made for fun, NOT for production!!
->
-> okay real talk: this thing is **experimental** and i built it **as a hobby**, just for the fun of it. it is **not meant for production use**. it has only been tested on one specific minecraft version and one specific build of folia, and it pokes around game internals that change between versions. things might explode. :3
->
-> * **back up your worlds!!** seriously, make backups before you run this on anything you care about.
-> * expect bugs, weird behaviour, and missing features. if something breaks, that's on me, not on carpet <3
-> * if you find a bug, please open an issue and tell me what you did (rule, commands, server log, what you expected vs what actually happened). screenshots help a lot too!
-> * please don't blame gnembon for anything broken here, the bugs are all mine :3 o7
+a port of gnembon's fabric carpet into a bukkit plugin
 
-## what is this?
+re-implements the carpet rules with events and folia region threading instead of fabric mixins
 
-so, carpet is a mod that lets technical minecraft people take control of game mechanics: rules, debug tools, redstone behaviour, all that jazz :3 the original lives at [gnembon/fabric-carpet](https://github.com/gnembon/fabric-carpet) and is built for the Fabric mod loader.
+runs on stock folia, no fabric loader needed
 
-this repo has **two source trees**:
+rules are set the classic way with /carpet
 
-| path          | what it is                                                        |
-|---------------|-------------------------------------------------------------------|
-| `Fabric/`     | the upstream **gnembon/fabric-carpet** source (the fabric mod).   |
-| `Folia-fork/` | **Carpet-Folia** :3 the bukkit plugin built from that carpet code |
+implements: tntDoNotUpdate, mergeTNT, railPowerLimit, movableBlockEntities, persistentParrots, stackableShulkerBoxes, pushLimit, creativeNoClip, /log tnt, /profile
 
-`Folia-fork` reuses carpet's rule definitions and mixin setup, but the actual gameplay rules are re-implemented with bukkit events and folia's region threading, so the plugin can run on stock folia (which can't run fabric mods the way a normal single-threaded server can).
+-----------------------------
 
-## why folia??
+**how to install:**
 
-folia splits the world into region threads instead of using one single server thread. that means anything touching the world has to run on the correct region thread, which is why carpet (written for a single thread) had to be rewritten:
+drop the jar in the plugins folder
 
-* world mutations happen inside `Bukkit.getRegionScheduler().execute(...)` region tasks,
-* a central tick counter (`CarpetFoliaPlugin.getTick()`) replaces `ServerTickEvent`,
-* loaded chunks are tracked via `ChunkLoadEvent` / `ChunkUnloadEvent` (`ChunkRegistry`), because folia doesn't give you a global `getLoadedChunks()`.
+restart server
 
-## implemented rules & features
+done
 
-| rule                        | status |
-|-----------------------------|--------|
-| `tntDoNotUpdate`            | implemented (block is not ignited by redstone at *placement* time, but still ignites if it gets powered later) |
-| `mergeTNT`                  | implemented (nearby primed TNT merges together) |
-| `railPowerLimit`            | implemented (custom powered-rail limit, even across steps! took forever to figure that one out :3) |
-| `movableBlockEntities`      | implemented (pistons can push block entities like chests) |
-| `persistentParrots`         | implemented (parrots stop hopping off your shoulder) |
-| `stackableShulkerBoxes` / `shulkerBoxStackSize` | implemented (shulker boxes can stack) |
-| `pushLimit`                 | implemented (custom piston push limit) |
-| `creativeNoClip`            | implemented |
-| `/log tnt`                  | implemented (TNT placement logging) |
-| `/profile`                  | implemented |
+**requires:**
 
-you configure rules the usual carpet way, with `/carpet <rule> <value>` from console or as an admin on the server :3
+folia 1.21.11 (needs folia's region threads, normal paper wont work)
 
-## requirements
+java 21
 
-* a **Folia** 1.21.11 server (the plugin compiles against `folia-api` plus a `folia-server-1.21.11.jar` that goes in `Folia-fork/libs/`).
-* java 21.
+**does it have all carpet rules?**
 
-## building
+no, its a small subset, check the list above
 
-```sh
-cd Folia-fork
-./gradlew shadowJar
-```
+**does it work on normal paper?**
 
-the jar lands at:
+no, it needs folia
 
-```
-Folia-fork/build/libs/carpet-folia-1.4.194+folia1.21.11.jar
-```
+**commands:**
 
-the version is the upstream carpet version it's based on (`1.4.194`) with the folia target tacked on (`folia1.21.11`).
+/carpet <rule> <value> - sets a carpet rule (console or admin)
 
-## installing
+/carpet <rule> - shows the current value
 
-1. stop the server.
-2. drop `carpet-folia-1.4.194+folia1.21.11.jar` into the server's `plugins/` folder.
-3. start the server.
-4. configure rules with `/carpet <rule> <value>` as needed :3
+/profile - the carpet profiler thing
 
-## support me :3
+/log tnt - logs tnt placements
 
-if you like this silly plugin and wanna say thanks, ko-fi me a coffee maybe? :3
+**config:**
 
-https://ko-fi.com/xxduckyxx
+rules are not stored in config.yml
 
-any support means a lot to me, but no pressure. this is a hobby after all <3
+use /carpet, and if you want a rule to survive a restart answer yes to the "[Change permanently?]" prompt, otherwise every restart resets it to the default
 
-## license
+**permissions:**
 
-this project is under the **MIT License** (see `LICENSE`).
+no permission nodes, /carpet is console/admin only
 
-Carpet-Folia is a **fork/downport of [gnembon's Fabric Carpet](https://github.com/gnembon/fabric-carpet)**, which is also MIT licensed. the MIT license requires that the original copyright notice stays intact in all copies and substantial portions of the software:
+-----------------------------
 
-> **Carpet Mod** Copyright (c) 2020 **gnembon** (and Carpet contributors).
-> Licensed under the MIT License.
+**how it works (nerd stuff):**
 
-thank you gnembon for making carpet free and open source, this project literally wouldn't exist without you :3 🧶
+folia splits the world into region threads, so anything touching the world has to run inside a region task
 
-**no warranty.** the software is provided "as is", without warranty of any kind. check `LICENSE` for the full text :3
+a central tick counter replaces the old server tick event
+
+loaded chunks are tracked manually because folia hides the global chunk list
+
+tntDoNotUpdate remembers where you placed the tnt and cancels redstone ignition from the same tick
+
+railPowerLimit rescans every loaded chunk and rewrites the powered flag of each rail to match the limit, works up steps too
+
+movableBlockEntities, parrots and shulkers hook into bukkit events plus a periodic scan
+
+-----------------------------
+
+**IMPORTANT NOTE**
+
+LISTEN UP
+
+THIS IS AN EXPERIMENTAL HOBBY PROJECT, NOT FOR PRODUCTION
+
+ONLY TESTED ON FOLIA 1.21.11, EXPECT BUGS ON ANYTHING ELSE
+
+BACKUP YOUR WORLD BEFORE USING THIS, YOU HAVE BEEN WARNED
+
+IF YOU FIND A BUG REPORT IT, PREFERABLY WITH THE RULE, THE COMMANDS YOU RAN, AND YOUR SERVER LOG
+
+IF ANYTHING BREAKS ITS MY BUG, NOT CARPET'S, DONT BLAME GNEMBON
+
+IF YOU DONT LIKE IT FORK THE CODE, ITS MIT FOR A REASON
+
+TO REPORT BUGS OPEN AN ISSUE ON THE GITHUB REPO
+
+now go enjoy your carpet
+
+**if you enjoy this mod**
+
+Donate me: ko-fi.com/xxduckyxx
+
+**license:**
+
+MIT, same as the carpet mod this is built on
+
+Carpet is copyright 2020 gnembon and carpet contributors, MIT licensed, and this fork keeps that notice in the LICENSE file as required

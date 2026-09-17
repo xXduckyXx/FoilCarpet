@@ -126,9 +126,10 @@ public class EntityPlayerMPFake extends ServerPlayer
         CommonListenerCookie cookie = new CommonListenerCookie(current, 0, instance.clientInformation(), false, null, Set.of(), new KeepAlive());
         server.getPlayerList().placeNewPlayer(fakeConnection, instance, cookie);
         ensureFakeHandler(instance, fakeConnection, cookie);
+        bindConnectionListener(fakeConnection, instance.connection);
         loadPlayerData(instance);
         instance.stopRiding();
-        instance.fixStartingPosition.run();
+        instance.connection.teleport(pos.x, pos.y, pos.z, (float) yaw, (float) pitch);
         instance.setHealth(20.0F);
         instance.unsetRemoved();
         instance.getAttribute(Attributes.STEP_HEIGHT).setBaseValue(0.6F);
@@ -146,6 +147,20 @@ public class EntityPlayerMPFake extends ServerPlayer
         if (!(instance.connection instanceof NetHandlerPlayServerFake))
         {
             instance.connection = new NetHandlerPlayServerFake(instance.level().getServer(), fakeConnection, instance, cookie);
+        }
+    }
+
+    private static void bindConnectionListener(FakeClientConnection fakeConnection, net.minecraft.server.network.ServerGamePacketListenerImpl handler)
+    {
+        try
+        {
+            java.lang.reflect.Field packetListener = net.minecraft.network.Connection.class.getDeclaredField("packetListener");
+            packetListener.setAccessible(true);
+            packetListener.set(fakeConnection, handler);
+        }
+        catch (Throwable e)
+        {
+            CarpetSettings.LOG.error("[FoilCarpet] Failed to bind fake connection packet listener", e);
         }
     }
 
@@ -198,6 +213,7 @@ public class EntityPlayerMPFake extends ServerPlayer
         CommonListenerCookie cookie = new CommonListenerCookie(gameprofile, 0, player.clientInformation(), true, null, Set.of(), new KeepAlive());
         server.getPlayerList().placeNewPlayer(fakeConnection, playerShadow, cookie);
         ensureFakeHandler(playerShadow, fakeConnection, cookie);
+        bindConnectionListener(fakeConnection, playerShadow.connection);
         loadPlayerData(playerShadow);
 
         playerShadow.setHealth(player.getHealth());
@@ -270,6 +286,10 @@ public class EntityPlayerMPFake extends ServerPlayer
     @Override
     public void tick()
     {
+        if (!ca.spottedleaf.moonrise.common.util.TickThread.isTickThreadFor(this.level(), this.blockPosition()))
+        {
+            return;
+        }
         if (++fakeTickCounter % 10 == 0)
         {
             this.connection.resetPosition();

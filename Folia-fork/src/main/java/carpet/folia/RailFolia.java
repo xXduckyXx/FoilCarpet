@@ -72,6 +72,14 @@ public final class RailFolia implements Listener
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onChunkLoad(ChunkLoadEvent event)
     {
+        // With the vanilla limit there is nothing to track. Scanning every block in every loaded
+        // chunk costs about 100k block lookups per chunk and only helps custom rail power limits.
+        // When the rule is enabled later, tick() calls rescanAll(), so no rail is missed.
+        if (CarpetSettings.railPowerLimit == 9)
+        {
+            return;
+        }
+
         World world = event.getWorld();
         ServerLevel level = ((CraftWorld) world).getHandle();
         int chunkX = event.getChunk().getX();

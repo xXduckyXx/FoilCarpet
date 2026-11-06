@@ -30,6 +30,14 @@ folia 1.21.11 (needs folia's region threads, normal paper wont work)
 
 java 21
 
+**how to build:**
+
+install java 21, then in the Folia-fork folder run:
+
+`./gradlew build`
+
+the first build downloads the pinned folia 1.21.11 server jar into `Folia-fork/libs/` automatically (the jar is too big to commit), so no manual setup is needed, the output jar is in `Folia-fork/build/libs/`
+
 **does it have all carpet rules?**
 
 no, its a small subset, check the list above

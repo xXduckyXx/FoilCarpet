@@ -56,6 +56,89 @@ dependencies {
     shade 'io.github.llamalad7:mixinextras-common:0.4.1'
 }
 
+def foliaVersion = '1.21.11'
+def foliaBuild = '14'
+def foliaSha256 = 'f52c408490a0225611e67907a3ca19f7e6da2c6bc899e715d5f46844e7103c39'
+def foliaServerFile = layout.projectDirectory.file("libs/folia-server-${foliaVersion}.jar")
+
+def sha256 = { File file ->
+    def digest = java.security.MessageDigest.getInstance('SHA-256')
+    file.withInputStream { input ->
+        byte[] buffer = new byte[8192]
+        int read
+        while ((read = input.read(buffer)) != -1) {
+            digest.update(buffer, 0, read)
+        }
+    }
+    digest.digest().collect { String.format('%02x', it) }.join()
+}
+
+// The plugin compiles against the unremapped Folia server jar, and that jar is not in the
+// repository because it is far too large. This task recreates it from the pinned PaperMC bundle,
+// so a fresh clone can build without any manual setup.
+tasks.register('setupFoliaServer') {
+    group = 'build setup'
+    description = "Downloads the Folia ${foliaVersion} server jar that is needed to compile the plugin."
+    outputs.file(foliaServerFile)
+
+    doLast {
+        File target = foliaServerFile.asFile
+        if (target.exists()) {
+            return
+        }
+
+        File cacheDir = layout.buildDirectory.dir('folia-bundle').get().asFile
+        cacheDir.mkdirs()
+        File bundle = new File(cacheDir, "folia-${foliaVersion}-${foliaBuild}.jar")
+        String bundleUrl = "https://fill-data.papermc.io/v1/objects/${foliaSha256}/folia-${foliaVersion}-${foliaBuild}.jar"
+
+        if (!bundle.exists() || sha256(bundle) != foliaSha256) {
+            logger.lifecycle("Downloading ${bundleUrl}")
+            bundle.withOutputStream { out ->
+                new URL(bundleUrl).openStream().withCloseable { input ->
+                    out << input
+                }
+            }
+            String actual = sha256(bundle)
+            if (actual != foliaSha256) {
+                bundle.delete()
+                throw new GradleException("Checksum mismatch for the Folia bundle: "
+                        + "expected ${foliaSha256}, got ${actual}")
+            }
+        }
+
+        File runDir = new File(cacheDir, 'run')
+        runDir.mkdirs()
+        File serverJar = new File(runDir, "versions/${foliaVersion}/folia-${foliaVersion}.jar")
+        if (!serverJar.exists()) {
+            logger.lifecycle("Extracting the Folia server jar, this downloads the vanilla server once")
+            String javaExecutable = javaToolchains.launcherFor {
+                languageVersion = JavaLanguageVersion.of(21)
+            }.get().executablePath.asFile.absolutePath
+            Process process = new ProcessBuilder(javaExecutable, '-jar', bundle.absolutePath, '--version')
+                    .directory(runDir)
+                    .redirectErrorStream(true)
+                    .start()
+            process.outputStream.close()
+            process.inputStream.eachLine { line -> logger.info(line) }
+            int exitCode = process.waitFor()
+            if (exitCode != 0 || !serverJar.exists()) {
+                throw new GradleException("Could not create the Folia server jar "
+                        + "(exit code ${exitCode})")
+            }
+        }
+
+        target.parentFile.mkdirs()
+        java.nio.file.Files.copy(serverJar.toPath(), target.toPath(),
+                java.nio.file.StandardCopyOption.REPLACE_EXISTING)
+        logger.lifecycle("Created ${target}")
+    }
+}
+
+tasks.named('compileJava') {
+    dependsOn 'setupFoliaServer'
+}
+
 processResources {
     from('LICENSE') {
         rename { 'LICENSE' }
